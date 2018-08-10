@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #endif
 
+#include <stdlib.h>
 #include <stdint.h>
 
 static inline double bi_get_now()

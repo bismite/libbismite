@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
+#include <bi/bi_sdl.h>
 #include <bi/node.h>
 #include <bi/shader.h>
 #include <bi/profile.h>

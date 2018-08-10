@@ -2,7 +2,7 @@
 #define __BI_CORE_TEXTURE_H__
 
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
+#include <bi/bi_sdl.h>
 #include <stdint.h>
 #include <stdbool.h>
 

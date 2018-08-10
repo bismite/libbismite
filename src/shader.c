@@ -1,9 +1,9 @@
 #include <bi/shader.h>
 #include <bi/shader_text.h>
 #include <bi/util.h>
+#include <bi/bi_sdl.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <SDL2/SDL.h>
 
 static GLuint load_shader()
 {

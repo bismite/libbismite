@@ -1,6 +1,10 @@
 #include <bi/texture.h>
 #include <GL/glew.h>
-#include <SDL_image.h>
+#ifdef __APPLE__
+#include <SDL2_image/SDL_image.h>
+#else
+#include <SDL2/SDL_image.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 

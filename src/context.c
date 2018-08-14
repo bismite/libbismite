@@ -5,6 +5,7 @@
 #include <bi/timer.h>
 #include <bi/gl_ext.h>
 #include <bi/layer.h>
+#include <bi/bi_sdl.h>
 #include <stdlib.h>
 
 void bi_init_context(BiContext* context,int w,int h, int fps, const char* title, InitializeFunction func)

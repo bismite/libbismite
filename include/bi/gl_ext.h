@@ -42,7 +42,7 @@ static inline void checkSupports()
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
     if(GLEW_ARB_vertex_array_object) SDL_Log("ARB_vertex_array_object ok\n");
 
-#ifdef __APPLE__
+#ifndef __EMSCRIPTEN__
     // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
     if(GLEW_APPLE_vertex_array_object){
         SDL_Log("APPLE_vertex_array_object ok\n");

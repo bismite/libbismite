@@ -4,6 +4,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static SDL_Surface* create_surface_abgr8888(int w, int h)
+{
+#if SDL_VERSION_ATLEAST(2,0,5)
+  return SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ABGR8888);
+#else
+  Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+  rmask = 0xff000000;
+  gmask = 0x00ff0000;
+  bmask = 0x0000ff00;
+  amask = 0x000000ff;
+#else
+  rmask = 0x000000ff;
+  gmask = 0x0000ff00;
+  bmask = 0x00ff0000;
+  amask = 0xff000000;
+#endif
+  return SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
+#endif
+}
+
 static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
 {
     SDL_Surface* img = src;
@@ -11,7 +32,7 @@ static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
     // force change Format to SDL_PIXELFORMAT_ABGR8888
     if(src->format->format != SDL_PIXELFORMAT_ABGR8888)
     {
-        img = SDL_CreateRGBSurfaceWithFormat(0, src->w, src->h, 32, SDL_PIXELFORMAT_ABGR8888);
+        img = create_surface_abgr8888(src->w, src->h);
         if (img == NULL) {
             SDL_Log("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
             return 0;

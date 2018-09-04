@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <stdbool.h>
 #include <bi/texture.h>
+#include <bi/util.h>
 
 struct _BiNode;
 typedef struct _BiNode BiNode;
@@ -71,8 +72,13 @@ extern BiNode* bi_remove_node(BiNode* node,BiNode* child);
 
 // geometry
 extern void bi_node_set_position(BiNode* n, int x, int y);
+static inline void bi_node_set_x(BiNode* n, int x) { bi_node_set_position(n,x,n->y); }
+static inline void bi_node_set_y(BiNode* n, int y) { bi_node_set_position(n,n->x,y); }
 extern void bi_node_set_size(BiNode* n, int w, int h);
+static inline void bi_node_set_w(BiNode* n, int w) { bi_node_set_size(n,w,n->h); }
+static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->w,h); }
 extern void bi_node_set_angle(BiNode* n, float angle);
+static inline void bi_node_set_degree(BiNode* n, float degree) { bi_node_set_angle(n,degree*M_PI/180.f); }
 extern void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_include_anchor_translate);
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);

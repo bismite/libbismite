@@ -171,18 +171,6 @@ bool bi_node_inside(BiNode* node, int x, int y)
 }
 
 //
-// visual
-//
-
-void bi_set_color(BiNode* n, uint8_t r, uint8_t g, uint8_t b, uint8_t a )
-{
-  n->color[0] = r;
-  n->color[1] = g;
-  n->color[2] = b;
-  n->color[3] = a;
-}
-
-//
 // callbacks
 //
 

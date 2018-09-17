@@ -1,16 +1,17 @@
 
 #ifdef __EMSCRIPTEN__
-// #define VERTEX_SHADER_HEADER "#version 100\n#extension GL_EXT_draw_instanced : enable\n"
-#define VERTEX_SHADER_HEADER "#version 100\nprecision mediump float;"
-#define FRAGMENT_SHADER_HEADER "#version 100\nprecision mediump float;"
+#define SHADER_VERSION "#version 100\n"
+#define VERTEX_SHADER_HEADER "precision highp float;\n"
+#define FRAGMENT_SHADER_HEADER "precision mediump float;\n"
 #else
-#define VERTEX_SHADER_HEADER "#version 120\n"
-#define FRAGMENT_SHADER_HEADER "#version 120\n"
+#define SHADER_VERSION "#version 120\n"
+#define VERTEX_SHADER_HEADER ""
+#define FRAGMENT_SHADER_HEADER ""
 #endif
 
 #define D(...) #__VA_ARGS__ "\n";
 
-const char *VERTEX_SHADER = VERTEX_SHADER_HEADER D(
+const char *VERTEX_SHADER = SHADER_VERSION VERTEX_SHADER_HEADER D(
 uniform mat4 projection;
 uniform mat4 view;
 attribute vec2 vertex;
@@ -46,7 +47,7 @@ void main()
 }
 );
 
-const char *FRAGMENT_SHADER = FRAGMENT_SHADER_HEADER D(
+const char *FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 varying vec3 uv;
 varying vec4 color;
 uniform sampler2D sampler0;

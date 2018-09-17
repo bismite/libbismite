@@ -1,5 +1,6 @@
 #include <bi/texture.h>
 #include <bi/bi_sdl.h>
+#include <bi/logger.h>
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +35,7 @@ static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
     {
         img = create_surface_abgr8888(src->w, src->h);
         if (img == NULL) {
-            SDL_Log("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
+            LOG("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
             return 0;
         }
         SDL_BlitSurface(src,NULL,img,NULL);
@@ -79,7 +80,7 @@ bool bi_load_texture(const char* filename,BiTextureImage* texture_image, bool an
     // WebGL:          SDL_PIXELFORMAT_ABGR8888, correct.
     SDL_Surface *image = IMG_Load(filename);
     if(image == NULL) {
-      printf("Error IMG_Load %s\n",filename);
+      LOG("Error IMG_Load %s\n",filename);
       return false;
     }
 

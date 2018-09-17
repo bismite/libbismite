@@ -2,6 +2,7 @@
 #include <bi/context.h>
 #include <bi/render.h>
 #include <bi/util.h>
+#include <bi/logger.h>
 
 static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 {
@@ -67,7 +68,7 @@ static void main_loop( void* arg )
     double delta = context->profile.delta;
 
     if( context->debug && (now - stats_shows_at) > 1000 ) {
-        SDL_Log("FPS: %d/%.2f - frame: %.2f/%.2f [ms] - matrix_updated(AVG): %.2f - queued nodes: %d\n",
+        LOG("FPS: %d/%.2f - frame: %.2f/%.2f [ms] - matrix_updated(AVG): %.2f - queued nodes: %d\n",
           context->profile.stats.actual_fps,
           context->profile.stats.estimated_fps,
           context->profile.stats.average_in_frame,
@@ -135,7 +136,7 @@ static void main_loop( void* arg )
     // failsafe
     for(int i=0;i<event_size;i++) {
       if(e[i].type==SDL_QUIT){
-          SDL_Log("Program quit after %i ticks", e[i].quit.timestamp);
+          LOG("Program quit after %i ticks", e[i].quit.timestamp);
           context->running = false;
       }
     }
@@ -170,7 +171,7 @@ static void main_loop( void* arg )
 
 void bi_start_run_loop(BiContext* context)
 {
-    SDL_Log("start main loop\n");
+    LOG("start main loop\n");
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(main_loop, context, context->profile.target_fps, true);
 #else

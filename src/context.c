@@ -6,6 +6,7 @@
 #include <bi/gl_ext.h>
 #include <bi/layer.h>
 #include <bi/bi_sdl.h>
+#include <bi/logger.h>
 #include <stdlib.h>
 
 void bi_init_context(BiContext* context,int w,int h, int fps, const char* title, InitializeFunction func)
@@ -34,26 +35,26 @@ void bi_init_context(BiContext* context,int w,int h, int fps, const char* title,
     context->color[3] = 0;
 
     if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
-        SDL_Log("SDL_Init fail.");
+        LOG("SDL_Init fail.");
         return;
     }
 
     SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
 #ifdef __EMSCRIPTEN__
-    SDL_Log("EMSCRIPTEN\n");
+    LOG("EMSCRIPTEN\n");
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #elif __APPLE__
-    SDL_Log("APPLE\n");
+    LOG("APPLE\n");
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #elif __MINGW32__
-    SDL_Log("MINGW32\n");
+    LOG("MINGW32\n");
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #else
-    SDL_Log("unknown platform\n");
+    LOG("unknown platform\n");
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
@@ -63,9 +64,9 @@ void bi_init_context(BiContext* context,int w,int h, int fps, const char* title,
     SDL_GL_CreateContext(context->window);
 
     if( glewInit() == GLEW_OK ){
-      SDL_Log("glewInit ok\n");
+      LOG("glewInit ok\n");
     }else{
-      SDL_Log("glewInit faild\n");
+      LOG("glewInit faild\n");
     }
 
     checkSupports();

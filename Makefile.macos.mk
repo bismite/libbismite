@@ -1,6 +1,6 @@
 CC=gcc
 AR=ar
-CFLAGS=-Wall -O3
+CFLAGS=-Wall -O3 -F $(HOME)/Library/Frameworks
 INCLUDE_PATHS=
 TARGET=$(BUILD_DIR)/libbi.a
 

@@ -175,24 +175,19 @@ void bi_start_run_loop(BiContext* context)
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(main_loop, context, context->profile.target_fps, true);
 #else
-
+    // fallback
     if( context->profile.target_fps == 0 ) {
-      // leave to OpenGL
-      SDL_GL_SetSwapInterval(1); // 0:immediate-update 1:vsync
-      while (context->running) { main_loop(context); }
-    } else {
-      // control FPS
-      SDL_GL_SetSwapInterval(0); // 0:immediate-update 1:vsync
-      while (context->running) {
-          double start_at = bi_get_now();
-          main_loop(context);
-          double end_at = bi_get_now();
-          int sleep = 1;
-          if(context->profile.target_fps>0) { sleep = (1.0 / context->profile.target_fps) * 1000 - (end_at - start_at); }
-          if(sleep<=0) { sleep = 1; }
-          SDL_Delay(sleep);
-      }
+      context->profile.target_fps = 60;
     }
-
+    SDL_GL_SetSwapInterval(0);
+    while (context->running) {
+        double start_at = bi_get_now();
+        main_loop(context);
+        double end_at = bi_get_now();
+        int sleep = 1;
+        if(context->profile.target_fps>0) { sleep = (1.0 / context->profile.target_fps) * 1000 - (end_at - start_at); }
+        if(sleep<=0) { sleep = 1; }
+        SDL_Delay(sleep);
+    }
 #endif
 }

@@ -54,6 +54,11 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
         swallow = n->_on_keyinput(n,n->_on_keyinput_context,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,false);
       }
       break;
+    case SDL_TEXTINPUT:
+      if(n->_on_textinput!=NULL){
+        swallow = n->_on_textinput(n,n->_on_textinput_context,e->text.text);
+      }
+      break;
   }
   return swallow;
 }

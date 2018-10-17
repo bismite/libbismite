@@ -40,6 +40,7 @@ void bi_node_init(BiNode* n)
   n->_on_move_finger = NULL;
   n->_on_touch = NULL;
   n->_on_keyinput = NULL;
+  n->_on_textinput = NULL;
 
   n->userdata = NULL;
 }
@@ -210,13 +211,20 @@ void bi_set_on_keyinput(BiNode* node, on_keyinput_callback callback, void *conte
   node->_on_keyinput_context = context;
 }
 
+void bi_set_on_textinput(BiNode* node, on_textinput_callback callback, void *context)
+{
+  node->_on_textinput = callback;
+  node->_on_textinput_context = context;
+}
+
 bool bi_node_has_callback(BiNode* n)
 {
   if(n->_on_move_cursor != NULL ||
      n->_on_click != NULL ||
      n->_on_move_finger != NULL ||
      n->_on_keyinput != NULL ||
-     n->_on_touch != NULL
+     n->_on_touch != NULL ||
+     n->_on_textinput != NULL
    ) {
     return true;
   }

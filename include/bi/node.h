@@ -15,6 +15,7 @@ typedef bool (*on_move_cursor_callback)(BiNode*, void*, int, int); // x, y
 typedef bool (*on_move_finger_callback)(BiNode*, void*, float, float); // x, y
 typedef bool (*on_touch_callback)(BiNode*, void*, float, float, bool); // x, y, pressed
 typedef bool (*on_keyinput_callback)(BiNode*, void*, uint16_t, uint32_t, uint16_t, bool); // scancode, keycode, mod, pressed
+typedef bool (*on_textinput_callback)(BiNode*, void*, char*); // null-terminated UTF-8 text
 
 struct _BiNode {
   int x;
@@ -59,6 +60,9 @@ struct _BiNode {
   on_keyinput_callback _on_keyinput;
   void *_on_keyinput_context;
 
+  on_textinput_callback _on_textinput;
+  void *_on_textinput_context;
+
   void* userdata;
 };
 
@@ -92,6 +96,7 @@ extern void bi_set_on_move_cursor(BiNode* node, on_move_cursor_callback callback
 extern void bi_set_on_move_finger(BiNode* node, on_move_finger_callback callback, void *context);
 extern void bi_set_on_touch(BiNode* node, on_touch_callback callback, void *context);
 extern void bi_set_on_keyinput(BiNode* node, on_keyinput_callback callback, void *context);
+extern void bi_set_on_textinput(BiNode* node, on_textinput_callback callback, void *context);
 extern bool bi_node_has_callback(BiNode* node);
 
 #endif

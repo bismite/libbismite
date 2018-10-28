@@ -85,29 +85,7 @@ static void main_loop( void* arg )
     }
 
     // Timer callback
-    for(int i=0;i<context->timers_size;i++){
-      BiTimer* t = context->timers[i];
-
-      // add in previous frame
-      if(t->will_fire_at==0) {
-        t->will_fire_at = now + t->interval;
-      }
-
-      if( now >= t->will_fire_at ) {
-        t->callback(context,t->node,now,t);
-        if(t->repeat == 0) {
-          // XXX: modify in iteration
-          bi_remove_timer(context,t);
-        }else{
-          if(t->repeat > 0){
-            t->repeat -= 1;
-          // } else if(t->repeat < 0) {
-            // nop!
-          }
-          t->will_fire_at += t->interval;
-        }
-      }
-    }
+    bi_run_timers(context, now);
 
     //
     // event handling

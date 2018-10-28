@@ -49,7 +49,7 @@ struct _BiContext {
     int callback_planned_nodes_size;
 
     // timer callback
-    BiTimer* timers[0xFFFF];
+    BiTimer **timers;
     int timers_size;
 
     //
@@ -71,10 +71,5 @@ extern void bi_set_title(BiContext* context,const char* title);
 extern void bi_layer_init(BiLayer* layer);
 extern void bi_add_layer(BiContext* context, BiLayer* layer);
 extern void bi_remove_layer(BiContext* context, BiLayer* layer);
-
-// timer
-extern void bi_timer_init(BiTimer* timer, BiNode* node, timer_callback callback, double interval, int repeat, void* userdata);
-extern void bi_add_timer(BiContext* context, BiTimer* timer);
-extern void bi_remove_timer(BiContext* context, BiTimer* timer);
 
 #endif

@@ -22,6 +22,15 @@ struct _BiTimer {
     BiNode* node;
     timer_callback callback;
     void* userdata;
+    bool finished;
 };
+
+// timer
+extern BiTimer* bi_timer_alloc(BiNode* node, timer_callback callback, double interval, int repeat, void* userdata);
+extern void bi_add_timer(BiContext* context, BiTimer* timer);
+extern void bi_finish_timer(BiContext* context, BiTimer* timer);
+extern void bi_remove_timer(BiContext* context, BiTimer* timer);
+extern void bi_free_timer(BiTimer* timer);
+extern void bi_run_timers(BiContext *context, double now);
 
 #endif

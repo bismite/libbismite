@@ -84,9 +84,6 @@ static void main_loop( void* arg )
         stats_shows_at = now;
     }
 
-    // Timer callback
-    bi_run_timers(context, now);
-
     //
     // event handling
     //
@@ -101,17 +98,22 @@ static void main_loop( void* arg )
       if( n == NULL ){
         continue;
       }
+      // On Update
       if(n->_on_update != NULL) {
         n->_on_update(n,context,n->_on_update_context,delta);
       }
-      if( bi_node_has_callback(n) == false ) {
-        continue;
+      // Timer
+      if(n->timers_size > 0 ) {
+        bi_run_timers(n->timers_size,n->timers,now);
       }
-      for(int i=0;i<event_size;i++) {
-        if(e[i].type == 0) continue;
-        bool swallow = node_event_handle(n,context,&e[i]);
-        if(swallow) {
-          e[i].type = 0; // XXX: swallow
+      // Event Handler
+      if( bi_node_has_callback(n) ) {
+        for(int i=0;i<event_size;i++) {
+          if(e[i].type == 0) continue;
+          bool swallow = node_event_handle(n,context,&e[i]);
+          if(swallow) {
+            e[i].type = 0; // XXX: swallow
+          }
         }
       }
     }

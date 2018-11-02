@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <bi/texture.h>
 #include <bi/util.h>
+#include <bi/timer.h>
 
 struct _BiNode;
 typedef struct _BiNode BiNode;
@@ -63,6 +64,9 @@ struct _BiNode {
   on_textinput_callback _on_textinput;
   void *_on_textinput_context;
 
+  BiTimer **timers;
+  int timers_size;
+
   void* userdata;
 };
 
@@ -89,6 +93,11 @@ extern bool bi_node_inside(BiNode* node, int x, int y);
 
 // callback every frame
 extern void bi_set_on_update(BiNode* node, on_update_callback callback, void *context);
+
+// timer
+extern void bi_node_add_timer(BiNode* node, BiTimer* timer);
+extern BiTimer* bi_node_remove_timer_index(BiNode* node, int index);
+extern BiTimer* bi_node_remove_timer(BiNode* node, BiTimer* timer);
 
 // event handler
 extern void bi_set_on_click(BiNode* node, on_click_callback callback, void *context);

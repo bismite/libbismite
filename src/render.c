@@ -83,7 +83,7 @@ static void update_matrix(BiNode* n)
 static void draw(BiContext* context, BiNode* n, bool visible)
 {
     // add callback
-    if( n->_on_update != NULL || bi_node_has_callback(n) ) {
+    if( n->_on_update != NULL || bi_node_has_callback(n) || n->timers_size > 0 ) {
       context->callback_planned_nodes[context->callback_planned_nodes_size] = n;
       context->callback_planned_nodes_size++;
     }

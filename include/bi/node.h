@@ -86,7 +86,8 @@ extern void bi_node_set_size(BiNode* n, int w, int h);
 static inline void bi_node_set_w(BiNode* n, int w) { bi_node_set_size(n,w,n->h); }
 static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->w,h); }
 extern void bi_node_set_angle(BiNode* n, float angle);
-static inline void bi_node_set_degree(BiNode* n, float degree) { bi_node_set_angle(n,degree*M_PI/180.f); }
+static inline void bi_node_set_degree(BiNode* n, float degree) { bi_node_set_angle(n,degree*(M_PI/180.f)); }
+static inline double bi_node_get_degree(BiNode* n) { return n->angle*(180.f/M_PI); }
 extern void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_include_anchor_translate);
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);

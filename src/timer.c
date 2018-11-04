@@ -1,5 +1,4 @@
 #include <bi/timer.h>
-#include <bi/context.h>
 
 void bi_timer_init(BiTimer* timer, timer_callback callback, double interval, int repeat, void* userdata)
 {

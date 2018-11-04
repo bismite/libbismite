@@ -6,7 +6,7 @@
 struct _BiTimer;
 typedef struct _BiTimer BiTimer;
 
-typedef bool (*timer_callback)(double,BiTimer*); // context,now,timer
+typedef bool (*timer_callback)(double,BiTimer*); // now,timer
 
 struct _BiTimer {
     int repeat; // -1:infinity, 0:oneshot, 1:twice...

@@ -33,6 +33,10 @@ void bi_node_init(BiNode* n)
   n->children_size = 0;
   n->parent = NULL;
 
+  // timers
+  n->timers = NULL;
+  n->timers_size = 0;
+
   // callbacks
   n->_on_update = NULL;
   n->_on_click = NULL;
@@ -170,6 +174,49 @@ bool bi_node_inside(BiNode* node, int x, int y)
     }
     return false;
 }
+
+// Timers
+
+void bi_node_add_timer(BiNode* node, BiTimer* timer)
+{
+    // TODO: duplicate check
+    node->timers_size += 1;
+    node->timers = realloc(node->timers, sizeof(BiTimer*)*node->timers_size);
+    node->timers[node->timers_size-1] = timer;
+}
+
+BiTimer* bi_node_remove_timer_index(BiNode* node,int index)
+{
+  if(index<0) return NULL;
+  if(node->timers_size==0) return NULL;
+
+  BiTimer* tmp = node->timers[index];
+
+  for(int i=index;i<node->timers_size-1;i++){
+    node->timers[i] = node->timers[i+1];
+  }
+
+  node->timers_size -= 1;
+  node->timers = realloc( node->timers, sizeof(BiTimer*) * node->timers_size );
+
+  return tmp;
+}
+
+BiTimer* bi_node_remove_timer(BiNode* node, BiTimer* timer)
+{
+  int index = -1;
+  for(int i=0;i<node->timers_size;i++){
+    if(node->timers[i] == timer){
+      index = i;
+      break;
+    }
+  }
+  if(index<0){
+    return NULL;
+  }
+  return bi_node_remove_timer_index(node,index);
+}
+
 
 //
 // callbacks

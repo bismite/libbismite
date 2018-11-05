@@ -34,6 +34,9 @@ void bi_init_context(BiContext* context,int w,int h, int fps, const char* title,
     context->color[2] = 0;
     context->color[3] = 0;
 
+    context->timers = NULL;
+    context->timers_size = 0;
+
     if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
         LOG("SDL_Init fail.");
         return;
@@ -117,41 +120,4 @@ void bi_remove_layer(BiContext* context, BiLayer* layer)
     context->layers[i-1] = context->layers[i];
   }
   context->layers_size -= 1;
-}
-
-//
-// Timer
-//
-
-void bi_timer_init(BiTimer* timer, BiNode* node, timer_callback callback, double interval, int repeat, void* userdata)
-{
-    timer->repeat = repeat;
-    timer->interval = interval;
-    timer->will_fire_at = 0; // XXX: set at next frame start
-    timer->last_fire_at = 0;
-    timer->node = node;
-    timer->callback = callback;
-    timer->userdata = userdata;
-}
-
-void bi_add_timer(BiContext* context, BiTimer* timer)
-{
-    // TODO: duplicate check
-    context->timers[context->timers_size] = timer;
-    context->timers_size += 1;
-}
-
-void bi_remove_timer(BiContext* context, BiTimer* timer)
-{
-  int index = -1;
-  for(int i=0;i<context->timers_size;i++){
-    if( context->timers[i] == timer ) {
-      index = i;
-      break;
-    }
-  }
-  for(int i=index+1;i<context->timers_size;i++) {
-    context->timers[i-1] = context->timers[i];
-  }
-  context->timers_size -= 1;
 }

@@ -59,7 +59,7 @@ void bi_init_context(BiContext* context,int w,int h, int fps, const char* title,
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
 
-    context->window = SDL_CreateWindow(title, 0, 0, w, h, SDL_WINDOW_OPENGL);
+    context->window = SDL_CreateWindow(title, 0, 0, w, h, SDL_WINDOW_OPENGL|SDL_WINDOW_ALLOW_HIGHDPI);
     // SDL_GLContext sdl_gl_context = SDL_GL_CreateContext(context->window);
     SDL_GL_CreateContext(context->window);
 

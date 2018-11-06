@@ -9,7 +9,7 @@
 #include <bi/logger.h>
 #include <stdlib.h>
 
-void bi_init_context(BiContext* context,int w,int h,double scale,int fps, const char* title)
+void bi_init_context(BiContext* context,int w,int h,int fps, const char* title)
 {
     context->rendering_nodes_queue_size = 0;
     context->callback_planned_nodes_size = 0;
@@ -28,7 +28,6 @@ void bi_init_context(BiContext* context,int w,int h,double scale,int fps, const 
     context->h = h;
     context->camera_x = 0;
     context->camera_y = 0;
-    context->scale = scale;
 
     context->color[0] = 0;
     context->color[1] = 0;
@@ -63,7 +62,7 @@ void bi_init_context(BiContext* context,int w,int h,double scale,int fps, const 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
 
-    context->window = SDL_CreateWindow(title, 0, 0, w*scale, h*scale, SDL_WINDOW_OPENGL|SDL_WINDOW_ALLOW_HIGHDPI);
+    context->window = SDL_CreateWindow(title, 0, 0, w, h, SDL_WINDOW_OPENGL|SDL_WINDOW_ALLOW_HIGHDPI);
 
     // SDL_GLContext sdl_gl_context = SDL_GL_CreateContext(context->window);
     SDL_GL_CreateContext(context->window);

@@ -30,7 +30,6 @@ struct _BiContext {
     int h;
     int camera_x;
     int camera_y;
-    double scale;
 
     // background color
     uint8_t color[4];
@@ -69,7 +68,7 @@ struct _BiContext {
 
 typedef void (*InitializeFunction)(BiContext*);
 
-extern void bi_init_context(BiContext* context,int w, int h, double scale, int fps, const char* title );
+extern void bi_init_context(BiContext* context,int w, int h, int fps, const char* title );
 extern void bi_set_title(BiContext* context,const char* title);
 
 // layer

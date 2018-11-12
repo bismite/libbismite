@@ -91,16 +91,6 @@ void bi_set_title(BiContext* context, const char* title)
 // Layer
 //
 
-void bi_layer_init(BiLayer* layer)
-{
-  layer->root = NULL;
-  layer->camera_x = 0;
-  layer->camera_y = 0;
-  layer->projection_centering = false;
-  layer->blend_src = GL_SRC_ALPHA;
-  layer->blend_dst = GL_ONE_MINUS_SRC_ALPHA;
-}
-
 void bi_add_layer(BiContext* context, BiLayer* layer)
 {
   context->layers[context->layers_size] = layer;

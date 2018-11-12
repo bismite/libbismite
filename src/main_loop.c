@@ -1,5 +1,6 @@
 #include <bi/main_loop.h>
 #include <bi/context.h>
+#include <bi/node.h>
 #include <bi/render.h>
 #include <bi/util.h>
 #include <bi/logger.h>

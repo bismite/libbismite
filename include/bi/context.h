@@ -4,13 +4,12 @@
 #include <stdbool.h>
 #include <GL/glew.h>
 #include <bi/bi_sdl.h>
-#include <bi/node.h>
 #include <bi/shader.h>
 #include <bi/profile.h>
 #include <bi/timer.h>
 
 #define BI_CORE_MAJOR_VERSION 0
-#define BI_CORE_MINOR_VERSION 2
+#define BI_CORE_MINOR_VERSION 3
 #define BI_CORE_PATCHLEVEL 0
 
 struct _BiContext;
@@ -72,7 +71,6 @@ extern void bi_init_context(BiContext* context,int w, int h, int fps, bool highd
 extern void bi_set_title(BiContext* context,const char* title);
 
 // layer
-extern void bi_layer_init(BiLayer* layer);
 extern void bi_add_layer(BiContext* context, BiLayer* layer);
 extern void bi_remove_layer(BiContext* context, BiLayer* layer);
 

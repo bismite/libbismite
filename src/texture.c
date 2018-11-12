@@ -73,7 +73,7 @@ static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
     return texture_id;
 }
 
-bool bi_load_texture(const char* filename,BiTextureImage* texture_image, bool antialiase,int texture_unit)
+bool bi_load_texture(const char* filename,BiTextureImage* texture_image, bool antialiase)
 {
     // XXX: ARGB? ABGR?
     // Desktop OpenGL: SDL_PIXELFORMAT_ARGB8888, invert R<->B
@@ -87,7 +87,7 @@ bool bi_load_texture(const char* filename,BiTextureImage* texture_image, bool an
     texture_image->texture_id = createTextureFromSurface(image,antialiase);
     texture_image->w = image->w;
     texture_image->h = image->h;
-    texture_image->texture_unit = texture_unit;
+    texture_image->_texture_unit = 0;
 
     SDL_FreeSurface(image);
 

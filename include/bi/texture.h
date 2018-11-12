@@ -16,7 +16,7 @@ struct _BiTextureImage {
   GLuint texture_id;
   uint16_t w;
   uint16_t h;
-  int texture_unit;
+  GLuint _texture_unit;
 };
 
 struct _BiTexture {
@@ -25,7 +25,7 @@ struct _BiTexture {
   double boundary[4]; // left,top,right,bottom
 };
 
-extern bool bi_load_texture(const char* filename, BiTextureImage* texture_image, bool antialiase, int texture_unit);
+extern bool bi_load_texture(const char* filename, BiTextureImage* texture_image, bool antialiase);
 extern void bi_set_texture_boundary(BiTexture* texture, uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 
 #endif

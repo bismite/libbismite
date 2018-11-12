@@ -50,6 +50,7 @@ void main()
 const char *FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 varying vec3 uv;
 varying vec4 color;
+uniform sampler2D sampler[8];
 uniform sampler2D sampler0;
 uniform sampler2D sampler1;
 uniform sampler2D sampler2;

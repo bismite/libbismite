@@ -129,10 +129,23 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
     const size_t len = context->rendering_nodes_queue_size;
     BiShader* shader = &context->shader;
 
+    // Textures
+    for(int i=0;i<8;i++) {
+      // set Sampler2D uniform
+      glUniform1i( shader->texture_locations[i], i );
+      // texture bind
+      glActiveTexture(GL_TEXTURE0+i);
+      if( layer->textures[i] == NULL ) {
+        glBindTexture(GL_TEXTURE_2D, 0);
+      }else{
+        layer->textures[i]->_texture_unit = i;
+        glBindTexture(GL_TEXTURE_2D, layer->textures[i]->texture_id);
+      }
+    }
+
     //
     // copy to buffer
     //
-    GLuint texture_units[8] = { 0 }; // texture unit to texture id
     GLfloat uv[4*len]; // [ left, top, right, bottom ]
     GLfloat texture_z[len];
     GLfloat transforms[len][16];
@@ -150,10 +163,7 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
         uv[i*4+1] = t->boundary[1]; // Top
         uv[i*4+2] = t->boundary[2]; // Right
         uv[i*4+3] = t->boundary[3]; // Bottom
-        if( 0 <= t->texture_image->texture_unit && t->texture_image->texture_unit < 8 ) {
-          texture_z[i] = t->texture_image->texture_unit;
-          texture_units[t->texture_image->texture_unit] = t->texture_image->texture_id;
-        }
+        texture_z[i] = t->texture_image->_texture_unit; // texture
       }
 
       //
@@ -190,18 +200,6 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, mod_color);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //
-    // texture
-    //
-
-    for(int i=0;i<8;i++) {
-      //
-      glUniform1i( shader->texture_locations[i], i );
-      // texture bind
-      glActiveTexture(GL_TEXTURE0+i);
-      glBindTexture(GL_TEXTURE_2D, texture_units[i]);
-    }
 
     // set camera, projection, blend function
     bi_set_projection(&context->shader, context->w, context->h, layer->projection_centering);

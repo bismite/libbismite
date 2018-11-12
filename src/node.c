@@ -117,6 +117,15 @@ void bi_node_set_size(BiNode* n, int w, int h)
   n->h = h;
 }
 
+void bi_node_set_scale(BiNode* n, float x, float y)
+{
+  if(n->scale_x != x || n->scale_y != y) {
+    n->matrix_cached = false;
+  }
+  n->scale_x = x;
+  n->scale_y = y;
+}
+
 void bi_node_set_angle(BiNode* n, float angle)
 {
   if(n->angle != angle) {

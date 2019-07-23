@@ -23,10 +23,11 @@ static inline void checkSupports()
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
     LOG("GL_MAX_TEXTURE_SIZE: %d\n",max_texture_size);
 
-    // iphone7: 0 (not supported!)
-    GLint max_array_texture_layers;
-    glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_array_texture_layers);
-    LOG("GL_MAX_ARRAY_TEXTURE_LAYERS: %d\n",max_array_texture_layers);
+    // not supported in ES2.0 and WebGL1.0
+    // // iphone7: 0 (not supported!)
+    // GLint max_array_texture_layers;
+    // glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_array_texture_layers);
+    // LOG("GL_MAX_ARRAY_TEXTURE_LAYERS: %d\n",max_array_texture_layers);
 
     // iphone7: 8
     GLint max_texture_image_units;

@@ -127,6 +127,9 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
     draw(context, layer->root, true);
 
     const size_t len = context->rendering_nodes_queue_size;
+
+    if(len==0) return; // eraly exit
+
     BiShader* shader = &context->shader;
 
     // Textures

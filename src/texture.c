@@ -2,8 +2,6 @@
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
 #include <GL/glew.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 static SDL_Surface* create_surface_abgr8888(int w, int h)
 {
@@ -73,25 +71,34 @@ static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
     return texture_id;
 }
 
-bool bi_load_texture(const char* filename,BiTextureImage* texture_image, bool antialiase)
+static bool _create_texture(BiTextureImage* texture_image, SDL_RWops* rwops, bool antialias)
 {
     // XXX: ARGB? ABGR?
     // Desktop OpenGL: SDL_PIXELFORMAT_ARGB8888, invert R<->B
     // WebGL:          SDL_PIXELFORMAT_ABGR8888, correct.
-    SDL_Surface *image = IMG_Load(filename);
+    SDL_Surface *image = IMG_Load_RW( rwops, 1 );
     if(image == NULL) {
-      LOG("Error IMG_Load %s\n",filename);
+      LOG("Error IMG_Load\n");
       return false;
     }
 
-    texture_image->texture_id = createTextureFromSurface(image,antialiase);
+    texture_image->texture_id = createTextureFromSurface(image,antialias);
     texture_image->w = image->w;
     texture_image->h = image->h;
     texture_image->_texture_unit = 0;
 
     SDL_FreeSurface(image);
-
     return true;
+}
+
+bool bi_create_texture(void* buffer, size_t size, BiTextureImage* texture_image, bool antialias)
+{
+    return _create_texture( texture_image, SDL_RWFromMem(buffer,size), antialias );
+}
+
+bool bi_load_texture(const char* filename, BiTextureImage* texture_image, bool antialias)
+{
+    return _create_texture( texture_image, SDL_RWFromFile(filename,"rb"), antialias );
 }
 
 void bi_set_texture_boundary(BiTexture* texture, uint16_t x, uint16_t y, uint16_t w, uint16_t h)

@@ -30,19 +30,19 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
     case SDL_FINGERMOTION:
       if(n->_on_move_finger!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_move_finger(n,n->_on_move_finger_context,e->tfinger.x,y);
+        swallow = n->_on_move_finger(n,n->_on_move_finger_context, e->tfinger.x, y, e->tfinger.fingerId);
       }
       break;
     case SDL_FINGERDOWN:
       if(n->_on_touch!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_touch(n,n->_on_touch_context,e->tfinger.x,y,true);
+        swallow = n->_on_touch(n,n->_on_touch_context,e->tfinger.x,y,e->tfinger.fingerId,true);
       }
       break;
     case SDL_FINGERUP:
       if(n->_on_touch!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_touch(n,n->_on_touch_context,e->tfinger.x,y,false);
+        swallow = n->_on_touch(n,n->_on_touch_context,e->tfinger.x,y,e->tfinger.fingerId,false);
       }
       break;
     case SDL_KEYDOWN:

@@ -13,8 +13,8 @@ typedef struct _BiNode BiNode;
 typedef void (*on_update_callback)(BiNode*, void*, void*, double); // context, callback-context, delta
 typedef bool (*on_click_callback)(BiNode*, void*, int, int, int, bool); // x,y,button,pressed
 typedef bool (*on_move_cursor_callback)(BiNode*, void*, int, int); // x, y
-typedef bool (*on_move_finger_callback)(BiNode*, void*, float, float); // x, y
-typedef bool (*on_touch_callback)(BiNode*, void*, float, float, bool); // x, y, pressed
+typedef bool (*on_move_finger_callback)(BiNode*, void*, float, float, int64_t); // x, y, fingerID
+typedef bool (*on_touch_callback)(BiNode*, void*, float, float, int64_t, bool); // x, y, fingerID, pressed
 typedef bool (*on_keyinput_callback)(BiNode*, void*, uint16_t, uint32_t, uint16_t, bool); // scancode, keycode, mod, pressed
 typedef bool (*on_textinput_callback)(BiNode*, void*, char*); // null-terminated UTF-8 text
 

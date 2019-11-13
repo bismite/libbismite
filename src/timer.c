@@ -23,7 +23,6 @@ void bi_finish_timer(BiTimer* timer)
 
 void bi_run_timers(BiTimers* timers, double now)
 {
-  int unfinished_timers = 0;
   for(int i=0;i<timers->size;i++){
     BiTimer* t = timers->timers[i];
 
@@ -47,9 +46,6 @@ void bi_run_timers(BiTimers* timers, double now)
         }
         t->will_fire_at += t->interval;
       }
-    }
-    if(t->finished==false) {
-      unfinished_timers++;
     }
   }
 }

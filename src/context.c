@@ -13,7 +13,6 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 {
     context->rendering_nodes_queue_size = 0;
     context->callback_planned_nodes_size = 0;
-    context->timers_size = 0;
     context->layers_size = 0;
 
     //
@@ -33,9 +32,6 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     context->color[1] = 0;
     context->color[2] = 0;
     context->color[3] = 0;
-
-    context->timers = NULL;
-    context->timers_size = 0;
 
     if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
         LOG("SDL_Init fail.");

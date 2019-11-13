@@ -51,10 +51,6 @@ struct _BiContext {
     BiNode* callback_planned_nodes[0xFFFF];
     int callback_planned_nodes_size;
 
-    // timer callback
-    BiTimer **timers;
-    int timers_size;
-
     //
     BiShader shader;
 

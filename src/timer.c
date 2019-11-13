@@ -1,4 +1,5 @@
 #include <bi/timer.h>
+#include <stdlib.h>
 
 void bi_timer_init(BiTimer* timer, timer_callback callback, double interval, int repeat, void* userdata)
 {
@@ -16,12 +17,15 @@ void bi_finish_timer(BiTimer* timer)
   timer->finished = true;
 }
 
+//
+// Timers
+//
 
-void bi_run_timers(int timers_size, BiTimer **timers, double now)
+void bi_run_timers(BiTimers* timers, double now)
 {
   int unfinished_timers = 0;
-  for(int i=0;i<timers_size;i++){
-    BiTimer* t = timers[i];
+  for(int i=0;i<timers->size;i++){
+    BiTimer* t = timers->timers[i];
 
     // skip finished timer
     if(t->finished){
@@ -48,4 +52,44 @@ void bi_run_timers(int timers_size, BiTimer **timers, double now)
       unfinished_timers++;
     }
   }
+}
+
+void bi_add_timer(BiTimers* timers, BiTimer* timer)
+{
+    // TODO: duplicate check
+    timers->size += 1;
+    timers->timers = realloc(timers->timers, sizeof(BiTimer*)*timers->size);
+    timers->timers[timers->size-1] = timer;
+}
+
+BiTimer* bi_remove_timer_index(BiTimers* timers, int index)
+{
+  if(index<0) return NULL;
+  if(timers->size==0) return NULL;
+
+  BiTimer* tmp = timers->timers[index];
+
+  for(int i=index;i<timers->size-1;i++){
+    timers->timers[i] = timers->timers[i+1];
+  }
+
+  timers->size -= 1;
+  timers->timers = realloc( timers->timers, sizeof(BiTimer*) * timers->size );
+
+  return tmp;
+}
+
+BiTimer* bi_remove_timer(BiTimers* timers, BiTimer* timer)
+{
+  int index = -1;
+  for(int i=0;i<timers->size;i++){
+    if(timers->timers[i] == timer){
+      index = i;
+      break;
+    }
+  }
+  if(index<0){
+    return NULL;
+  }
+  return bi_remove_timer_index(timers,index);
 }

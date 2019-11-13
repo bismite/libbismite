@@ -104,9 +104,7 @@ static void main_loop( void* arg )
         n->_on_update(n,context,n->_on_update_context,delta);
       }
       // Timer
-      if(n->timers_size > 0 ) {
-        bi_run_timers(n->timers_size,n->timers,now);
-      }
+      bi_run_timers(&n->timers,now);
       // Event Handler
       if( bi_node_has_callback(n) ) {
         for(int i=0;i<event_size;i++) {

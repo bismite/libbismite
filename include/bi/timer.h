@@ -21,6 +21,16 @@ struct _BiTimer {
 extern void bi_timer_init(BiTimer* timer, timer_callback callback, double interval, int repeat, void* userdata);
 extern void bi_finish_timer(BiTimer* timer);
 
-extern void bi_run_timers(int timers_size, BiTimer **timers, double now);
+// timers
+typedef struct {
+  int size;
+  BiTimer **timers;
+} BiTimers;
+
+extern void bi_run_timers(BiTimers* timers, double now);
+
+extern void bi_add_timer(BiTimers* timers, BiTimer* timer);
+extern BiTimer* bi_remove_timer_index(BiTimers* timers, int index);
+extern BiTimer* bi_remove_timer(BiTimers* timers, BiTimer* timer);
 
 #endif

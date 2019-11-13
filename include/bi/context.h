@@ -6,7 +6,7 @@
 #include <bi/bi_sdl.h>
 #include <bi/shader.h>
 #include <bi/profile.h>
-#include <bi/timer.h>
+#include <bi/node.h>
 
 #define BI_CORE_MAJOR_VERSION 0
 #define BI_CORE_MINOR_VERSION 4
@@ -14,9 +14,6 @@
 
 struct _BiContext;
 typedef struct _BiContext BiContext;
-
-struct _BiNode;
-typedef struct _BiNode BiNode;
 
 struct _BiLayer;
 typedef struct _BiLayer BiLayer;
@@ -50,6 +47,9 @@ struct _BiContext {
     // event and update callback
     BiNode* callback_planned_nodes[0xFFFF];
     int callback_planned_nodes_size;
+
+    on_update_callback on_update_callbacks[0xFF];
+    int on_update_callbacks_size;
 
     //
     BiShader shader;

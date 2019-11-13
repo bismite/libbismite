@@ -13,6 +13,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 {
     context->rendering_nodes_queue_size = 0;
     context->callback_planned_nodes_size = 0;
+    context->on_update_callbacks_size = 0;
     context->layers_size = 0;
 
     //

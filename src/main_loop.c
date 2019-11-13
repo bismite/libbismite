@@ -66,28 +66,19 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 
 static void main_loop( void* arg )
 {
-    static double stats_shows_at = 0;
     BiContext *context = (BiContext*)arg;
 
     bi_frame_start(&context->profile);
     double now = context->profile.frame_start_at;
     double delta = context->profile.delta;
 
-    if( context->debug && (now - stats_shows_at) > 1000 ) {
-        LOG("FPS: %d/%.2f - frame: %.2f/%.2f [ms] - matrix_updated(AVG): %.2f - queued nodes: %d\n",
-          context->profile.stats.actual_fps,
-          context->profile.stats.estimated_fps,
-          context->profile.stats.average_in_frame,
-          context->profile.stats.average_frame_to_frame,
-          context->profile.stats.total_matrix_updated / (double)(context->profile.stats.actual_fps),
-          context->rendering_nodes_queue_size
-        );
-        stats_shows_at = now;
-    }
+    //
+    // callback and event handling
+    //
 
-    //
-    // event handling
-    //
+    for(int i=0;i<context->on_update_callbacks_size;i++){
+      context->on_update_callbacks[i](NULL,context,NULL,delta);
+    }
 
     const int PUMP_EVENT_MAX = 32;
     SDL_Event e[PUMP_EVENT_MAX];

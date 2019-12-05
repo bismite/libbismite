@@ -1,6 +1,6 @@
 CC=emcc
 AR=emar
-CFLAGS=-Wall -Oz -s USE_SDL=2
+CFLAGS=-Wall -Oz -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png]
 INCLUDE_PATHS=
 
 BUILD_DIR=build/emscripten

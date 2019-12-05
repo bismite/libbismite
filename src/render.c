@@ -83,9 +83,9 @@ static void update_matrix(BiNode* n)
 static void draw(BiContext* context, BiNode* n, bool visible)
 {
     // add callback
-    if( n->_on_update != NULL || bi_node_has_callback(n) || n->timers.size > 0 ) {
+    if( n->_on_update.callback != NULL || bi_node_has_callback(n) || n->timers.size > 0 ) {
       context->callback_planned_nodes[context->callback_planned_nodes_size] = n;
-      context->callback_planned_nodes_size++;
+      context->callback_planned_nodes_size += 1;
     }
 
     // skip: invisible, zero-size node, transparent node

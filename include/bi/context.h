@@ -48,7 +48,7 @@ struct _BiContext {
     BiNode* callback_planned_nodes[0xFFFF];
     int callback_planned_nodes_size;
 
-    on_update_callback on_update_callbacks[0xFF];
+    OnUpdateCallback on_update_callbacks[0xFF];
     int on_update_callbacks_size;
 
     //

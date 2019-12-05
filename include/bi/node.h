@@ -10,13 +10,21 @@
 struct _BiNode;
 typedef struct _BiNode BiNode;
 
-typedef void (*on_update_callback)(BiNode*, void*, void*, double); // context, callback-context, delta
 typedef bool (*on_click_callback)(BiNode*, void*, int, int, int, bool); // x,y,button,pressed
 typedef bool (*on_move_cursor_callback)(BiNode*, void*, int, int); // x, y
 typedef bool (*on_move_finger_callback)(BiNode*, void*, float, float, int64_t); // x, y, fingerID
 typedef bool (*on_touch_callback)(BiNode*, void*, float, float, int64_t, bool); // x, y, fingerID, pressed
 typedef bool (*on_keyinput_callback)(BiNode*, void*, uint16_t, uint32_t, uint16_t, bool); // scancode, keycode, mod, pressed
 typedef bool (*on_textinput_callback)(BiNode*, void*, char*); // null-terminated UTF-8 text
+
+struct _BiContext;
+typedef struct _BiContext BiContext;
+
+typedef void (*on_update_callback)(BiContext*, void*, double); // context, BiNode/userdata, delta
+typedef struct {
+  on_update_callback callback;
+  void *userdata;
+} OnUpdateCallback;
 
 struct _BiNode {
   int x;
@@ -43,8 +51,7 @@ struct _BiNode {
   BiNode** children;
   int children_size;
 
-  on_update_callback _on_update;
-  void *_on_update_context;
+  OnUpdateCallback _on_update;
 
   on_click_callback _on_click;
   void *_on_click_context;
@@ -95,7 +102,7 @@ extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly)
 extern bool bi_node_inside(BiNode* node, int x, int y);
 
 // callback every frame
-extern void bi_set_on_update(BiNode* node, on_update_callback callback, void *context);
+extern void bi_set_on_update(BiNode* node, on_update_callback callback, void *userdata);
 
 // event handler
 extern void bi_set_on_click(BiNode* node, on_click_callback callback, void *context);

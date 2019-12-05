@@ -77,7 +77,7 @@ static void main_loop( void* arg )
     //
 
     for(int i=0;i<context->on_update_callbacks_size;i++){
-      context->on_update_callbacks[i](NULL,context,NULL,delta);
+      context->on_update_callbacks[i].callback(context, context->on_update_callbacks[i].userdata, delta);
     }
 
     const int PUMP_EVENT_MAX = 32;
@@ -91,8 +91,8 @@ static void main_loop( void* arg )
         continue;
       }
       // On Update
-      if(n->_on_update != NULL) {
-        n->_on_update(n,context,n->_on_update_context,delta);
+      if(n->_on_update.callback != NULL) {
+        n->_on_update.callback(context,n,delta);
       }
       // Timer
       bi_run_timers(&n->timers,now);

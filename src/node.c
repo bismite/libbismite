@@ -38,7 +38,7 @@ void bi_node_init(BiNode* n)
   n->timers.timers = NULL;
 
   // callbacks
-  n->_on_update = NULL;
+  n->_on_update.callback = NULL;
   n->_on_click = NULL;
   n->_on_move_cursor = NULL;
   n->_on_move_finger = NULL;
@@ -188,10 +188,10 @@ bool bi_node_inside(BiNode* node, int x, int y)
 // callbacks
 //
 
-void bi_set_on_update(BiNode* node, on_update_callback callback, void *context)
+void bi_set_on_update(BiNode* node, on_update_callback callback, void *userdata)
 {
-  node->_on_update = callback;
-  node->_on_update_context = context;
+  node->_on_update.callback = callback;
+  node->_on_update.userdata = userdata;
 }
 
 void bi_set_on_click(BiNode* node, on_click_callback callback, void *context)

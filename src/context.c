@@ -3,11 +3,47 @@
 #include <bi/shader.h>
 #include <bi/profile.h>
 #include <bi/timer.h>
-#include <bi/gl_ext.h>
 #include <bi/layer.h>
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
 #include <stdlib.h>
+
+#ifndef __EMSCRIPTEN__
+static inline void glGenVertexArrays_APPLE_wrapper(GLsizei s, GLuint *p) { glGenVertexArraysAPPLE(s,p); }
+static inline void glBindVertexArray_APPLE_wrapper(GLuint vao) {glBindVertexArrayAPPLE(vao); }
+#endif
+
+static void enable_gl_extensions()
+{
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_instanced_arrays.txt
+    if(GLEW_ARB_instanced_arrays) LOG("ARB_instanced_arrays ok\n");
+
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_draw_instanced.txt
+    if(GLEW_ARB_draw_instanced) LOG("ARB_draw_instanced ok\n");
+
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
+    if(GLEW_ARB_vertex_array_object) LOG("ARB_vertex_array_object ok\n");
+
+#ifndef __EMSCRIPTEN__
+    // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
+    if(GLEW_APPLE_vertex_array_object){
+        LOG("APPLE_vertex_array_object ok\n");
+        glGenVertexArrays = glGenVertexArrays_APPLE_wrapper;
+        glBindVertexArray = glBindVertexArray_APPLE_wrapper;
+    }
+#endif
+
+    // https://www.khronos.org/registry/webgl/extensions/ANGLE_instanced_arrays/
+    if(GLEW_ANGLE_instanced_arrays) LOG("ANGLE_instanced_arrays ok\n");
+
+#ifdef __EMSCRIPTEN__
+    // https://www.khronos.org/registry/OpenGL/extensions/OES/OES_vertex_array_object.txt
+    if(GLEW_OES_vertex_array_object) LOG("OES_vertex_array_object ok\n");
+#endif
+
+    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_draw_instanced.txt
+    if(GLEW_EXT_draw_instanced) LOG("EXT_draw_instanced ok\n");
+}
 
 void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
@@ -74,7 +110,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
       LOG("glewInit faild\n");
     }
 
-    checkSupports();
+    enable_gl_extensions();
 
     bi_init_shader(&context->shader,context->w,context->h);
 }

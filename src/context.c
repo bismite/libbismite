@@ -96,7 +96,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 #endif
 
     Uint32 flag = SDL_WINDOW_OPENGL;
-    if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI }
+    if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
     context->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
 
     // SDL_GLContext sdl_gl_context = SDL_GL_CreateContext(context->window);

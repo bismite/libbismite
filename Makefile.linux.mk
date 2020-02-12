@@ -1,4 +1,4 @@
-CC=gcc
+CC=clang
 AR=ar
 CFLAGS=-Wall -O3 `sdl2-config --cflags`
 INCLUDE_PATHS=

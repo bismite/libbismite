@@ -1,6 +1,6 @@
-CC=gcc
+CC=clang
 AR=ar
-CFLAGS=-Wall -O3 -F $(HOME)/Library/Frameworks
+CFLAGS=-Wall -O3
 INCLUDE_PATHS=
 
 BUILD_DIR=build/macos

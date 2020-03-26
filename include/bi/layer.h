@@ -1,7 +1,7 @@
 #ifndef __BI_CORE_LAYER_H__
 #define __BI_CORE_LAYER_H__
 
-#include <GL/glew.h>
+#include <bi/bi_gl.h>
 #include <stdbool.h>
 
 struct _BiNode;

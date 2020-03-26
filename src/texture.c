@@ -1,7 +1,7 @@
 #include <bi/texture.h>
+#include <bi/bi_gl.h>
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
-#include <GL/glew.h>
 
 static SDL_Surface* create_surface_abgr8888(int w, int h)
 {

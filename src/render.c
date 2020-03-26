@@ -3,8 +3,7 @@
 #include <bi/context.h>
 #include <bi/matrix.h>
 #include <bi/layer.h>
-
-#include <GL/glew.h>
+#include <bi/bi_gl.h>
 #include <math.h>
 
 static void update_matrix(BiNode* n)
@@ -214,8 +213,7 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
     //
     // Draw instances
     //
-    glBindVertexArray(shader->vao);
-      // XXX: not glDrawArraysInstancedANGLE in emscripten
-      glDrawArraysInstancedARB(GL_TRIANGLE_STRIP, 0, 4, len);
-    glBindVertexArray(0);
+    glBindVertexArray_wrapper(shader->vao);
+      glDrawArraysInstanced_wrapper(GL_TRIANGLE_STRIP, 0, 4, len);
+    glBindVertexArray_wrapper(0);
 }

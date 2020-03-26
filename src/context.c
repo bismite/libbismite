@@ -1,48 +1,104 @@
 #include <bi/context.h>
 #include <bi/util.h>
-#include <bi/shader.h>
-#include <bi/profile.h>
 #include <bi/timer.h>
 #include <bi/layer.h>
-#include <bi/bi_sdl.h>
 #include <bi/logger.h>
 #include <stdlib.h>
 
-#ifndef __EMSCRIPTEN__
-static inline void glGenVertexArrays_APPLE_wrapper(GLsizei s, GLuint *p) { glGenVertexArraysAPPLE(s,p); }
-static inline void glBindVertexArray_APPLE_wrapper(GLuint vao) {glBindVertexArrayAPPLE(vao); }
-#endif
+void (*glGenVertexArrays_wrapper)(GLsizei, GLuint*);
+void (*glBindVertexArray_wrapper)(GLuint);
+void (*glDrawArraysInstanced_wrapper)(GLenum, int, GLsizei, GLsizei);
+void (*glVertexAttribDivisor_wrapper)(GLuint,GLuint);
 
-static void enable_gl_extensions()
+static void enable_gl_extensions(BiContext* context)
 {
-    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_instanced_arrays.txt
-    if(GLEW_ARB_instanced_arrays) LOG("ARB_instanced_arrays ok\n");
-
-    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_draw_instanced.txt
-    if(GLEW_ARB_draw_instanced) LOG("ARB_draw_instanced ok\n");
-
-    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
-    if(GLEW_ARB_vertex_array_object) LOG("ARB_vertex_array_object ok\n");
-
-#ifndef __EMSCRIPTEN__
-    // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
-    if(GLEW_APPLE_vertex_array_object){
-        LOG("APPLE_vertex_array_object ok\n");
-        glGenVertexArrays = glGenVertexArrays_APPLE_wrapper;
-        glBindVertexArray = glBindVertexArray_APPLE_wrapper;
-    }
-#endif
-
-    // https://www.khronos.org/registry/webgl/extensions/ANGLE_instanced_arrays/
-    if(GLEW_ANGLE_instanced_arrays) LOG("ANGLE_instanced_arrays ok\n");
+    bool vertex_array_object = false;
+    bool instanced_arrays = false;
+    bool draw_instanced = false;
 
 #ifdef __EMSCRIPTEN__
+
     // https://www.khronos.org/registry/OpenGL/extensions/OES/OES_vertex_array_object.txt
-    if(GLEW_OES_vertex_array_object) LOG("OES_vertex_array_object ok\n");
+    if(SDL_GL_ExtensionSupported("GL_OES_vertex_array_object")) {
+      vertex_array_object = true;
+      glGenVertexArrays_wrapper = SDL_GL_GetProcAddress("glGenVertexArraysOES");
+      glBindVertexArray_wrapper = SDL_GL_GetProcAddress("glBindVertexArrayOES");
+    }
+
+    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_instanced_arrays.txt
+    if(SDL_GL_ExtensionSupported("GL_EXT_instanced_arrays")) {
+      instanced_arrays = true;
+      glDrawArraysInstanced_wrapper = SDL_GL_GetProcAddress("glDrawArraysInstancedEXT");
+      glVertexAttribDivisor_wrapper = SDL_GL_GetProcAddress("glVertexAttribDivisorEXT");
+    }
+
+    // https://www.khronos.org/registry/OpenGL/extensions/ANGLE/ANGLE_instanced_arrays.txt
+    if(SDL_GL_ExtensionSupported("GL_ANGLE_instanced_arrays")) {
+      instanced_arrays = true;
+      draw_instanced = true;
+      glDrawArraysInstanced_wrapper = SDL_GL_GetProcAddress("glDrawArraysInstancedANGLE");
+      glVertexAttribDivisor_wrapper = SDL_GL_GetProcAddress("glVertexAttribDivisorANGLE");
+    }
+
+#else
+    if( glewInit() == GLEW_OK ){
+      LOG("glewInit ok\n");
+    }else{
+      LOG("glewInit faild\n");
+      exit(1);
+    }
+
+    // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
+    if (GL_APPLE_vertex_array_object) {
+        vertex_array_object = true;
+        glGenVertexArrays_wrapper = glGenVertexArraysAPPLE;
+        glBindVertexArray_wrapper = glBindVertexArrayAPPLE;
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
+    } else if(GLEW_ARB_vertex_array_object) {
+        vertex_array_object = true;
+        glGenVertexArrays_wrapper = glGenVertexArrays;
+        glBindVertexArray_wrapper = glBindVertexArray;
+    }
+
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_instanced_arrays.txt
+    if(GLEW_ARB_instanced_arrays) {
+      instanced_arrays = true;
+      glVertexAttribDivisor_wrapper = glVertexAttribDivisorARB;
+    }
+
+    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_draw_instanced.txt
+    if(GLEW_ARB_draw_instanced) {
+      draw_instanced = true;
+      glDrawArraysInstanced_wrapper = glDrawArraysInstancedARB;
+    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_draw_instanced.txt
+    } else if(GLEW_EXT_draw_instanced) {
+      draw_instanced = true;
+      glDrawArraysInstanced_wrapper = glDrawArraysInstancedEXT;
+    }
+
 #endif
 
-    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_draw_instanced.txt
-    if(GLEW_EXT_draw_instanced) LOG("EXT_draw_instanced ok\n");
+    if( vertex_array_object==false || instanced_arrays==false || draw_instanced==false) {
+      char buf[256];
+      snprintf(buf,256,
+        "OpenGL Version: %s\n"
+        "OpenGL Vendor: %s\n"
+        "OpenGL Renderer: %s\n"
+        "GLSL Version: %s\n"
+        "vertex array object: %s\n"
+        "instanced arrays: %s\n"
+        "draw instanced: %s\n",
+        glGetString(GL_VERSION),
+        glGetString(GL_VENDOR),
+        glGetString(GL_RENDERER),
+        glGetString(GL_SHADING_LANGUAGE_VERSION),
+        vertex_array_object ? "available" : "unavailable",
+        instanced_arrays ? "available" : "unavailable",
+        draw_instanced ? "available" : "unavailable"
+      );
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Missing function", buf, context->window);
+      exit(1);
+    }
 }
 
 void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
@@ -80,12 +136,6 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif __APPLE__
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-#elif __MINGW32__
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -95,16 +145,13 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
     context->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
 
-    // SDL_GLContext sdl_gl_context = SDL_GL_CreateContext(context->window);
-    SDL_GL_CreateContext(context->window);
-
-    if( glewInit() == GLEW_OK ){
-      LOG("glewInit ok\n");
-    }else{
-      LOG("glewInit faild\n");
+    SDL_GLContext *glcontext = SDL_GL_CreateContext(context->window);
+    if(glcontext==NULL){
+      printf("SDL_GL_CreateContext failed: %s\n",SDL_GetError());
+      exit(1);
     }
 
-    enable_gl_extensions();
+    enable_gl_extensions(context);
 
     bi_init_shader(&context->shader,context->w,context->h);
 }

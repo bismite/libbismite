@@ -144,8 +144,8 @@ void bi_init_shader(BiShader* shader,int w,int h)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // create vao
-    glGenVertexArrays(1, &shader->vao);
-    glBindVertexArray(shader->vao);
+    glGenVertexArrays_wrapper(1, &shader->vao);
+    glBindVertexArray_wrapper(shader->vao);
 
       // vertex
       glBindBuffer(GL_ARRAY_BUFFER, shader->vertex_buffer);
@@ -182,15 +182,14 @@ void bi_init_shader(BiShader* shader,int w,int h)
       }
 
       // for instancing
-      // XXX: not glVertexAttribDivisorANGLE in emscripten
-      glVertexAttribDivisorARB(shader->vertex_location, 0); // vertex
-      glVertexAttribDivisorARB(shader->texture_uv_location, 1); // uv
-      glVertexAttribDivisorARB(shader->vertex_index_location, 0); // vertex_index
-      glVertexAttribDivisorARB(shader->texture_z_location, 1); // texture_z
-      glVertexAttribDivisorARB(shader->mod_color_location, 1); // mod_color
+      glVertexAttribDivisor_wrapper(shader->vertex_location, 0); // vertex
+      glVertexAttribDivisor_wrapper(shader->texture_uv_location, 1); // uv
+      glVertexAttribDivisor_wrapper(shader->vertex_index_location, 0); // vertex_index
+      glVertexAttribDivisor_wrapper(shader->texture_z_location, 1); // texture_z
+      glVertexAttribDivisor_wrapper(shader->mod_color_location, 1); // mod_color
       for(int i=0;i<4;i++){
-        glVertexAttribDivisorARB(shader->transform_locations[i], 1); // transform
+        glVertexAttribDivisor_wrapper(shader->transform_locations[i], 1); // transform
       }
 
-    glBindVertexArray(0);
+    glBindVertexArray_wrapper(0);
 }

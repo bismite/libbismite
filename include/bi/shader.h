@@ -1,8 +1,8 @@
 #ifndef __BI_CORE_SHADER_H__
 #define __BI_CORE_SHADER_H__
 
-#include <GL/glew.h>
 #include <stdbool.h>
+#include <bi/bi_gl.h>
 
 struct _BiShader;
 typedef struct _BiShader BiShader;

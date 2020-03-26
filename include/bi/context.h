@@ -2,7 +2,7 @@
 #define __BI_CORE_CONTEXT_H__
 
 #include <stdbool.h>
-#include <GL/glew.h>
+#include <bi/bi_gl.h>
 #include <bi/bi_sdl.h>
 #include <bi/shader.h>
 #include <bi/profile.h>

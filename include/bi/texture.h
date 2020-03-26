@@ -1,10 +1,10 @@
 #ifndef __BI_CORE_TEXTURE_H__
 #define __BI_CORE_TEXTURE_H__
 
-#include <GL/glew.h>
-#include <bi/bi_sdl.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <bi/bi_gl.h>
+#include <bi/bi_sdl.h>
 
 struct _BiTextureImage;
 typedef struct _BiTextureImage BiTextureImage;

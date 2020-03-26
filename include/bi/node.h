@@ -1,8 +1,8 @@
 #ifndef __BI_CORE_NODE_H__
 #define __BI_CORE_NODE_H__
 
-#include <GL/glew.h>
 #include <stdbool.h>
+#include <bi/bi_gl.h>
 #include <bi/texture.h>
 #include <bi/util.h>
 #include <bi/timer.h>

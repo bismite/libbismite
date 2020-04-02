@@ -49,7 +49,7 @@ static void enable_gl_extensions(BiContext* context)
     }
 
     // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
-    if (GL_APPLE_vertex_array_object) {
+    if (GLEW_APPLE_vertex_array_object) {
         vertex_array_object = true;
         glGenVertexArrays_wrapper = glGenVertexArraysAPPLE;
         glBindVertexArray_wrapper = glBindVertexArrayAPPLE;

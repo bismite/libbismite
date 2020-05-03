@@ -27,7 +27,7 @@ void bi_node_init(BiNode* n)
 
   n->matrix_cached = false;
 
-  n->texture = NULL;
+  n->texture_mapping = NULL;
 
   n->children = NULL;
   n->children_size = 0;

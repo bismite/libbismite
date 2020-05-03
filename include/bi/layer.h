@@ -7,8 +7,8 @@
 struct _BiNode;
 typedef struct _BiNode BiNode;
 
-struct _BiTextureImage;
-typedef struct _BiTextureImage BiTextureImage;
+struct _BiTexture;
+typedef struct _BiTexture BiTexture;
 
 struct _BiLayer;
 typedef struct _BiLayer BiLayer;
@@ -20,7 +20,7 @@ struct _BiLayer {
   BiNode* root;
   GLenum blend_src;
   GLenum blend_dst;
-  BiTextureImage* textures[8];
+  BiTexture* textures[8];
 };
 
 extern void bi_layer_init(BiLayer* layer);

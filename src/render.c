@@ -158,14 +158,14 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
 
       // texture_uv
       texture_z[i] = -1; // no-texture
-      if(node->texture != NULL) {
+      if(node->texture_mapping != NULL) {
         // Left-Top is 0-0, Right-Bottom is 1-1.
-        BiTexture *t = node->texture;
+        BiTextureMapping *t = node->texture_mapping;
         uv[i*4+0] = t->boundary[0]; // Left
         uv[i*4+1] = t->boundary[1]; // Top
         uv[i*4+2] = t->boundary[2]; // Right
         uv[i*4+3] = t->boundary[3]; // Bottom
-        texture_z[i] = t->texture_image->_texture_unit; // texture
+        texture_z[i] = t->texture->_texture_unit; // texture
       }
 
       //

@@ -40,7 +40,7 @@ struct _BiNode {
   bool visible;
 
   uint8_t color[4];
-  BiTexture *texture;
+  BiTextureMapping *texture_mapping;
 
   // matrix
   GLfloat transform[16];

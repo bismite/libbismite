@@ -71,7 +71,7 @@ static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
     return texture_id;
 }
 
-static bool _create_texture(BiTextureImage* texture_image, SDL_RWops* rwops, bool antialias)
+static bool _create_texture(BiTexture* texture, SDL_RWops* rwops, bool antialias)
 {
     // XXX: ARGB? ABGR?
     // Desktop OpenGL: SDL_PIXELFORMAT_ARGB8888, invert R<->B
@@ -82,36 +82,36 @@ static bool _create_texture(BiTextureImage* texture_image, SDL_RWops* rwops, boo
       return false;
     }
 
-    texture_image->texture_id = createTextureFromSurface(image,antialias);
-    texture_image->w = image->w;
-    texture_image->h = image->h;
-    texture_image->_texture_unit = 0;
+    texture->texture_id = createTextureFromSurface(image,antialias);
+    texture->w = image->w;
+    texture->h = image->h;
+    texture->_texture_unit = 0;
 
     SDL_FreeSurface(image);
     return true;
 }
 
-bool bi_create_texture(void* buffer, size_t size, BiTextureImage* texture_image, bool antialias)
+bool bi_create_texture(void* buffer, size_t size, BiTexture* texture, bool antialias)
 {
-    return _create_texture( texture_image, SDL_RWFromMem(buffer,size), antialias );
+    return _create_texture( texture, SDL_RWFromMem(buffer,size), antialias );
 }
 
-bool bi_load_texture(const char* filename, BiTextureImage* texture_image, bool antialias)
+bool bi_load_texture(const char* filename, BiTexture* texture, bool antialias)
 {
-    return _create_texture( texture_image, SDL_RWFromFile(filename,"rb"), antialias );
+    return _create_texture( texture, SDL_RWFromFile(filename,"rb"), antialias );
 }
 
-void bi_set_texture_boundary(BiTexture* texture, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+void bi_set_texture_mapping(BiTextureMapping* t, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
-  texture->x = x;
-  texture->y = y;
-  texture->w = w;
-  texture->h = h;
+  t->x = x;
+  t->y = y;
+  t->w = w;
+  t->h = h;
   // left, top, right, bottom
-  double tw = texture->texture_image->w;
-  double th = texture->texture_image->h;
-  texture->boundary[0] = x / tw;
-  texture->boundary[1] = y / th;
-  texture->boundary[2] = (x+w) / tw;
-  texture->boundary[3] = (y+h) / th;
+  double tw = t->texture->w;
+  double th = t->texture->h;
+  t->boundary[0] = x / tw;
+  t->boundary[1] = y / th;
+  t->boundary[2] = (x+w) / tw;
+  t->boundary[3] = (y+h) / th;
 }

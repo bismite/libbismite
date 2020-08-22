@@ -12,4 +12,5 @@ void bi_layer_init(BiLayer* layer)
   for(int i=0;i<8;i++) {
     layer->textures[i] = NULL;
   }
+  layer->z_order = 0;
 }

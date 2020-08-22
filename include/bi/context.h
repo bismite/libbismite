@@ -68,6 +68,7 @@ extern void bi_set_title(BiContext* context,const char* title);
 
 // layer
 extern void bi_add_layer(BiContext* context, BiLayer* layer);
+extern void bi_update_layer_order(BiContext* context);
 extern void bi_remove_layer(BiContext* context, BiLayer* layer);
 
 #endif

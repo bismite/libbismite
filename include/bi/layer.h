@@ -21,6 +21,8 @@ struct _BiLayer {
   GLenum blend_src;
   GLenum blend_dst;
   BiTexture* textures[8];
+  int z_order;
+  int index;
 };
 
 extern void bi_layer_init(BiLayer* layer);

@@ -109,8 +109,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     context->layers_size = 0;
 
     //
-    double now = bi_get_now();
-    bi_profile_init(&context->profile,fps,now);
+    bi_profile_init(&context->profile,fps,bi_get_now());
 
     context->debug = false;
 

@@ -20,7 +20,7 @@ typedef bool (*on_textinput_callback)(BiNode*, void*, char*); // null-terminated
 struct _BiContext;
 typedef struct _BiContext BiContext;
 
-typedef void (*on_update_callback)(BiContext*, void*, double); // context, BiNode/userdata, delta
+typedef void (*on_update_callback)(BiContext*, void*); // context, BiNode/userdata
 typedef struct {
   on_update_callback callback;
   void *userdata;

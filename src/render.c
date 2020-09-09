@@ -129,6 +129,8 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
 
     if(len==0) return; // eraly exit
 
+    context->profile.rendering_nodes_queue_size += len;
+
     BiShader* shader = &context->shader;
 
     // Textures

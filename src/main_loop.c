@@ -66,18 +66,21 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 
 static void main_loop( void* arg )
 {
+    int64_t now = bi_get_now();
+
     BiContext *context = (BiContext*)arg;
 
-    bi_frame_start(&context->profile);
-    double now = context->profile.frame_start_at;
-    double delta = context->profile.delta;
+    bi_profile_record(&context->profile,now);
+
+    context->profile.on_update_callbacks_size = context->on_update_callbacks_size;
+    context->profile.callback_planned_nodes_size = context->callback_planned_nodes_size;
 
     //
     // callback and event handling
     //
 
     for(int i=0;i<context->on_update_callbacks_size;i++){
-      context->on_update_callbacks[i].callback(context, context->on_update_callbacks[i].userdata, delta);
+      context->on_update_callbacks[i].callback(context, context->on_update_callbacks[i].userdata);
     }
 
     const int PUMP_EVENT_MAX = 32;
@@ -92,7 +95,7 @@ static void main_loop( void* arg )
       }
       // On Update
       if(n->_on_update.callback != NULL) {
-        n->_on_update.callback(context,n,delta);
+        n->_on_update.callback(context,n);
       }
       // Timer
       bi_run_timers(&n->timers,now);
@@ -116,6 +119,11 @@ static void main_loop( void* arg )
       }
     }
 
+    // reset queue
+    context->callback_planned_nodes_size = 0;
+
+    int64_t phase2 = bi_get_now();
+
     //
     // rendering
     //
@@ -129,24 +137,26 @@ static void main_loop( void* arg )
     );
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // reset queue
-    context->callback_planned_nodes_size = 0;
     // reset stats
     context->profile.matrix_updated = 0;
+    context->profile.rendering_nodes_queue_size = 0;
     //
     for(int i=0;i<context->layers_size;i++) {
       bi_render_layer(context,context->layers[i]);
     }
 
+    int64_t phase3 = bi_get_now();
+
     //
     SDL_GL_SwapWindow(context->window);
 
-    bi_frame_end(&context->profile);
+    //
+    context->profile.time_spent_on_callback = phase2 - now;
+    context->profile.time_spent_on_rendering = phase3 - phase2;
 }
 
 void bi_start_run_loop(BiContext* context)
 {
-    LOG("start main loop FPS:%d\n", context->profile.target_fps);
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop_arg(main_loop, context, context->profile.target_fps, false);
 #else

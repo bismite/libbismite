@@ -14,14 +14,14 @@
 #define M_PI (3.14159265358979323846264338327950288)
 #endif
 
-static inline double bi_get_now()
+static inline int64_t bi_get_now()
 {
 #ifdef __EMSCRIPTEN__
-  return emscripten_get_now();
+  return (int64_t)( EM_ASM_DOUBLE({ return Date.now(); }) );
 #else
   struct timeval now;
   gettimeofday(&now, NULL);
-  return (double)now.tv_sec*1000 + (double)now.tv_usec/1000;
+  return now.tv_sec*1000 + now.tv_usec/1000;
 #endif
 }
 

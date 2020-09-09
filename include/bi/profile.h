@@ -2,39 +2,41 @@
 #define __BI_CORE_PROFILE_H__
 
 #include <stdbool.h>
+#include <stdint.h>
 
 struct _BiProfile;
 typedef struct _BiProfile BiProfile;
 
+typedef struct {
+    int64_t start_at;
+    int64_t end_at;
+    int frames;
+    float fps;
+    int64_t time_spent_on_callback;
+    int64_t time_spent_on_rendering;
+} BiProfileStats;
+
 struct _BiProfile
 {
+    int64_t profile_created_at;
+
     // FPS
     int target_fps;
-    float current_fps;
-    int frames;
-    double frame_start_at;
-    double last_frame_start_at;
-    double delta;
-    double delta_sum;
-    double frame_spent;
 
-    // statistics
+    // current frame profile
+    int64_t now;
     int matrix_updated;
-    int total_matrix_updated;
+    int rendering_nodes_queue_size;
+    int on_update_callbacks_size;
+    int callback_planned_nodes_size;
+    int64_t time_spent_on_callback;
+    int64_t time_spent_on_rendering;
 
-    double stats_updated_at;
-
-    struct {
-      int actual_fps;
-      float estimated_fps;
-      float average_in_frame;
-      float average_frame_to_frame;
-      int total_matrix_updated;
-    } stats;
+    BiProfileStats _stats_tmp;
+    BiProfileStats stats;
 };
 
-extern void bi_profile_init(BiProfile* profile,int fps,double now);
-extern void bi_frame_start(BiProfile* profile);
-extern void bi_frame_end(BiProfile* profile);
+extern void bi_profile_init(BiProfile* profile,int fps,int64_t now);
+extern void bi_profile_record(BiProfile* profile, int64_t now);
 
 #endif

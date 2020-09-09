@@ -30,7 +30,10 @@ struct _BiContext {
     // background color
     uint8_t color[4];
 
-    // fps
+    // time of frame start(millisecond)
+    int64_t frame_start_at;
+
+    // fps, etc...
     BiProfile profile;
 
     // show debug info

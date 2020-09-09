@@ -67,8 +67,8 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 static void main_loop( void* arg )
 {
     int64_t now = bi_get_now();
-
     BiContext *context = (BiContext*)arg;
+    context->frame_start_at = now;
 
     bi_profile_record(&context->profile,now);
 

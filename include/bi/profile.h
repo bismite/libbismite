@@ -24,7 +24,7 @@ struct _BiProfile
     int target_fps;
 
     // current frame profile
-    int64_t now;
+    int64_t frame_start_at;
     int matrix_updated;
     int rendering_nodes_queue_size;
     int on_update_callbacks_size;

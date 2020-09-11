@@ -12,8 +12,10 @@ typedef struct {
     int64_t end_at;
     int frames;
     float fps;
+    // average
     int64_t time_spent_on_callback;
     int64_t time_spent_on_rendering;
+    float matrix_updated;
 } BiProfileStats;
 
 struct _BiProfile

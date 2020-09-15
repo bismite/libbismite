@@ -29,6 +29,7 @@ typedef struct {
 struct _BiNode {
   int x;
   int y;
+  int z;
   int w;
   int h;
   float angle;
@@ -50,6 +51,8 @@ struct _BiNode {
   BiNode *parent;
   BiNode** children;
   int children_size;
+  bool children_order_cached;
+  int _index;
 
   OnUpdateCallback _on_update;
 
@@ -88,6 +91,7 @@ extern BiNode* bi_remove_node(BiNode* node,BiNode* child);
 extern void bi_node_set_position(BiNode* n, int x, int y);
 static inline void bi_node_set_x(BiNode* n, int x) { bi_node_set_position(n,x,n->y); }
 static inline void bi_node_set_y(BiNode* n, int y) { bi_node_set_position(n,n->x,y); }
+extern void bi_node_set_z(BiNode* n, int z);
 extern void bi_node_set_size(BiNode* n, int w, int h);
 static inline void bi_node_set_w(BiNode* n, int w) { bi_node_set_size(n,w,n->h); }
 static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->w,h); }

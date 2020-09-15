@@ -8,6 +8,7 @@ void bi_node_init(BiNode* n)
 {
   n->x = 0;
   n->y = 0;
+  n->z = 0;
   n->w = 0;
   n->h = 0;
   n->angle = 0;
@@ -29,9 +30,10 @@ void bi_node_init(BiNode* n)
 
   n->texture_mapping = NULL;
 
+  n->parent = NULL;
   n->children = NULL;
   n->children_size = 0;
-  n->parent = NULL;
+  n->children_order_cached = true;
 
   // timers
   n->timers.size = 0;
@@ -59,6 +61,7 @@ void bi_add_node(BiNode* node,BiNode* child)
   BiNode* *tmp = realloc( node->children, sizeof(BiNode*) * node->children_size );
   node->children = tmp;
   node->children[node->children_size-1] = child;
+  node->children_order_cached = false;
   child->parent = node;
   child->matrix_cached = false;
 }
@@ -106,6 +109,14 @@ void bi_node_set_position(BiNode* n, int x, int y)
   }
   n->x = x;
   n->y = y;
+}
+
+void bi_node_set_z(BiNode* n, int z)
+{
+  n->z = z;
+  if( n->parent ) {
+    n->parent->children_order_cached = false;
+  }
 }
 
 void bi_node_set_size(BiNode* n, int w, int h)

@@ -83,7 +83,7 @@ static int node_order_compare(const void *_a, const void *_b )
 {
   const BiNode *a = *(BiNode**)_a;
   const BiNode *b = *(BiNode**)_b;
-  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
+  return a->z == b->z ? b->_index - a->_index : a->z - b->z;
 }
 
 static void draw(BiContext* context, BiNode* n, bool visible)

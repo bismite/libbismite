@@ -83,7 +83,7 @@ static int node_order_compare(const void *_a, const void *_b )
 {
   const BiNode *a = *(BiNode**)_a;
   const BiNode *b = *(BiNode**)_b;
-  return a->z == b->z ? b->_index - a->_index : a->z - b->z;
+  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
 }
 
 static void draw(BiContext* context, BiNode* n, bool visible)
@@ -110,7 +110,7 @@ static void draw(BiContext* context, BiNode* n, bool visible)
     }
 
     //
-    if( ! n->children_order_cached ) {
+    if( n->children_order_cached == false ) {
       for(int i=0;i<n->children_size;i++){ n->_index = i; }
       qsort( n->children, n->children_size, sizeof(BiNode*), node_order_compare);
       n->children_order_cached = true;

@@ -113,6 +113,7 @@ static void draw(BiContext* context, BiNode* n, bool visible)
     if( ! n->children_order_cached ) {
       for(int i=0;i<n->children_size;i++){ n->_index = i; }
       qsort( n->children, n->children_size, sizeof(BiNode*), node_order_compare);
+      n->children_order_cached = true;
     }
     for(int i=0;i<n->children_size;i++){
       if( n->children[i]->matrix_cached == true && matrix_update_require ) {

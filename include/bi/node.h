@@ -39,6 +39,7 @@ struct _BiNode {
   float anchor_y;
   bool matrix_include_anchor_translate;
   bool visible;
+  bool _final_visibility;
 
   uint8_t color[4];
   BiTextureMapping *texture_mapping;

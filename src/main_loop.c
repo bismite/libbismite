@@ -100,7 +100,7 @@ static void main_loop( void* arg )
       // Timer
       bi_run_timers(&n->timers,now);
       // Event Handler
-      if( bi_node_has_callback(n) ) {
+      if( bi_node_has_callback(n) && n->_final_visibility ) {
         for(int i=0;i<event_size;i++) {
           if(e[i].type == 0) continue;
           bool swallow = node_event_handle(n,context,&e[i]);

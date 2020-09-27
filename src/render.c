@@ -88,6 +88,8 @@ static int node_order_compare(const void *_a, const void *_b )
 
 static void draw(BiContext* context, BiNode* n, bool visible)
 {
+    n->_final_visibility = n->visible && visible;
+
     // add callback
     if( n->_on_update.callback != NULL || bi_node_has_callback(n) || n->timers.size > 0 ) {
       context->callback_planned_nodes[context->callback_planned_nodes_size] = n;

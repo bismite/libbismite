@@ -18,6 +18,7 @@ void bi_node_init(BiNode* n)
   n->anchor_y = 0;
   n->matrix_include_anchor_translate = false;
   n->visible = true;
+  n->_final_visibility = true;
   n->color[0] = 0;
   n->color[1] = 0;
   n->color[2] = 0;

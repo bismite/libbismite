@@ -1,7 +1,7 @@
 #include <bi/timer.h>
 #include <stdlib.h>
 
-void bi_timer_init(BiTimer* timer, timer_callback callback, double interval, int repeat, void* userdata)
+void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, int repeat, void* userdata)
 {
     timer->repeat = repeat;
     timer->interval = interval;
@@ -21,10 +21,15 @@ void bi_finish_timer(BiTimer* timer)
 // Timers
 //
 
-void bi_run_timers(BiTimers* timers, double now)
+void bi_run_timers(BiTimers* timers, int64_t now)
 {
   for(int i=0;i<timers->size;i++){
     BiTimer* t = timers->timers[i];
+
+    // skip if NULL
+    if(t==NULL){
+      continue;
+    }
 
     // skip finished timer
     if(t->finished){
@@ -48,6 +53,18 @@ void bi_run_timers(BiTimers* timers, double now)
       }
     }
   }
+  // compaction
+  int actual_size = 0;
+  for(int i=0;i<timers->size;i++){
+    if(timers->timers[i]!=NULL){
+      timers->timers[actual_size] = timers->timers[i];
+      actual_size++;
+    }
+  }
+  if( timers->size != actual_size ){
+    timers->size = actual_size;
+    timers->timers = realloc( timers->timers, sizeof(BiTimer*) * timers->size );
+  }
 }
 
 void bi_add_timer(BiTimers* timers, BiTimer* timer)
@@ -58,34 +75,15 @@ void bi_add_timer(BiTimers* timers, BiTimer* timer)
     timers->timers[timers->size-1] = timer;
 }
 
-BiTimer* bi_remove_timer_index(BiTimers* timers, int index)
-{
-  if(index<0) return NULL;
-  if(timers->size==0) return NULL;
-
-  BiTimer* tmp = timers->timers[index];
-
-  for(int i=index;i<timers->size-1;i++){
-    timers->timers[i] = timers->timers[i+1];
-  }
-
-  timers->size -= 1;
-  timers->timers = realloc( timers->timers, sizeof(BiTimer*) * timers->size );
-
-  return tmp;
-}
-
 BiTimer* bi_remove_timer(BiTimers* timers, BiTimer* timer)
 {
-  int index = -1;
+  BiTimer* tmp = NULL;
   for(int i=0;i<timers->size;i++){
     if(timers->timers[i] == timer){
-      index = i;
+      tmp = timers->timers[i];
+      timers->timers[i] = NULL;
       break;
     }
   }
-  if(index<0){
-    return NULL;
-  }
-  return bi_remove_timer_index(timers,index);
+  return tmp;
 }

@@ -9,7 +9,7 @@
 #include <bi/node.h>
 
 #define BI_CORE_MAJOR_VERSION 0
-#define BI_CORE_MINOR_VERSION 8
+#define BI_CORE_MINOR_VERSION 9
 #define BI_CORE_PATCHLEVEL 0
 
 struct _BiContext;
@@ -51,8 +51,8 @@ struct _BiContext {
     BiNode* callback_planned_nodes[0xFFFF];
     int callback_planned_nodes_size;
 
-    OnUpdateCallback on_update_callbacks[0xFF];
-    int on_update_callbacks_size;
+    // global timers
+    BiTimers timers;
 
     //
     BiShader shader;

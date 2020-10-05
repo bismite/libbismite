@@ -72,16 +72,14 @@ static void main_loop( void* arg )
 
     bi_profile_record(&context->profile,now);
 
-    context->profile.on_update_callbacks_size = context->on_update_callbacks_size;
     context->profile.callback_planned_nodes_size = context->callback_planned_nodes_size;
 
     //
     // callback and event handling
     //
 
-    for(int i=0;i<context->on_update_callbacks_size;i++){
-      context->on_update_callbacks[i].callback(context, context->on_update_callbacks[i].userdata);
-    }
+    // Global Timers
+    bi_run_timers(&context->timers,now);
 
     const int PUMP_EVENT_MAX = 32;
     SDL_Event e[PUMP_EVENT_MAX];

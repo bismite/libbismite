@@ -13,4 +13,8 @@ void bi_layer_init(BiLayer* layer)
     layer->textures[i] = NULL;
   }
   layer->z_order = 0;
+  layer->shader = NULL;
+  for(int i=0;i<4;i++) {
+    layer->optional_shader_attributes[i] = 0;
+  }
 }

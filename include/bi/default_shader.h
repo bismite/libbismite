@@ -2,7 +2,7 @@
 #ifdef __EMSCRIPTEN__
 #define SHADER_VERSION "#version 100\n"
 #define VERTEX_SHADER_HEADER "precision highp float;\n"
-#define FRAGMENT_SHADER_HEADER "precision mediump float;\n"
+#define FRAGMENT_SHADER_HEADER "precision highp float;\n"
 #else
 #define SHADER_VERSION "#version 120\n"
 #define VERTEX_SHADER_HEADER ""
@@ -11,7 +11,7 @@
 
 #define D(...) #__VA_ARGS__ "\n";
 
-const char *VERTEX_SHADER = SHADER_VERSION VERTEX_SHADER_HEADER D(
+const char *DEFAULT_VERTEX_SHADER = SHADER_VERSION VERTEX_SHADER_HEADER D(
 uniform mat4 projection;
 uniform mat4 view;
 attribute vec2 vertex;
@@ -47,37 +47,32 @@ void main()
 }
 );
 
-const char *FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
+const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 varying vec3 uv;
 varying vec4 color;
+uniform float time;
+varying vec2 resolution;
+varying vec4 optional_attributes;
 uniform sampler2D sampler[8];
-uniform sampler2D sampler0;
-uniform sampler2D sampler1;
-uniform sampler2D sampler2;
-uniform sampler2D sampler3;
-uniform sampler2D sampler4;
-uniform sampler2D sampler5;
-uniform sampler2D sampler6;
-uniform sampler2D sampler7;
+
+vec4 getTextureColor(int samplerID,vec2 xy) {
+  // WebGL not supported dynamic indexing for sampler...
+  if(samplerID==0){ return texture2D(sampler[0], xy); }
+  if(samplerID==1){ return texture2D(sampler[1], xy); }
+  if(samplerID==2){ return texture2D(sampler[2], xy); }
+  if(samplerID==3){ return texture2D(sampler[3], xy); }
+  if(samplerID==4){ return texture2D(sampler[4], xy); }
+  if(samplerID==5){ return texture2D(sampler[5], xy); }
+  if(samplerID==6){ return texture2D(sampler[6], xy); }
+  if(samplerID==7){ return texture2D(sampler[7], xy); }
+  return vec4(0);
+}
+
 void main()
 {
   int samplerID = int(uv.z);
-  if(samplerID==0){
-    gl_FragColor = texture2D( sampler0, uv.xy ) * color;
-  }else if(samplerID==1){
-    gl_FragColor = texture2D( sampler1, uv.xy ) * color;
-  }else if(samplerID==2){
-    gl_FragColor = texture2D( sampler2, uv.xy ) * color;
-  }else if(samplerID==3){
-    gl_FragColor = texture2D( sampler3, uv.xy ) * color;
-  }else if(samplerID==4){
-    gl_FragColor = texture2D( sampler4, uv.xy ) * color;
-  }else if(samplerID==5){
-    gl_FragColor = texture2D( sampler5, uv.xy ) * color;
-  }else if(samplerID==6){
-    gl_FragColor = texture2D( sampler6, uv.xy ) * color;
-  }else if(samplerID==7){
-    gl_FragColor = texture2D( sampler7, uv.xy ) * color;
+  if( 0 <= samplerID && samplerID <= 7 ) {
+    gl_FragColor = getTextureColor(samplerID, uv.xy) * color;
   }else{
     gl_FragColor = color;
   }

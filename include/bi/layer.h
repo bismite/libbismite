@@ -13,6 +13,9 @@ typedef struct _BiTexture BiTexture;
 struct _BiLayer;
 typedef struct _BiLayer BiLayer;
 
+struct _BiShader;
+typedef struct _BiShader BiShader;
+
 struct _BiLayer {
   GLfloat camera_x;
   GLfloat camera_y;
@@ -23,6 +26,8 @@ struct _BiLayer {
   BiTexture* textures[8];
   int z_order;
   int index;
+  BiShader *shader;
+  GLfloat optional_shader_attributes[4];
 };
 
 extern void bi_layer_init(BiLayer* layer);

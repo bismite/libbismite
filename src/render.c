@@ -145,12 +145,24 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
 
     context->profile.rendering_nodes_queue_size += len;
 
-    BiShader* shader = &context->shader;
+    // shader select
+    BiShader* shader = &context->default_shader;
+    if( layer->shader != NULL ){
+      shader = layer->shader;
+    }
+    glUseProgram(shader->program_id);
+
+    // time
+    glUniform1f(shader->time_location, (context->program_start_at - context->frame_start_at)/1000.0 );
+    // resolution - retina display scaled x2
+    int drawable_w,drawable_h;
+    SDL_GL_GetDrawableSize(context->window, &drawable_w, &drawable_h);
+    glUniform2f(shader->resolution_location, drawable_w, drawable_h );
+    // optional attributes
+    glUniform4fv(shader->optional_attributes_location, 1, layer->optional_shader_attributes );
 
     // Textures
     for(int i=0;i<8;i++) {
-      // set Sampler2D uniform
-      glUniform1i( shader->texture_locations[i], i );
       // texture bind
       glActiveTexture(GL_TEXTURE0+i);
       if( layer->textures[i] == NULL ) {
@@ -220,8 +232,8 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // set camera, projection, blend function
-    bi_set_projection(&context->shader, context->w, context->h, layer->projection_centering);
-    bi_set_camera(&context->shader, layer->camera_x, layer->camera_y);
+    bi_set_projection(shader, context->w, context->h, layer->projection_centering);
+    bi_set_camera(shader, layer->camera_x, layer->camera_y);
 
     // blend function
     glBlendFunc(layer->blend_src,layer->blend_dst);

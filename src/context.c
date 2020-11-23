@@ -4,6 +4,7 @@
 #include <bi/layer.h>
 #include <bi/logger.h>
 #include <stdlib.h>
+#include <bi/default_shader.h>
 
 void (*glGenVertexArrays_wrapper)(GLsizei, GLuint*);
 void (*glBindVertexArray_wrapper)(GLuint);
@@ -103,6 +104,8 @@ static void enable_gl_extensions(BiContext* context)
 
 void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
+    context->program_start_at = bi_get_now();
+
     context->rendering_nodes_queue_size = 0;
     context->callback_planned_nodes_size = 0;
     context->layers_size = 0;
@@ -155,7 +158,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     enable_gl_extensions(context);
 
-    bi_init_shader(&context->shader,context->w,context->h);
+    bi_init_shader(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
 }
 
 void bi_set_title(BiContext* context, const char* title)

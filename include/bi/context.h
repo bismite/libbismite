@@ -30,6 +30,9 @@ struct _BiContext {
     // background color
     uint8_t color[4];
 
+    //
+    int64_t program_start_at;
+
     // time of frame start(millisecond)
     int64_t frame_start_at;
 
@@ -54,8 +57,8 @@ struct _BiContext {
     // global timers
     BiTimers timers;
 
-    //
-    BiShader shader;
+    // default shader
+    BiShader default_shader;
 
     //
     SDL_Window *window;

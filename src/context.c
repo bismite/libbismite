@@ -165,7 +165,6 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     //
     // frame buffer
     glGenFramebuffers(1, &context->post_processing.framebuffer);
-    printf("generated GL_FRAMEBUFFER_BINDING: %d\n",context->post_processing.framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, context->post_processing.framebuffer);
     glGenTextures(1, &context->post_processing.texture);
     glBindTexture(GL_TEXTURE_2D, context->post_processing.texture);

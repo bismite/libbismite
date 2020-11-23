@@ -99,7 +99,7 @@ void bi_set_camera(BiShader* shader,int x, int y)
     glUniformMatrix4fv(shader->view_location, 1, GL_FALSE, view);
 }
 
-void bi_init_shader(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source)
+void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source)
 {
     glEnable(GL_BLEND);
 

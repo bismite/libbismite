@@ -91,17 +91,37 @@ static bool _create_texture(BiTexture* texture, SDL_RWops* rwops, bool antialias
     return true;
 }
 
-bool bi_create_texture(void* buffer, size_t size, BiTexture* texture, bool antialias)
+void bi_texture_init(BiTexture* texture)
+{
+  texture->texture_id = 0;
+  texture->w = 0;
+  texture->h = 0;
+  texture->_texture_unit = 0;
+}
+
+bool bi_texture_load_from_memory(BiTexture* texture, void* buffer, size_t size, bool antialias)
 {
     return _create_texture( texture, SDL_RWFromMem(buffer,size), antialias );
 }
 
-bool bi_load_texture(const char* filename, BiTexture* texture, bool antialias)
+bool bi_texture_load_from_file(BiTexture* texture, const char* filename, bool antialias)
 {
     return _create_texture( texture, SDL_RWFromFile(filename,"rb"), antialias );
 }
 
-void bi_set_texture_mapping(BiTextureMapping* t, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+void bi_texture_mapping_init(BiTextureMapping* texture_mapping)
+{
+  texture_mapping->texture = NULL;
+  texture_mapping->x = 0;
+  texture_mapping->y = 0;
+  texture_mapping->w = 0;
+  texture_mapping->h = 0;
+  for(int i=0;i<4;i++) texture_mapping->boundary[i] = 0;
+  texture_mapping->flip_vertical = false;
+  texture_mapping->flip_horizontal = false;
+}
+
+void bi_texture_mapping_set_bound(BiTextureMapping* t, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
   t->x = x;
   t->y = y;

@@ -18,6 +18,14 @@ typedef struct _BiContext BiContext;
 struct _BiLayer;
 typedef struct _BiLayer BiLayer;
 
+struct _BiPostProcessing {
+    BiShader* shader;
+    GLuint framebuffer;
+    GLuint texture;
+    GLfloat optional_shader_attributes[4];
+};
+typedef struct _BiPostProcessing BiPostProcessing;
+
 struct _BiContext {
     bool running;
 
@@ -59,6 +67,10 @@ struct _BiContext {
 
     // default shader
     BiShader default_shader;
+
+    // shader for post process
+    BiShader default_post_processing_shader;
+    BiPostProcessing post_processing;
 
     //
     SDL_Window *window;

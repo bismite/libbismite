@@ -158,7 +158,30 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     enable_gl_extensions(context);
 
-    bi_init_shader(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+    bi_shader_init(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+
+    //
+    // post processing
+    //
+    // frame buffer
+    glGenFramebuffers(1, &context->post_processing.framebuffer);
+    printf("generated GL_FRAMEBUFFER_BINDING: %d\n",context->post_processing.framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, context->post_processing.framebuffer);
+    glGenTextures(1, &context->post_processing.texture);
+    glBindTexture(GL_TEXTURE_2D, context->post_processing.texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    int scaled_w,scaled_h;
+    SDL_GL_GetDrawableSize(context->window, &scaled_w, &scaled_h); // !!!: retina display scaled x2!
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scaled_w, scaled_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, context->post_processing.texture, 0);
+    // unbind
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // shader
+    context->post_processing.shader = NULL;
 }
 
 void bi_set_title(BiContext* context, const char* title)

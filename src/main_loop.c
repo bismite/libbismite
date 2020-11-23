@@ -125,28 +125,10 @@ static void main_loop( void* arg )
     //
     // rendering
     //
+    bi_render(context);
 
-    // clear
-    glClearColor(
-      context->color[0]/255.f,
-      context->color[1]/255.f,
-      context->color[2]/255.f,
-      context->color[3]/255.f
-    );
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // reset stats
-    context->profile.matrix_updated = 0;
-    context->profile.rendering_nodes_queue_size = 0;
     //
-    for(int i=0;i<context->layers_size;i++) {
-      bi_render_layer(context,context->layers[i]);
-    }
-
     int64_t phase3 = bi_get_now();
-
-    //
-    SDL_GL_SwapWindow(context->window);
 
     //
     context->profile.time_spent_on_callback = phase2 - now;

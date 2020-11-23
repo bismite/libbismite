@@ -125,7 +125,7 @@ static void draw(BiContext* context, BiNode* n, bool visible)
     }
 }
 
-void bi_render_layer(BiContext* context,BiLayer* layer)
+static void bi_render_layer(BiContext* context,BiLayer* layer)
 {
     if( layer->root == NULL ) {
       return;
@@ -193,6 +193,14 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
         uv[i*4+1] = t->boundary[1]; // Top
         uv[i*4+2] = t->boundary[2]; // Right
         uv[i*4+3] = t->boundary[3]; // Bottom
+        if(t->flip_horizontal) {
+          uv[i*4+0] = t->boundary[2];
+          uv[i*4+2] = t->boundary[0];
+        }
+        if(t->flip_vertical) {
+          uv[i*4+1] = t->boundary[3];
+          uv[i*4+3] = t->boundary[1];
+        }
         texture_z[i] = t->texture->_texture_unit; // texture
       }
 
@@ -244,4 +252,65 @@ void bi_render_layer(BiContext* context,BiLayer* layer)
     glBindVertexArray_wrapper(shader->vao);
       glDrawArraysInstanced_wrapper(GL_TRIANGLE_STRIP, 0, 4, len);
     glBindVertexArray_wrapper(0);
+}
+
+void bi_render(BiContext* context)
+{
+    // bind framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, context->post_processing.framebuffer);
+
+    // clear framebuffer
+    glClearColor( context->color[0]/255.f, context->color[1]/255.f, context->color[2]/255.f, context->color[3]/255.f );
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // reset stats
+    context->profile.matrix_updated = 0;
+    context->profile.rendering_nodes_queue_size = 0;
+    // rendering
+    for(int i=0;i<context->layers_size;i++) {
+      bi_render_layer(context,context->layers[i]);
+    }
+
+    // unbind framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // clear
+    glClearColor( context->color[0]/255.f, context->color[1]/255.f, context->color[2]/255.f, context->color[3]/255.f );
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // render to screen
+    BiTexture t;
+    bi_texture_init(&t);
+    t.texture_id = context->post_processing.texture;
+    t.w = context->w;
+    t.h = context->h;
+    t._texture_unit = 0;
+
+    BiTextureMapping m;
+    bi_texture_mapping_init(&m);
+    m.flip_vertical = true;
+    m.texture = &t;
+    bi_texture_mapping_set_bound(&m,0,0,m.texture->w,m.texture->h);
+
+    BiNode n;
+    bi_node_init(&n);
+    bi_node_set_size(&n,t.w,t.h);
+    n.texture_mapping = &m;
+    bi_set_color(n.color,0xff,0xff,0xff,0xff);
+
+    BiLayer l;
+    bi_layer_init(&l);
+    l.root = &n;
+    l.textures[0] = &t;
+    memcpy(l.optional_shader_attributes, context->post_processing.optional_shader_attributes, sizeof(GLfloat)*4 );
+    if(context->post_processing.shader) {
+      l.shader = context->post_processing.shader;
+    } else {
+      l.shader = &context->default_shader;
+    }
+
+    bi_render_layer(context,&l);
+
+    //
+    SDL_GL_SwapWindow(context->window);
 }

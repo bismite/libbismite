@@ -36,7 +36,7 @@ struct _BiShader {
     GLint optional_attributes_location;
 };
 
-extern void bi_init_shader(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source);
+extern void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source);
 extern void bi_set_projection(BiShader* shader,int w,int h,bool centering);
 extern void bi_set_camera(BiShader* shader,int x,int y);
 

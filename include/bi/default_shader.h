@@ -51,8 +51,8 @@ const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 varying vec3 uv;
 varying vec4 color;
 uniform float time;
-varying vec2 resolution;
-varying vec4 optional_attributes;
+uniform vec2 resolution;
+uniform vec4 optional_attributes;
 uniform sampler2D sampler[8];
 
 vec4 getTextureColor(int samplerID,vec2 xy) {

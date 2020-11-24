@@ -1,4 +1,4 @@
-# bi-core
+# bismite-library-core
 
 # License
 

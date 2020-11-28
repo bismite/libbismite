@@ -9,7 +9,7 @@
 #include <bi/node.h>
 
 #define BI_CORE_MAJOR_VERSION 0
-#define BI_CORE_MINOR_VERSION 10
+#define BI_CORE_MINOR_VERSION 11
 #define BI_CORE_PATCHLEVEL 0
 
 struct _BiContext;

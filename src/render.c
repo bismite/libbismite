@@ -302,6 +302,8 @@ void bi_render(BiContext* context)
     bi_layer_init(&l);
     l.root = &n;
     l.textures[0] = &t;
+    l.blend_src = GL_ONE;
+    l.blend_dst = GL_ZERO;
     memcpy(l.optional_shader_attributes, context->post_processing.optional_shader_attributes, sizeof(GLfloat)*4 );
     if(context->post_processing.shader) {
       l.shader = context->post_processing.shader;

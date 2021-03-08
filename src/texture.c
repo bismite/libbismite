@@ -3,6 +3,36 @@
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
 
+static GLuint create_texture_from_pixels(int w, int h, void*pixels, bool antialiase)
+{
+    GLuint texture_id;
+    glGenTextures(1, &texture_id);
+
+    //
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+    //
+    if(antialiase) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }else{
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
+
+    // XXX: Non-power-of-two textures must have a wrap mode of CLAMP_TO_EDGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // unbind
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return texture_id;
+}
+
 static SDL_Surface* create_surface_abgr8888(int w, int h)
 {
 #if SDL_VERSION_ATLEAST(2,0,5)
@@ -24,70 +54,36 @@ static SDL_Surface* create_surface_abgr8888(int w, int h)
 #endif
 }
 
-static GLuint createTextureFromSurface(SDL_Surface *src, bool antialiase)
-{
-    SDL_Surface* img = src;
-
-    // force change Format to SDL_PIXELFORMAT_ABGR8888
-    if(src->format->format != SDL_PIXELFORMAT_ABGR8888)
-    {
-        img = create_surface_abgr8888(src->w, src->h);
-        if (img == NULL) {
-            LOG("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
-            return 0;
-        }
-        SDL_BlitSurface(src,NULL,img,NULL);
-    }
-
-    GLuint texture_id;
-    glGenTextures(1, &texture_id);
-
-    //
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-
-    // SDL_PIXELFORMAT_ABGR8888 -> GL_RGBA
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w, img->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->pixels);
-
-    //
-    if(antialiase) {
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    }else{
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    }
-
-    // XXX: Non-power-of-two textures must have a wrap mode of CLAMP_TO_EDGE
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // unbind
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    if(src->format->format != SDL_PIXELFORMAT_ABGR8888)
-      SDL_FreeSurface(img);
-
-    return texture_id;
-}
-
-static bool _create_texture(BiTexture* texture, SDL_RWops* rwops, bool antialias)
+static bool load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, bool antialias)
 {
     // XXX: ARGB? ABGR?
     // Desktop OpenGL: SDL_PIXELFORMAT_ARGB8888, invert R<->B
     // WebGL:          SDL_PIXELFORMAT_ABGR8888, correct.
-    SDL_Surface *image = IMG_Load_RW( rwops, 1 );
-    if(image == NULL) {
+    SDL_Surface *orig = IMG_Load_RW( rwops, 1 );
+    if(orig == NULL) {
       LOG("Error IMG_Load\n");
       return false;
     }
 
-    texture->texture_id = createTextureFromSurface(image,antialias);
-    texture->w = image->w;
-    texture->h = image->h;
-    texture->_texture_unit = 0;
+    SDL_Surface* img = orig;
 
-    SDL_FreeSurface(image);
+    // force change Format to SDL_PIXELFORMAT_ABGR8888
+    if(orig->format->format != SDL_PIXELFORMAT_ABGR8888)
+    {
+        img = create_surface_abgr8888(orig->w, orig->h);
+        if (img == NULL) {
+            LOG("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
+            return false;
+        }
+        SDL_BlitSurface(orig,NULL,img,NULL);
+    }
+
+    bi_texture_load_from_pixels(texture,img->w,img->h,img->pixels,antialias);
+
+    if(orig->format->format != SDL_PIXELFORMAT_ABGR8888)
+      SDL_FreeSurface(img);
+
+    SDL_FreeSurface(orig);
     return true;
 }
 
@@ -99,14 +95,23 @@ void bi_texture_init(BiTexture* texture)
   texture->_texture_unit = 0;
 }
 
+bool bi_texture_load_from_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias)
+{
+    texture->texture_id = create_texture_from_pixels(w,h,pixels,antialias);
+    texture->w = w;
+    texture->h = h;
+    texture->_texture_unit = 0;
+    return true;
+}
+
 bool bi_texture_load_from_memory(BiTexture* texture, void* buffer, size_t size, bool antialias)
 {
-    return _create_texture( texture, SDL_RWFromMem(buffer,size), antialias );
+    return load_texture_from_image( texture, SDL_RWFromMem(buffer,size), antialias );
 }
 
 bool bi_texture_load_from_file(BiTexture* texture, const char* filename, bool antialias)
 {
-    return _create_texture( texture, SDL_RWFromFile(filename,"rb"), antialias );
+    return load_texture_from_image( texture, SDL_RWFromFile(filename,"rb"), antialias );
 }
 
 void bi_texture_mapping_init(BiTextureMapping* texture_mapping)

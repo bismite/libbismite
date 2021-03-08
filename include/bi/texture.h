@@ -29,6 +29,7 @@ struct _BiTextureMapping {
 
 
 extern void bi_texture_init(BiTexture* texture);
+extern bool bi_texture_load_from_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias);
 extern bool bi_texture_load_from_memory(BiTexture* texture, void* buffer, size_t size, bool antialiase);
 extern bool bi_texture_load_from_file(BiTexture* texture, const char* filename, bool antialiase);
 

@@ -4,7 +4,8 @@
 #ifdef __EMSCRIPTEN__
 #  include <SDL_opengles2.h>
 #else
-#  include <GL/glew.h>
+#  include <SDL_opengl.h>
+#  include <SDL_opengl_glext.h>
 #endif
 
 extern void (*glGenVertexArrays_wrapper)(GLsizei, GLuint*);

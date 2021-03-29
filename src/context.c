@@ -42,39 +42,33 @@ static void enable_gl_extensions(BiContext* context)
     }
 
 #else
-    if( glewInit() == GLEW_OK ){
-      LOG("glewInit ok\n");
-    }else{
-      LOG("glewInit faild\n");
-      exit(1);
-    }
 
     // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
-    if (GLEW_APPLE_vertex_array_object) {
+    if( SDL_GL_ExtensionSupported("GL_APPLE_vertex_array_object") ) {
         vertex_array_object = true;
-        glGenVertexArrays_wrapper = glGenVertexArraysAPPLE;
-        glBindVertexArray_wrapper = glBindVertexArrayAPPLE;
+        glGenVertexArrays_wrapper = SDL_GL_GetProcAddress("glGenVertexArraysAPPLE");
+        glBindVertexArray_wrapper = SDL_GL_GetProcAddress("glBindVertexArrayAPPLE");
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
-    } else if(GLEW_ARB_vertex_array_object) {
+    } else if( SDL_GL_ExtensionSupported("GL_ARB_vertex_array_object")) {
         vertex_array_object = true;
-        glGenVertexArrays_wrapper = glGenVertexArrays;
-        glBindVertexArray_wrapper = glBindVertexArray;
+        glGenVertexArrays_wrapper = SDL_GL_GetProcAddress("glGenVertexArrays");
+        glBindVertexArray_wrapper = SDL_GL_GetProcAddress("glBindVertexArray");
     }
 
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_instanced_arrays.txt
-    if(GLEW_ARB_instanced_arrays) {
+    if( SDL_GL_ExtensionSupported("GL_ARB_instanced_arrays")) {
       instanced_arrays = true;
-      glVertexAttribDivisor_wrapper = glVertexAttribDivisorARB;
+      glVertexAttribDivisor_wrapper = SDL_GL_GetProcAddress("glVertexAttribDivisorARB");
     }
 
     // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_draw_instanced.txt
-    if(GLEW_ARB_draw_instanced) {
+    if( SDL_GL_ExtensionSupported("GL_ARB_draw_instanced") ) {
       draw_instanced = true;
-      glDrawArraysInstanced_wrapper = glDrawArraysInstancedARB;
+      glDrawArraysInstanced_wrapper = SDL_GL_GetProcAddress("glDrawArraysInstancedARB");
     // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_draw_instanced.txt
-    } else if(GLEW_EXT_draw_instanced) {
+    } else if(SDL_GL_ExtensionSupported("GL_EXT_draw_instanced")) {
       draw_instanced = true;
-      glDrawArraysInstanced_wrapper = glDrawArraysInstancedEXT;
+      glDrawArraysInstanced_wrapper = SDL_GL_GetProcAddress("glDrawArraysInstancedEXT");
     }
 
 #endif

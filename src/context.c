@@ -17,6 +17,15 @@ static void enable_gl_extensions(BiContext* context)
     bool instanced_arrays = false;
     bool draw_instanced = false;
 
+#ifdef __MINGW32__
+    if( glewInit() == GLEW_OK ){
+      LOG("glewInit ok\n");
+    }else{
+      LOG("glewInit faild\n");
+      exit(1);
+    }
+#endif
+
 #ifdef __EMSCRIPTEN__
 
     // https://www.khronos.org/registry/OpenGL/extensions/OES/OES_vertex_array_object.txt

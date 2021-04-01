@@ -3,6 +3,8 @@
 
 #ifdef __EMSCRIPTEN__
 #  include <SDL_opengles2.h>
+#elif __MINGW32__
+#  include <GL/glew.h>
 #else
 #  include <SDL_opengl.h>
 #  include <SDL_opengl_glext.h>

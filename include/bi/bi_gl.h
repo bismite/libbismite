@@ -5,8 +5,11 @@
 #define GL_GLEXT_PROTOTYPES
 #endif
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__)
 #include <SDL_opengles2.h>
+#elif defined(__APPLE__)
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 #else
 #include <GL/gl.h>
 #include <GL/glext.h>

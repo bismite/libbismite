@@ -144,8 +144,8 @@ void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_sourc
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // create vao
-    glGenVertexArrays_wrapper(1, &shader->vao);
-    glBindVertexArray_wrapper(shader->vao);
+    glGenVertexArrays(1, &shader->vao);
+    glBindVertexArray(shader->vao);
 
       // vertex
       glBindBuffer(GL_ARRAY_BUFFER, shader->vertex_buffer);
@@ -182,14 +182,14 @@ void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_sourc
       }
 
       // for instancing
-      glVertexAttribDivisor_wrapper(shader->vertex_location, 0); // vertex
-      glVertexAttribDivisor_wrapper(shader->texture_uv_location, 1); // uv
-      glVertexAttribDivisor_wrapper(shader->vertex_index_location, 0); // vertex_index
-      glVertexAttribDivisor_wrapper(shader->texture_z_location, 1); // texture_z
-      glVertexAttribDivisor_wrapper(shader->mod_color_location, 1); // mod_color
+      glVertexAttribDivisor(shader->vertex_location, 0); // vertex
+      glVertexAttribDivisor(shader->texture_uv_location, 1); // uv
+      glVertexAttribDivisor(shader->vertex_index_location, 0); // vertex_index
+      glVertexAttribDivisor(shader->texture_z_location, 1); // texture_z
+      glVertexAttribDivisor(shader->mod_color_location, 1); // mod_color
       for(int i=0;i<4;i++){
-        glVertexAttribDivisor_wrapper(shader->transform_locations[i], 1); // transform
+        glVertexAttribDivisor(shader->transform_locations[i], 1); // transform
       }
 
-    glBindVertexArray_wrapper(0);
+    glBindVertexArray(0);
 }

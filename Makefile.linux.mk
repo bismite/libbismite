@@ -1,6 +1,6 @@
 CC=clang
 AR=ar
-CFLAGS=-Wall -O3 `sdl2-config --cflags` -DGL_GLEXT_PROTOTYPES
+CFLAGS=-Wall -O3 `sdl2-config --cflags`
 INCLUDE_PATHS=
 
 BUILD_DIR=build/linux

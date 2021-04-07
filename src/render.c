@@ -249,9 +249,9 @@ static void bi_render_layer(BiContext* context,BiLayer* layer)
     //
     // Draw instances
     //
-    glBindVertexArray_wrapper(shader->vao);
-      glDrawArraysInstanced_wrapper(GL_TRIANGLE_STRIP, 0, 4, len);
-    glBindVertexArray_wrapper(0);
+    glBindVertexArray(shader->vao);
+      glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, len);
+    glBindVertexArray(0);
 }
 
 void bi_render(BiContext* context)

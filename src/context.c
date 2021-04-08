@@ -89,7 +89,7 @@ static void enable_gl_extensions(BiContext* context)
       glDrawArraysInstanced = SDL_GL_GetProcAddress("glDrawArraysInstancedANGLE");
       glVertexAttribDivisor = SDL_GL_GetProcAddress("glVertexAttribDivisorANGLE");
     }
-#elsif
+#else
     // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
     if( SDL_GL_ExtensionSupported("GL_APPLE_vertex_array_object") ) {
         glGenVertexArrays = SDL_GL_GetProcAddress("glGenVertexArraysAPPLE");

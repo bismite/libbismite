@@ -4,7 +4,7 @@
 #include <bi/layer.h>
 #include <bi/logger.h>
 #include <stdlib.h>
-#include <bi/default_shader.h>
+#include "default_shader.h"
 
 #ifndef GL_GLEXT_PROTOTYPES
 void (*glGenVertexArrays)(GLsizei, GLuint*);

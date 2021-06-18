@@ -14,7 +14,6 @@ static GLuint load_shader(const char* vertex_shader_source, const char* fragment
 
     // compile fragment shader
     GLuint fShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-
     glShaderSource(fShaderId, 1, &fragment_shader_source, NULL);
     glCompileShader(fShaderId);
 
@@ -22,11 +21,7 @@ static GLuint load_shader(const char* vertex_shader_source, const char* fragment
     GLuint program_id = glCreateProgram();
     glAttachShader(program_id,vShaderId);
     glAttachShader(program_id,fShaderId);
-
-    //
     glLinkProgram(program_id);
-
-    glUseProgram(program_id);
 
     return program_id;
 }

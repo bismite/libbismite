@@ -6,8 +6,9 @@
 #include <bi/texture.h>
 #include <bi/util.h>
 #include <bi/timer.h>
+#include <bi/array.h>
 
-struct _BiNode;
+typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
 
 typedef bool (*on_click_callback)(BiNode*, void*, int, int, int, bool); // x,y,button,pressed
@@ -16,9 +17,6 @@ typedef bool (*on_move_finger_callback)(BiNode*, void*, float, float, int64_t); 
 typedef bool (*on_touch_callback)(BiNode*, void*, float, float, int64_t, bool); // x, y, fingerID, pressed
 typedef bool (*on_keyinput_callback)(BiNode*, void*, uint16_t, uint32_t, uint16_t, bool); // scancode, keycode, mod, pressed
 typedef bool (*on_textinput_callback)(BiNode*, void*, char*); // null-terminated UTF-8 text
-
-struct _BiContext;
-typedef struct _BiContext BiContext;
 
 typedef void (*on_update_callback)(BiContext*, void*); // context, BiNode/userdata
 typedef struct {
@@ -50,8 +48,7 @@ struct _BiNode {
   bool matrix_cached;
 
   BiNode *parent;
-  BiNode** children;
-  int children_size;
+  Array children;
   bool children_order_cached;
   int _index;
 
@@ -84,9 +81,11 @@ struct _BiNode {
 extern void bi_node_init(BiNode* n);
 
 // scene graph
-extern void bi_add_node(BiNode* node,BiNode* child);
-extern BiNode* bi_remove_node_index(BiNode* node,int index);
-extern BiNode* bi_remove_node(BiNode* node,BiNode* child);
+static inline BiNode* bi_node_child_at(BiNode* node,int index){ return (BiNode*)node->children.objects[index]; }
+extern void bi_node_add_node(BiNode* node,BiNode* child);
+extern BiNode* bi_node_remove_at(BiNode* node,int index);
+extern BiNode* bi_node_remove_node(BiNode* node,BiNode* child);
+extern void bi_node_sort(BiNode* node);
 
 // geometry
 extern void bi_node_set_position(BiNode* n, int x, int y);

@@ -79,13 +79,6 @@ static void update_matrix(BiNode* n)
   }
 }
 
-static int node_order_compare(const void *_a, const void *_b )
-{
-  const BiNode *a = *(BiNode**)_a;
-  const BiNode *b = *(BiNode**)_b;
-  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
-}
-
 static void draw(BiContext* context, BiNode* n, bool visible)
 {
     n->_final_visibility = n->visible && visible;
@@ -112,16 +105,12 @@ static void draw(BiContext* context, BiNode* n, bool visible)
     }
 
     //
-    if( n->children_order_cached == false ) {
-      for(int i=0;i<n->children_size;i++){ n->children[i]->_index = i; }
-      qsort( n->children, n->children_size, sizeof(BiNode*), node_order_compare);
-      n->children_order_cached = true;
-    }
-    for(int i=0;i<n->children_size;i++){
-      if( n->children[i]->matrix_cached == true && matrix_update_require ) {
-          n->children[i]->matrix_cached = false;
+    bi_node_sort(n);
+    for( int i=0; i<n->children.size; i++ ){
+      if( bi_node_child_at(n,i)->matrix_cached == true && matrix_update_require ) {
+          bi_node_child_at(n,i)->matrix_cached = false;
       }
-      draw(context, n->children[i], visible && n->visible ? true : false);
+      draw(context, bi_node_child_at(n,i), visible && n->visible ? true : false);
     }
 }
 

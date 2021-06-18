@@ -11,7 +11,7 @@
 
 #define D(...) #__VA_ARGS__ "\n";
 
-const char *DEFAULT_VERTEX_SHADER = SHADER_VERSION VERTEX_SHADER_HEADER D(
+static const char *DEFAULT_VERTEX_SHADER = SHADER_VERSION VERTEX_SHADER_HEADER D(
 uniform mat4 projection;
 uniform mat4 view;
 attribute vec2 vertex;
@@ -47,7 +47,7 @@ void main()
 }
 );
 
-const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
+static const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 varying vec3 uv;
 varying vec4 color;
 uniform float time;

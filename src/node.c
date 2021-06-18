@@ -31,9 +31,8 @@ void bi_node_init(BiNode* n)
 
   n->texture_mapping = NULL;
 
+  array_init(&n->children);
   n->parent = NULL;
-  n->children = NULL;
-  n->children_size = 0;
   n->children_order_cached = true;
 
   // timers
@@ -56,47 +55,38 @@ void bi_node_init(BiNode* n)
 // scene graph
 //
 
-void bi_add_node(BiNode* node,BiNode* child)
+void bi_node_add_node(BiNode* node,BiNode* child)
 {
-  node->children_size += 1;
-  BiNode* *tmp = realloc( node->children, sizeof(BiNode*) * node->children_size );
-  node->children = tmp;
-  node->children[node->children_size-1] = child;
+  array_add_object(&node->children,child);
   node->children_order_cached = false;
   child->parent = node;
   child->matrix_cached = false;
 }
 
-BiNode* bi_remove_node_index(BiNode* node,int index)
+BiNode* bi_node_remove_at(BiNode* node,int index)
 {
-  if(index<0) return NULL;
-  if(node->children_size==0) return NULL;
-
-  BiNode* tmp = node->children[index];
-
-  for(int i=index;i<node->children_size-1;i++){
-    node->children[i] = node->children[i+1];
-  }
-
-  node->children_size -= 1;
-  node->children = realloc( node->children, sizeof(BiNode*) * node->children_size );
-
-  return tmp;
+  return array_remove_object_at(&node->children,index);
 }
 
-BiNode* bi_remove_node(BiNode* node,BiNode* child)
+BiNode* bi_node_remove_node(BiNode* node,BiNode* child)
 {
-  int index = -1;
-  for(int i=0;i<node->children_size;i++){
-    if(node->children[i] == child){
-      index = i;
-      break;
-    }
+  return array_remove_object(&node->children,child);
+}
+
+static int node_order_compare(const void *_a, const void *_b )
+{
+  const BiNode *a = *(BiNode**)_a;
+  const BiNode *b = *(BiNode**)_b;
+  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
+}
+
+void bi_node_sort(BiNode* node)
+{
+  if( node->children_order_cached == false ) {
+    for( int i=0; i<node->children.size; i++ ){ bi_node_child_at(node,i)->_index = i; }
+    qsort( node->children.objects, node->children.size, sizeof(BiNode*), node_order_compare);
+    node->children_order_cached = true;
   }
-  if(index<0){
-    return NULL;
-  }
-  return bi_remove_node_index(node,index);
 }
 
 //

@@ -256,8 +256,8 @@ void bi_render(BiContext* context)
     context->profile.matrix_updated = 0;
     context->profile.rendering_nodes_queue_size = 0;
     // rendering
-    for(int i=0;i<context->layers_size;i++) {
-      bi_render_layer(context,context->layers[i]);
+    for(int i=0;i<context->layers.size;i++) {
+      bi_render_layer(context,context->layers.objects[i]);
     }
 
     // unbind framebuffer

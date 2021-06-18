@@ -3,20 +3,26 @@
 
 #include <bi/bi_gl.h>
 #include <stdbool.h>
+#include <bi/array.h>
 
-struct _BiNode;
 typedef struct _BiNode BiNode;
-
-struct _BiTexture;
 typedef struct _BiTexture BiTexture;
-
-struct _BiLayer;
-typedef struct _BiLayer BiLayer;
-
-struct _BiShader;
 typedef struct _BiShader BiShader;
+typedef struct _BiLayerHeader BiLayerHeader;
+typedef struct _BiLayer BiLayer;
+typedef struct _BiLayerGroup BiLayerGroup;
+
+enum BiLayerType {
+  BI_LAYER_TYPE_LAYER,
+  BI_LAYER_TYPE_LAYER_GROUP
+};
+
+struct _BiLayerHeader {
+  int type;
+};
 
 struct _BiLayer {
+  BiLayerHeader header;
   GLfloat camera_x;
   GLfloat camera_y;
   bool projection_centering;
@@ -28,6 +34,12 @@ struct _BiLayer {
   int index;
   BiShader *shader;
   GLfloat optional_shader_attributes[4];
+};
+
+struct _BiLayerGroup {
+  BiLayerHeader header;
+  Array layers;
+  Array shaders;
 };
 
 extern void bi_layer_init(BiLayer* layer);

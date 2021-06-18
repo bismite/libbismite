@@ -7,15 +7,13 @@
 #include <bi/shader.h>
 #include <bi/profile.h>
 #include <bi/node.h>
+#include <bi/array.h>
 
 #define BI_CORE_MAJOR_VERSION 0
 #define BI_CORE_MINOR_VERSION 13
 #define BI_CORE_PATCHLEVEL 0
 
-struct _BiContext;
 typedef struct _BiContext BiContext;
-
-struct _BiLayer;
 typedef struct _BiLayer BiLayer;
 
 struct _BiPostProcessing {
@@ -51,8 +49,7 @@ struct _BiContext {
     bool debug;
 
     // Layers
-    BiLayer* layers[0xFF];
-    int layers_size;
+    Array layers;
 
     // rendering queue
     BiNode* rendering_nodes_queue[0xFFFF];

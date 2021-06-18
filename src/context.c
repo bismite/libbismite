@@ -128,7 +128,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     context->rendering_nodes_queue_size = 0;
     context->callback_planned_nodes_size = 0;
-    context->layers_size = 0;
+    array_init(&context->layers);
 
     // timers
     context->timers.size = 0;
@@ -222,29 +222,18 @@ static int layer_order_compare(const void *_a, const void *_b )
 
 void bi_update_layer_order(BiContext* context)
 {
-  for(int i=0;i<context->layers_size;i++) { context->layers[i]->index = i; }
-  qsort(context->layers,context->layers_size,sizeof(BiLayer*),layer_order_compare);
-  for(int i=0;i<context->layers_size;i++) { context->layers[i]->index = i; }
+  for(int i=0;i<context->layers.size;i++) { ((BiLayer*)context->layers.objects[i])->index = i; }
+  qsort(context->layers.objects,context->layers.size,sizeof(BiLayer*),layer_order_compare);
+  for(int i=0;i<context->layers.size;i++) { ((BiLayer*)context->layers.objects[i])->index = i; }
 }
 
 void bi_add_layer(BiContext* context, BiLayer* layer)
 {
-  context->layers[context->layers_size] = layer;
-  context->layers_size += 1;
+  array_add_object(&context->layers,layer);
   bi_update_layer_order(context);
 }
 
 void bi_remove_layer(BiContext* context, BiLayer* layer)
 {
-  int index = -1;
-  for(int i=0;i<context->layers_size;i++){
-    if( context->layers[i] == layer ) {
-      index = i;
-      break;
-    }
-  }
-  for(int i=index+1;i<context->layers_size;i++) {
-    context->layers[i-1] = context->layers[i];
-  }
-  context->layers_size -= 1;
+  array_remove_object(&context->layers,layer);
 }

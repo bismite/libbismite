@@ -1,3 +1,6 @@
+#ifndef __ARRAY_H__
+#define __ARRAY_H__
+
 #include <stdint.h>
 
 typedef struct {
@@ -11,3 +14,5 @@ void array_free(Array *a);
 void array_add_object(Array* a, void* object);
 void* array_remove_object_at(Array* a, int index);
 void* array_remove_object(Array* a, void* object);
+
+#endif

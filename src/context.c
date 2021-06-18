@@ -13,7 +13,9 @@ void (*glDrawArraysInstanced)(GLenum, int, GLsizei, GLsizei);
 void (*glVertexAttribDivisor)(GLuint,GLuint);
 
 #ifndef __EMSCRIPTEN__
+#ifndef __APPLE__
 PFNGLACTIVETEXTUREPROC glActiveTexture;
+#endif
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM2FPROC glUniform2f;
@@ -25,6 +27,7 @@ PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLCOMPILESHADERPROC glCompileShader;
 PFNGLATTACHSHADERPROC  glAttachShader;
+PFNGLDELETESHADERPROC  glDeleteShader;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLLINKPROGRAMPROC  glLinkProgram;
@@ -44,7 +47,9 @@ PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 static void enable_gl_extensions(BiContext* context)
 {
 #if ! defined(GL_GLEXT_PROTOTYPES) && ! defined(__EMSCRIPTEN__)
+#ifndef __APPLE__
     GLP(glActiveTexture);
+#endif
     GLP(glUseProgram);
     GLP(glUniform1f);
     GLP(glUniform2f);
@@ -56,6 +61,7 @@ static void enable_gl_extensions(BiContext* context)
     GLP(glShaderSource);
     GLP(glCompileShader);
     GLP(glAttachShader);
+    GLP(glDeleteShader);
     GLP(glBindFramebuffer);
     GLP(glCreateProgram);
     GLP(glLinkProgram);
@@ -171,6 +177,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     }
 
     enable_gl_extensions(context);
+    glEnable(GL_BLEND);
 
     bi_shader_init(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
 

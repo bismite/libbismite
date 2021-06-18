@@ -20,7 +20,9 @@ static GLuint load_shader(const char* vertex_shader_source, const char* fragment
     //
     GLuint program_id = glCreateProgram();
     glAttachShader(program_id,vShaderId);
+    glDeleteShader(vShaderId);
     glAttachShader(program_id,fShaderId);
+    glDeleteShader(fShaderId);
     glLinkProgram(program_id);
 
     return program_id;
@@ -96,8 +98,6 @@ void bi_set_camera(BiShader* shader,int x, int y)
 
 void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source)
 {
-    glEnable(GL_BLEND);
-
     shader->program_id = load_shader(vertex_shader_source,fragment_shader_source);
 
     load_locations(shader);

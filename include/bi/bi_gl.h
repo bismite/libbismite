@@ -1,7 +1,7 @@
 #ifndef __BI_CORE_GL_H__
 #define __BI_CORE_GL_H__
 
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__)
 #define GL_GLEXT_PROTOTYPES
 #endif
 
@@ -22,7 +22,9 @@ extern void (*glDrawArraysInstanced)(GLenum, int, GLsizei, GLsizei);
 extern void (*glVertexAttribDivisor)(GLuint,GLuint);
 
 #ifndef __EMSCRIPTEN__
+#ifndef __APPLE__
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
+#endif
 extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLUNIFORM1FPROC glUniform1f;
 extern PFNGLUNIFORM2FPROC glUniform2f;
@@ -34,6 +36,7 @@ extern PFNGLCREATESHADERPROC glCreateShader;
 extern PFNGLSHADERSOURCEPROC glShaderSource;
 extern PFNGLCOMPILESHADERPROC glCompileShader;
 extern PFNGLATTACHSHADERPROC  glAttachShader;
+extern PFNGLDELETESHADERPROC  glDeleteShader;
 extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLLINKPROGRAMPROC  glLinkProgram;

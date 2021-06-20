@@ -128,7 +128,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     context->rendering_nodes_queue_size = 0;
     context->callback_planned_nodes_size = 0;
-    array_init(&context->layers);
+    bi_layer_group_init(&context->layers);
 
     // timers
     context->timers.size = 0;
@@ -166,7 +166,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
 
-    Uint32 flag = SDL_WINDOW_OPENGL;
+    Uint32 flag = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
     context->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
 
@@ -179,29 +179,8 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     enable_gl_extensions(context);
     glEnable(GL_BLEND);
 
+    // default shader
     bi_shader_init(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
-
-    //
-    // post processing
-    //
-    // frame buffer
-    glGenFramebuffers(1, &context->post_processing.framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, context->post_processing.framebuffer);
-    glGenTextures(1, &context->post_processing.texture);
-    glBindTexture(GL_TEXTURE_2D, context->post_processing.texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    int scaled_w,scaled_h;
-    SDL_GL_GetDrawableSize(context->window, &scaled_w, &scaled_h); // !!!: retina display scaled x2!
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, scaled_w, scaled_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, context->post_processing.texture, 0);
-    // unbind
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // shader
-    context->post_processing.shader = NULL;
 }
 
 void bi_set_title(BiContext* context, const char* title)
@@ -212,28 +191,6 @@ void bi_set_title(BiContext* context, const char* title)
 //
 // Layer
 //
-
-static int layer_order_compare(const void *_a, const void *_b )
-{
-  const BiLayer *a = *(BiLayer**)_a;
-  const BiLayer *b = *(BiLayer**)_b;
-  return a->z_order == b->z_order ? a->index - b->index : a->z_order - b->z_order;
-}
-
-void bi_update_layer_order(BiContext* context)
-{
-  for(int i=0;i<context->layers.size;i++) { ((BiLayer*)context->layers.objects[i])->index = i; }
-  qsort(context->layers.objects,context->layers.size,sizeof(BiLayer*),layer_order_compare);
-  for(int i=0;i<context->layers.size;i++) { ((BiLayer*)context->layers.objects[i])->index = i; }
-}
-
-void bi_add_layer(BiContext* context, BiLayer* layer)
-{
-  array_add_object(&context->layers,layer);
-  bi_update_layer_order(context);
-}
-
-void bi_remove_layer(BiContext* context, BiLayer* layer)
-{
-  array_remove_object(&context->layers,layer);
-}
+void bi_add_layer(BiContext* context, BiLayer* layer) { bi_layer_group_add_layer(&context->layers,layer); }
+void bi_update_layer_order(BiContext* context) { bi_layer_group_update_order(&context->layers); }
+void bi_remove_layer(BiContext* context, BiLayer* layer) { bi_layer_group_remove_layer(&context->layers,layer); }

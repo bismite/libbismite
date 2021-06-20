@@ -114,7 +114,7 @@ static void draw(BiContext* context, BiNode* n, bool visible)
     }
 }
 
-static void bi_render_layer(BiContext* context,BiLayer* layer)
+static void render_layer(BiContext* context,BiLayer* layer)
 {
     if( layer->root == NULL ) {
       return;
@@ -243,65 +243,110 @@ static void bi_render_layer(BiContext* context,BiLayer* layer)
     glBindVertexArray(0);
 }
 
+static bool bind_framebuffer(BiLayerGroup *layer_group)
+{
+  // bind framebuffer when exist post process
+  if(layer_group->post_processes.size > 0) {
+    BiPostProcess* pp = (BiPostProcess*) layer_group->post_processes.objects[0];
+    glBindFramebuffer(GL_FRAMEBUFFER, pp->framebuffer);
+    return true;
+  }
+  return false;
+}
+
+static void render_post_process(BiContext* context, BiPostProcess *pp)
+{
+  BiTexture t;
+  bi_texture_init(&t);
+  t.texture_id = pp->texture;
+  t.w = context->w;
+  t.h = context->h;
+  t._texture_unit = 0;
+
+  BiTextureMapping m;
+  bi_texture_mapping_init(&m);
+  m.flip_vertical = true;
+  m.texture = &t;
+  bi_texture_mapping_set_bound(&m,0,0,m.texture->w,m.texture->h);
+
+  BiNode n;
+  bi_node_init(&n);
+  bi_node_set_size(&n,t.w,t.h);
+  n.texture_mapping = &m;
+  bi_set_color(n.color,0xff,0xff,0xff,0xff);
+
+  BiLayer l;
+  bi_layer_init(&l);
+  l.root = &n;
+  l.textures[0] = &t;
+  l.blend_src = GL_ONE;
+  l.blend_dst = GL_ZERO;
+  memcpy(l.optional_shader_attributes, pp->optional_shader_attributes, sizeof(GLfloat)*4 );
+  if(pp->shader) {
+    l.shader = pp->shader;
+  } else {
+    l.shader = &context->default_shader;
+  }
+
+  render_layer(context,&l);
+}
+
+static void render_layer_group(BiContext* context, BiLayerGroup *layer_group)
+{
+  if( bind_framebuffer(layer_group) ) {
+    // clear
+    glClearColor(0,0,0,0);
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
+
+  // rendering
+  for( int i=0; i<layer_group->layers.size; i++ ) {
+    if( ((BiLayerHeader*)layer_group->layers.objects[i])->type == BI_LAYER_TYPE_LAYER_GROUP ) {
+      render_layer_group( context, layer_group->layers.objects[i] );
+      // reset render target
+      bind_framebuffer(layer_group);
+    } else {
+      render_layer( context, layer_group->layers.objects[i] );
+    }
+  }
+
+  // chain post processing
+  if( layer_group->post_processes.size >= 2 ) {
+    for( int i=1; i<layer_group->post_processes.size; i++) {
+      BiPostProcess* pp1 = layer_group->post_processes.objects[i-1];
+      BiPostProcess* pp2 = layer_group->post_processes.objects[i];
+      // target new framebuffer
+      glBindFramebuffer(GL_FRAMEBUFFER, pp2->framebuffer);
+      glClearColor(0,0,0,0);
+      glClear(GL_COLOR_BUFFER_BIT);
+      // render
+      render_post_process(context,pp1);
+    }
+  }
+
+  // unbind framebuffer
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  if( layer_group->post_processes.size > 0 ) {
+    render_post_process(context, layer_group->post_processes.objects[layer_group->post_processes.size-1] );
+  }
+}
+
 void bi_render(BiContext* context)
 {
-    // bind framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, context->post_processing.framebuffer);
+  // clear
+  glClearColor( context->color[0]/255.f, context->color[1]/255.f, context->color[2]/255.f, context->color[3]/255.f );
+  glClear(GL_COLOR_BUFFER_BIT);
 
-    // clear framebuffer
-    glClearColor( context->color[0]/255.f, context->color[1]/255.f, context->color[2]/255.f, context->color[3]/255.f );
-    glClear(GL_COLOR_BUFFER_BIT);
+  // reset stats
+  context->profile.matrix_updated = 0;
+  context->profile.rendering_nodes_queue_size = 0;
 
-    // reset stats
-    context->profile.matrix_updated = 0;
-    context->profile.rendering_nodes_queue_size = 0;
-    // rendering
-    for(int i=0;i<context->layers.size;i++) {
-      bi_render_layer(context,context->layers.objects[i]);
-    }
+  // rendering
+  for(int i=0;i<context->layers.layers.size;i++) {
+    render_layer_group(context,&context->layers);
+  }
 
-    // unbind framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // clear
-    glClearColor( context->color[0]/255.f, context->color[1]/255.f, context->color[2]/255.f, context->color[3]/255.f );
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // render to screen
-    BiTexture t;
-    bi_texture_init(&t);
-    t.texture_id = context->post_processing.texture;
-    t.w = context->w;
-    t.h = context->h;
-    t._texture_unit = 0;
-
-    BiTextureMapping m;
-    bi_texture_mapping_init(&m);
-    m.flip_vertical = true;
-    m.texture = &t;
-    bi_texture_mapping_set_bound(&m,0,0,m.texture->w,m.texture->h);
-
-    BiNode n;
-    bi_node_init(&n);
-    bi_node_set_size(&n,t.w,t.h);
-    n.texture_mapping = &m;
-    bi_set_color(n.color,0xff,0xff,0xff,0xff);
-
-    BiLayer l;
-    bi_layer_init(&l);
-    l.root = &n;
-    l.textures[0] = &t;
-    l.blend_src = GL_ONE;
-    l.blend_dst = GL_ZERO;
-    memcpy(l.optional_shader_attributes, context->post_processing.optional_shader_attributes, sizeof(GLfloat)*4 );
-    if(context->post_processing.shader) {
-      l.shader = context->post_processing.shader;
-    } else {
-      l.shader = &context->default_shader;
-    }
-
-    bi_render_layer(context,&l);
-
-    //
-    SDL_GL_SwapWindow(context->window);
+  //
+  SDL_GL_SwapWindow(context->window);
 }

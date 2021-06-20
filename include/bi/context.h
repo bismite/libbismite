@@ -7,22 +7,13 @@
 #include <bi/shader.h>
 #include <bi/profile.h>
 #include <bi/node.h>
-#include <bi/array.h>
+#include <bi/layer.h>
 
 #define BI_CORE_MAJOR_VERSION 0
 #define BI_CORE_MINOR_VERSION 13
 #define BI_CORE_PATCHLEVEL 0
 
 typedef struct _BiContext BiContext;
-typedef struct _BiLayer BiLayer;
-
-struct _BiPostProcessing {
-    BiShader* shader;
-    GLuint framebuffer;
-    GLuint texture;
-    GLfloat optional_shader_attributes[4];
-};
-typedef struct _BiPostProcessing BiPostProcessing;
 
 struct _BiContext {
     bool running;
@@ -49,7 +40,7 @@ struct _BiContext {
     bool debug;
 
     // Layers
-    Array layers;
+    BiLayerGroup layers;
 
     // rendering queue
     BiNode* rendering_nodes_queue[0xFFFF];
@@ -65,10 +56,6 @@ struct _BiContext {
     // default shader
     BiShader default_shader;
 
-    // shader for post process
-    BiShader default_post_processing_shader;
-    BiPostProcessing post_processing;
-
     //
     SDL_Window *window;
 
@@ -81,7 +68,7 @@ typedef void (*InitializeFunction)(BiContext*);
 extern void bi_init_context(BiContext* context,int w, int h, int fps, bool highdpi, const char* title );
 extern void bi_set_title(BiContext* context,const char* title);
 
-// layer
+// Convenient Layer functions
 extern void bi_add_layer(BiContext* context, BiLayer* layer);
 extern void bi_update_layer_order(BiContext* context);
 extern void bi_remove_layer(BiContext* context, BiLayer* layer);

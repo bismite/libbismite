@@ -1,10 +1,8 @@
 #ifndef __BI_CORE_SHADER_H__
 #define __BI_CORE_SHADER_H__
 
-#include <stdbool.h>
 #include <bi/bi_gl.h>
 
-struct _BiShader;
 typedef struct _BiShader BiShader;
 
 struct _BiShader {
@@ -37,7 +35,5 @@ struct _BiShader {
 };
 
 extern void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source);
-extern void bi_set_projection(BiShader* shader,int w,int h,bool centering);
-extern void bi_set_camera(BiShader* shader,int x,int y);
 
 #endif

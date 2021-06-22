@@ -6,6 +6,47 @@
 #include <bi/bi_gl.h>
 #include <math.h>
 
+static void set_projection(BiShader* shader,int w, int h, bool centering)
+{
+    if(centering) {
+      int l = -w/2;
+      int r =  w/2;
+      int t =  h/2;
+      int b = -h/2;
+
+      GLfloat projection[16] = {
+        2.0/(r-l),           0.0, 0.0, 0.0,
+               0.0,    2.0/(t-b), 0.0, 0.0,
+               0.0,          0.0, 1.0, 0.0,
+      -(r+l)/(r-l), -(t+b)/(t-b), 0.0, 1.0
+      };
+
+      glUniformMatrix4fv(shader->projection_location, 1, GL_FALSE, projection);
+
+    }else{
+      GLfloat projection[16] = {
+        2.0/w,   0.0, 0.0, 0.0,
+          0.0, 2.0/h, 0.0, 0.0,
+          0.0,   0.0, 1.0, 0.0,
+         -1.0,  -1.0, 0.0, 1.0
+      };
+
+      glUniformMatrix4fv(shader->projection_location, 1, GL_FALSE, projection);
+    }
+}
+
+static void set_camera(BiShader* shader,int x, int y)
+{
+    GLfloat view[16] = {
+      1.0, 0.0, 0.0, 0.0,
+      0.0, 1.0, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+       -x,  -y, 0.0, 1.0
+    };
+
+    glUniformMatrix4fv(shader->view_location, 1, GL_FALSE, view);
+}
+
 static void update_matrix(BiNode* n)
 {
   GLfloat tx = n->x;
@@ -229,8 +270,8 @@ static void render_layer(BiContext* context,BiLayer* layer)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // set camera, projection, blend function
-    bi_set_projection(shader, context->w, context->h, layer->projection_centering);
-    bi_set_camera(shader, layer->camera_x, layer->camera_y);
+    set_projection(shader, context->w, context->h, layer->projection_centering);
+    set_camera(shader, layer->camera_x, layer->camera_y);
 
     // blend function
     glBlendFunc(layer->blend_src,layer->blend_dst);

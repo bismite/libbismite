@@ -54,16 +54,23 @@ extern void bi_layer_init(BiLayer* layer);
 extern void bi_layer_group_init(BiLayerGroup* layer_group);
 extern void bi_post_process_init(BiPostProcess* post_process);
 
+//
 // layer
+//
+static inline int bi_layer_get_z_order(BiLayer* layer){ return layer->header.z_order; }
 static inline void bi_layer_set_z_order(BiLayer* layer,int z){ layer->header.z_order = z; }
 
+//
 // layer group
+//
+static inline int bi_layer_group_get_z_order(BiLayerGroup* layer_group){ return layer_group->header.z_order; }
+static inline void bi_layer_group_set_z_order(BiLayerGroup* layer_group,int z){ layer_group->header.z_order = z; }
+
 extern void bi_layer_group_add_layer(BiLayerGroup* layer_group, BiLayer* obj);
 extern void bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj);
 extern void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_update_order(BiLayerGroup* layer_group);
-
 extern void bi_layer_group_add_post_process(BiLayerGroup* layer_group, BiPostProcess *obj);
 extern void bi_layer_group_remove_post_process(BiLayerGroup* layer_group, BiPostProcess *obj);
 

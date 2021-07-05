@@ -284,17 +284,6 @@ static void render_layer(BiContext* context,BiLayer* layer)
     glBindVertexArray(0);
 }
 
-static bool bind_framebuffer(BiLayerGroup *layer_group)
-{
-  // bind framebuffer when exist post process
-  if(layer_group->post_processes.size > 0) {
-    BiPostProcess* pp = (BiPostProcess*) layer_group->post_processes.objects[0];
-    glBindFramebuffer(GL_FRAMEBUFFER, pp->framebuffer);
-    return true;
-  }
-  return false;
-}
-
 static void render_post_process(BiContext* context, BiPostProcess *pp)
 {
   BiTexture t;
@@ -332,20 +321,27 @@ static void render_post_process(BiContext* context, BiPostProcess *pp)
   render_layer(context,&l);
 }
 
-static void render_layer_group(BiContext* context, BiLayerGroup *layer_group)
+static void render_layer_group(BiContext* context, BiLayerGroup *layer_group, GLuint parent_framebuffer)
 {
-  if( bind_framebuffer(layer_group) ) {
+  GLuint framebuffer = 0;
+
+  // select target framebuffer
+  if(layer_group->post_processes.size == 0) {
+    // cascade
+    framebuffer = parent_framebuffer;
+  } else {
+    BiPostProcess* pp = (BiPostProcess*) layer_group->post_processes.objects[0];
+    framebuffer = pp->framebuffer;
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     // clear
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT);
   }
 
-  // rendering
+  // render
   for( int i=0; i<layer_group->layers.size; i++ ) {
     if( ((BiLayerHeader*)layer_group->layers.objects[i])->type == BI_LAYER_TYPE_LAYER_GROUP ) {
-      render_layer_group( context, layer_group->layers.objects[i] );
-      // reset render target
-      bind_framebuffer(layer_group);
+      render_layer_group( context, layer_group->layers.objects[i], framebuffer );
     } else {
       render_layer( context, layer_group->layers.objects[i] );
     }
@@ -365,9 +361,10 @@ static void render_layer_group(BiContext* context, BiLayerGroup *layer_group)
     }
   }
 
-  // unbind framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  // reset
+  glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer);
 
+  // finalize
   if( layer_group->post_processes.size > 0 ) {
     render_post_process(context, layer_group->post_processes.objects[layer_group->post_processes.size-1] );
   }
@@ -385,7 +382,7 @@ void bi_render(BiContext* context)
 
   // rendering
   for(int i=0;i<context->layers.layers.size;i++) {
-    render_layer_group(context,&context->layers);
+    render_layer_group(context,&context->layers,0);
   }
 
   //

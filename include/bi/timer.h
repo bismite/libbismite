@@ -4,10 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct _BiTimer;
 typedef struct _BiTimer BiTimer;
+typedef struct _BiContext BiContext;
 
-typedef bool (*timer_callback)(int64_t,BiTimer*); // now,timer
+typedef bool (*timer_callback)(BiContext*,BiTimer*); // context,timer
 
 struct _BiTimer {
     int repeat; // -1:infinity, 0:oneshot, 1:twice...
@@ -28,7 +28,7 @@ typedef struct {
   BiTimer **timers;
 } BiTimers;
 
-extern void bi_run_timers(BiTimers* timers, int64_t now);
+extern void bi_run_timers(BiContext* context, BiTimers* timers);
 
 extern void bi_add_timer(BiTimers* timers, BiTimer* timer);
 extern BiTimer* bi_remove_timer(BiTimers* timers, BiTimer* timer);

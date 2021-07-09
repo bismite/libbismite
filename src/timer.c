@@ -1,4 +1,5 @@
 #include <bi/timer.h>
+#include <bi/context.h>
 #include <stdlib.h>
 
 void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, int repeat, void* userdata)
@@ -21,7 +22,7 @@ void bi_finish_timer(BiTimer* timer)
 // Timers
 //
 
-void bi_run_timers(BiTimers* timers, int64_t now)
+void bi_run_timers(BiContext* context, BiTimers* timers)
 {
   for(int i=0;i<timers->size;i++){
     BiTimer* t = timers->timers[i];
@@ -38,11 +39,11 @@ void bi_run_timers(BiTimers* timers, int64_t now)
 
     // add in previous frame
     if(t->will_fire_at==0) {
-      t->will_fire_at = now + t->interval;
+      t->will_fire_at = context->frame_start_at + t->interval;
     }
 
-    if( now >= t->will_fire_at ) {
-      t->callback(now,t);
+    if( context->frame_start_at >= t->will_fire_at ) {
+      t->callback(context,t);
       if(t->repeat == 0) {
         bi_finish_timer(t);
       }else{

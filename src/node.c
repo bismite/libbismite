@@ -40,7 +40,7 @@ void bi_node_init(BiNode* n)
   n->timers.timers = NULL;
 
   // callbacks
-  n->_on_update.callback = NULL;
+  n->_on_update = NULL;
   n->_on_click = NULL;
   n->_on_move_cursor = NULL;
   n->_on_move_finger = NULL;
@@ -184,64 +184,4 @@ bool bi_node_inside(BiNode* node, int x, int y)
       return true;
     }
     return false;
-}
-
-//
-// callbacks
-//
-
-void bi_set_on_update(BiNode* node, on_update_callback callback, void *userdata)
-{
-  node->_on_update.callback = callback;
-  node->_on_update.userdata = userdata;
-}
-
-void bi_set_on_click(BiNode* node, on_click_callback callback, void *context)
-{
-  node->_on_click = callback;
-  node->_on_click_context = context;
-}
-
-void bi_set_on_move_cursor(BiNode* node, on_move_cursor_callback callback, void *context)
-{
-  node->_on_move_cursor = callback;
-  node->_on_move_cursor_context = context;
-}
-
-void bi_set_on_move_finger(BiNode* node, on_move_finger_callback callback, void *context)
-{
-  node->_on_move_finger = callback;
-  node->_on_move_finger_context = context;
-}
-
-void bi_set_on_touch(BiNode* node, on_touch_callback callback, void *context)
-{
-  node->_on_touch = callback;
-  node->_on_touch_context = context;
-}
-
-void bi_set_on_keyinput(BiNode* node, on_keyinput_callback callback, void *context)
-{
-  node->_on_keyinput = callback;
-  node->_on_keyinput_context = context;
-}
-
-void bi_set_on_textinput(BiNode* node, on_textinput_callback callback, void *context)
-{
-  node->_on_textinput = callback;
-  node->_on_textinput_context = context;
-}
-
-bool bi_node_has_callback(BiNode* n)
-{
-  if(n->_on_move_cursor != NULL ||
-     n->_on_click != NULL ||
-     n->_on_move_finger != NULL ||
-     n->_on_keyinput != NULL ||
-     n->_on_touch != NULL ||
-     n->_on_textinput != NULL
-   ) {
-    return true;
-  }
-  return false;
 }

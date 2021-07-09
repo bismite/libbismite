@@ -12,52 +12,52 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
     case SDL_MOUSEMOTION:
       if(n->_on_move_cursor!=NULL){
         int y = context->h - e->motion.y;
-        swallow = n->_on_move_cursor(n,n->_on_move_cursor_context,e->motion.x,y);
+        swallow = n->_on_move_cursor(context,n,e->motion.x,y);
       }
       break;
     case SDL_MOUSEBUTTONDOWN:
       if(n->_on_click!=NULL){
         int y = context->h - e->button.y;
-        swallow = n->_on_click(n,n->_on_click_context,e->button.x,y,e->button.button,true);
+        swallow = n->_on_click(context,n,e->button.x,y,e->button.button,true);
       }
       break;
     case SDL_MOUSEBUTTONUP:
       if(n->_on_click!=NULL){
         int y = context->h - e->button.y;
-        swallow = n->_on_click(n,n->_on_click_context,e->button.x,y,e->button.button,false);
+        swallow = n->_on_click(context,n,e->button.x,y,e->button.button,false);
       }
       break;
     case SDL_FINGERMOTION:
       if(n->_on_move_finger!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_move_finger(n,n->_on_move_finger_context, e->tfinger.x, y, e->tfinger.fingerId);
+        swallow = n->_on_move_finger(context,n, e->tfinger.x, y, e->tfinger.fingerId);
       }
       break;
     case SDL_FINGERDOWN:
       if(n->_on_touch!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_touch(n,n->_on_touch_context,e->tfinger.x,y,e->tfinger.fingerId,true);
+        swallow = n->_on_touch(context,n,e->tfinger.x,y,e->tfinger.fingerId,true);
       }
       break;
     case SDL_FINGERUP:
       if(n->_on_touch!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_touch(n,n->_on_touch_context,e->tfinger.x,y,e->tfinger.fingerId,false);
+        swallow = n->_on_touch(context,n,e->tfinger.x,y,e->tfinger.fingerId,false);
       }
       break;
     case SDL_KEYDOWN:
       if(n->_on_keyinput!=NULL){
-        swallow = n->_on_keyinput(n,n->_on_keyinput_context,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,true);
+        swallow = n->_on_keyinput(context,n,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,true);
       }
       break;
     case SDL_KEYUP:
       if(n->_on_keyinput!=NULL){
-        swallow = n->_on_keyinput(n,n->_on_keyinput_context,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,false);
+        swallow = n->_on_keyinput(context,n,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,false);
       }
       break;
     case SDL_TEXTINPUT:
       if(n->_on_textinput!=NULL){
-        swallow = n->_on_textinput(n,n->_on_textinput_context,e->text.text);
+        swallow = n->_on_textinput(context,n,e->text.text);
       }
       break;
   }
@@ -79,7 +79,7 @@ static void main_loop( void* arg )
     //
 
     // Global Timers
-    bi_run_timers(&context->timers,now);
+    bi_run_timers(context,&context->timers);
 
     const int PUMP_EVENT_MAX = 32;
     SDL_Event e[PUMP_EVENT_MAX];
@@ -91,14 +91,12 @@ static void main_loop( void* arg )
       if( n == NULL ){
         continue;
       }
-      // On Update
-      if(n->_on_update.callback != NULL) {
-        n->_on_update.callback(context,n);
-      }
+      // on update
+      if(n->_on_update) n->_on_update(context,n);
       // Timer
-      bi_run_timers(&n->timers,now);
+      bi_run_timers(context,&n->timers);
       // Event Handler
-      if( bi_node_has_callback(n) && n->_final_visibility ) {
+      if( n->_final_visibility ) {
         for(int i=0;i<event_size;i++) {
           if(e[i].type == 0) continue;
           bool swallow = node_event_handle(n,context,&e[i]);

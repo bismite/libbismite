@@ -120,12 +120,27 @@ static void update_matrix(BiNode* n)
   }
 }
 
+static bool node_has_event_handler(BiNode* n)
+{
+  if(n->_on_update != NULL ||
+     n->_on_move_cursor != NULL ||
+     n->_on_click != NULL ||
+     n->_on_move_finger != NULL ||
+     n->_on_keyinput != NULL ||
+     n->_on_touch != NULL ||
+     n->_on_textinput != NULL
+   ) {
+    return true;
+  }
+  return false;
+}
+
 static void draw(BiContext* context, BiNode* n, bool visible)
 {
     n->_final_visibility = n->visible && visible;
 
     // add callback
-    if( n->_on_update.callback != NULL || bi_node_has_callback(n) || n->timers.size > 0 ) {
+    if( node_has_event_handler(n) || n->timers.size > 0 ) {
       context->callback_planned_nodes[context->callback_planned_nodes_size] = n;
       context->callback_planned_nodes_size += 1;
     }

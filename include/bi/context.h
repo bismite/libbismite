@@ -59,6 +59,9 @@ struct _BiContext {
     //
     SDL_Window *window;
 
+    // default texture
+    GLuint default_texture;
+
     //
     void* userdata;
 };

@@ -89,12 +89,12 @@ extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly)
 extern bool bi_node_inside(BiNode* node, int x, int y);
 
 // event handler
-static inline void bi_set_on_update(BiNode* node, on_update_callback callback){node->_on_update = callback;}
-static inline void bi_set_on_click(BiNode* node, on_click_callback callback){node->_on_click = callback;}
-static inline void bi_set_on_move_cursor(BiNode* node, on_move_cursor_callback callback){node->_on_move_cursor = callback;}
-static inline void bi_set_on_move_finger(BiNode* node, on_move_finger_callback callback){node->_on_move_finger = callback;}
-static inline void bi_set_on_touch(BiNode* node, on_touch_callback callback){node->_on_touch = callback;}
-static inline void bi_set_on_keyinput(BiNode* node, on_keyinput_callback callback){node->_on_keyinput = callback;}
-static inline void bi_set_on_textinput(BiNode* node, on_textinput_callback callback){node->_on_textinput = callback;}
+static inline void bi_node_set_on_update(BiNode* node, on_update_callback callback){node->_on_update = callback;}
+static inline void bi_node_set_on_click(BiNode* node, on_click_callback callback){node->_on_click = callback;}
+static inline void bi_node_set_on_move_cursor(BiNode* node, on_move_cursor_callback callback){node->_on_move_cursor = callback;}
+static inline void bi_node_set_on_move_finger(BiNode* node, on_move_finger_callback callback){node->_on_move_finger = callback;}
+static inline void bi_node_set_on_touch(BiNode* node, on_touch_callback callback){node->_on_touch = callback;}
+static inline void bi_node_set_on_keyinput(BiNode* node, on_keyinput_callback callback){node->_on_keyinput = callback;}
+static inline void bi_node_set_on_textinput(BiNode* node, on_textinput_callback callback){node->_on_textinput = callback;}
 
 #endif

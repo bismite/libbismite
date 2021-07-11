@@ -9,9 +9,8 @@ static GLuint create_texture_from_pixels(int w, int h, void*pixels, bool antiali
     glGenTextures(1, &texture_id);
 
     //
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glBindTexture(GL_TEXTURE_2D, texture_id);
-
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     //
@@ -33,25 +32,13 @@ static GLuint create_texture_from_pixels(int w, int h, void*pixels, bool antiali
     return texture_id;
 }
 
-static SDL_Surface* create_surface_abgr8888(int w, int h)
+bool bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias)
 {
-#if SDL_VERSION_ATLEAST(2,0,5)
-  return SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ABGR8888);
-#else
-  Uint32 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-  rmask = 0xff000000;
-  gmask = 0x00ff0000;
-  bmask = 0x0000ff00;
-  amask = 0x000000ff;
-#else
-  rmask = 0x000000ff;
-  gmask = 0x0000ff00;
-  bmask = 0x00ff0000;
-  amask = 0xff000000;
-#endif
-  return SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
-#endif
+    texture->texture_id = create_texture_from_pixels(w,h,pixels,antialias);
+    texture->w = w;
+    texture->h = h;
+    texture->_texture_unit = 0;
+    return true;
 }
 
 static bool load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, bool antialias)
@@ -70,7 +57,7 @@ static bool load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, bool a
     // force change Format to SDL_PIXELFORMAT_ABGR8888
     if(orig->format->format != SDL_PIXELFORMAT_ABGR8888)
     {
-        img = create_surface_abgr8888(orig->w, orig->h);
+        img = SDL_CreateRGBSurfaceWithFormat(0, orig->w, orig->h, 32, SDL_PIXELFORMAT_ABGR8888);
         if (img == NULL) {
             LOG("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
             return false;
@@ -78,7 +65,7 @@ static bool load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, bool a
         SDL_BlitSurface(orig,NULL,img,NULL);
     }
 
-    bi_texture_load_from_pixels(texture,img->w,img->h,img->pixels,antialias);
+    bi_texture_init_with_pixels(texture,img->w,img->h,img->pixels,antialias);
 
     if(orig->format->format != SDL_PIXELFORMAT_ABGR8888)
       SDL_FreeSurface(img);
@@ -87,31 +74,51 @@ static bool load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, bool a
     return true;
 }
 
-void bi_texture_init(BiTexture* texture)
-{
-  texture->texture_id = 0;
-  texture->w = 0;
-  texture->h = 0;
-  texture->_texture_unit = 0;
-}
-
-bool bi_texture_load_from_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias)
-{
-    texture->texture_id = create_texture_from_pixels(w,h,pixels,antialias);
-    texture->w = w;
-    texture->h = h;
-    texture->_texture_unit = 0;
-    return true;
-}
-
-bool bi_texture_load_from_memory(BiTexture* texture, void* buffer, size_t size, bool antialias)
+bool bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool antialias)
 {
     return load_texture_from_image( texture, SDL_RWFromMem(buffer,size), antialias );
 }
 
-bool bi_texture_load_from_file(BiTexture* texture, const char* filename, bool antialias)
+bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool antialias)
 {
     return load_texture_from_image( texture, SDL_RWFromFile(filename,"rb"), antialias );
+}
+
+void bi_texture_init_with_screen(BiTexture* texture,bool antialias)
+{
+  GLint dims[4] = {0};
+  glGetIntegerv(GL_VIEWPORT, dims);
+  int w = dims[2];
+  int h = dims[3];
+
+  GLuint texture_id;
+  glGenTextures(1, &texture_id);
+  glBindTexture(GL_TEXTURE_2D,texture_id);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  // no antialias
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  // CLAMP_TO_EDGE
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  //
+  texture->texture_id = texture_id;
+  texture->w = w;
+  texture->h = h;
+
+  glBindTexture(GL_TEXTURE_2D,texture->texture_id);
+  glReadBuffer(GL_FRONT);
+  glCopyTexSubImage2D(GL_TEXTURE_2D,0, 0,0, 0,0,texture->w,texture->h);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void bi_texture_delete(BiTexture* texture)
+{
+  glDeleteTextures(1,&texture->texture_id);
+  texture->texture_id = 0;
+  texture->w = 0;
+  texture->h = 0;
+  texture->_texture_unit = 0;
 }
 
 void bi_texture_mapping_init(BiTextureMapping* texture_mapping)

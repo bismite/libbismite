@@ -211,7 +211,7 @@ static void render_layer(BiContext* context,BiLayer* layer)
       // texture bind
       glActiveTexture(GL_TEXTURE0+i);
       if( layer->textures[i] == NULL ) {
-        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, context->default_texture);
       }else{
         layer->textures[i]->_texture_unit = i;
         glBindTexture(GL_TEXTURE_2D, layer->textures[i]->texture_id);
@@ -302,7 +302,6 @@ static void render_layer(BiContext* context,BiLayer* layer)
 static void render_post_process(BiContext* context, BiPostProcess *pp)
 {
   BiTexture t;
-  bi_texture_init(&t);
   t.texture_id = pp->texture;
   t.w = context->w;
   t.h = context->h;

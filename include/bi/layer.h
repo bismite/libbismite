@@ -32,6 +32,8 @@ struct _BiLayer {
   BiNode* root;
   GLenum blend_src;
   GLenum blend_dst;
+  GLenum blend_alpha_src;
+  GLenum blend_alpha_dst;
   BiTexture* textures[8];
   BiShader *shader;
   GLfloat optional_shader_attributes[4];
@@ -41,12 +43,18 @@ struct _BiLayerGroup {
   BiLayerHeader header;
   Array layers;
   Array post_processes;
+  GLuint framebuffer;
+  GLuint texture;
+  int w;
+  int h;
 };
 
 struct _BiPostProcess {
   BiShader* shader;
   GLuint framebuffer;
   GLuint texture;
+  int w;
+  int h;
   GLfloat optional_shader_attributes[4];
 };
 

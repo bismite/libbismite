@@ -289,7 +289,7 @@ static void render_layer(BiContext* context,BiLayer* layer)
     set_camera(shader, layer->camera_x, layer->camera_y);
 
     // blend function
-    glBlendFunc(layer->blend_src,layer->blend_dst);
+    glBlendFuncSeparate(layer->blend_src,layer->blend_dst,layer->blend_alpha_src,layer->blend_alpha_dst);
 
     //
     // Draw instances
@@ -299,10 +299,10 @@ static void render_layer(BiContext* context,BiLayer* layer)
     glBindVertexArray(0);
 }
 
-static void render_post_process(BiContext* context, BiPostProcess *pp)
+static void render_framebuffer(BiContext* context, GLuint texture, GLfloat attributes[4], BiShader* shader)
 {
   BiTexture t;
-  t.texture_id = pp->texture;
+  t.texture_id = texture;
   t.w = context->w;
   t.h = context->h;
   t._texture_unit = 0;
@@ -323,13 +323,12 @@ static void render_post_process(BiContext* context, BiPostProcess *pp)
   bi_layer_init(&l);
   l.root = &n;
   l.textures[0] = &t;
-  l.blend_src = GL_ONE;
-  l.blend_dst = GL_ZERO;
-  memcpy(l.optional_shader_attributes, pp->optional_shader_attributes, sizeof(GLfloat)*4 );
-  if(pp->shader) {
-    l.shader = pp->shader;
-  } else {
-    l.shader = &context->default_shader;
+
+  if(attributes){
+    memcpy(l.optional_shader_attributes, attributes, sizeof(GLfloat)*4 );
+  }
+  if(shader) {
+    l.shader = shader;
   }
 
   render_layer(context,&l);
@@ -337,20 +336,12 @@ static void render_post_process(BiContext* context, BiPostProcess *pp)
 
 static void render_layer_group(BiContext* context, BiLayerGroup *layer_group, GLuint parent_framebuffer)
 {
-  GLuint framebuffer = 0;
+  GLuint framebuffer = layer_group->framebuffer;
 
-  // select target framebuffer
-  if(layer_group->post_processes.size == 0) {
-    // cascade
-    framebuffer = parent_framebuffer;
-  } else {
-    BiPostProcess* pp = (BiPostProcess*) layer_group->post_processes.objects[0];
-    framebuffer = pp->framebuffer;
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    // clear
-    glClearColor(0,0,0,0);
-    glClear(GL_COLOR_BUFFER_BIT);
-  }
+  // select framebuffer
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  glClearColor(0,0,0,0);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   // render
   for( int i=0; i<layer_group->layers.size; i++ ) {
@@ -362,16 +353,17 @@ static void render_layer_group(BiContext* context, BiLayerGroup *layer_group, GL
   }
 
   // chain post processing
-  if( layer_group->post_processes.size >= 2 ) {
-    for( int i=1; i<layer_group->post_processes.size; i++) {
-      BiPostProcess* pp1 = layer_group->post_processes.objects[i-1];
-      BiPostProcess* pp2 = layer_group->post_processes.objects[i];
+  if( layer_group->post_processes.size > 0 ) {
+    GLuint src_texture = layer_group->texture;
+    for( int i=0; i<layer_group->post_processes.size; i++) {
+      BiPostProcess* pp = layer_group->post_processes.objects[i];
       // target new framebuffer
-      glBindFramebuffer(GL_FRAMEBUFFER, pp2->framebuffer);
+      glBindFramebuffer(GL_FRAMEBUFFER, pp->framebuffer);
       glClearColor(0,0,0,0);
       glClear(GL_COLOR_BUFFER_BIT);
       // render
-      render_post_process(context,pp1);
+      render_framebuffer(context,src_texture,pp->optional_shader_attributes,pp->shader);
+      src_texture = pp->texture;
     }
   }
 
@@ -380,7 +372,10 @@ static void render_layer_group(BiContext* context, BiLayerGroup *layer_group, GL
 
   // finalize
   if( layer_group->post_processes.size > 0 ) {
-    render_post_process(context, layer_group->post_processes.objects[layer_group->post_processes.size-1] );
+    BiPostProcess *pp = layer_group->post_processes.objects[layer_group->post_processes.size-1];
+    render_framebuffer(context,pp->texture,pp->optional_shader_attributes,pp->shader);
+  }else{
+    render_framebuffer(context,layer_group->texture,NULL,NULL);
   }
 }
 

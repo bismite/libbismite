@@ -2,6 +2,7 @@
 #include <bi/bi_gl.h>
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
+#include <bi/layer.h>
 
 static GLuint create_texture_from_pixels(int w, int h, void*pixels, bool antialiase)
 {
@@ -84,32 +85,44 @@ bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, boo
     return load_texture_from_image( texture, SDL_RWFromFile(filename,"rb"), antialias );
 }
 
-void bi_texture_init_with_screen(BiTexture* texture,bool antialias)
+void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *layer_group,bool antialias)
 {
-  GLint dims[4] = {0};
-  glGetIntegerv(GL_VIEWPORT, dims);
-  int w = dims[2];
-  int h = dims[3];
+  int w,h;
+  GLuint src_texture;
+  GLuint framebuffer;
+  int pp_size = layer_group->post_processes.size;
+  if(pp_size>0){
+    BiPostProcess* pp = layer_group->post_processes.objects[pp_size-1];
+    framebuffer = pp->framebuffer;
+    src_texture = pp->texture;
+    w = pp->w;
+    h = pp->h;
+  }else{
+    framebuffer = layer_group->framebuffer;
+    src_texture = layer_group->texture;
+    w = layer_group->w;
+    h = layer_group->h;
+  }
 
   GLuint texture_id;
   glGenTextures(1, &texture_id);
   glBindTexture(GL_TEXTURE_2D,texture_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   // no antialias
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   // CLAMP_TO_EDGE
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  // copy
+  glBindFramebuffer(GL_FRAMEBUFFER,framebuffer);
+  glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, 0,0, w,h, 0);
+  // unbind
+  glBindTexture(GL_TEXTURE_2D, 0);
+
   //
   texture->texture_id = texture_id;
   texture->w = w;
   texture->h = h;
-
-  glBindTexture(GL_TEXTURE_2D,texture->texture_id);
-  glReadBuffer(GL_FRONT);
-  glCopyTexSubImage2D(GL_TEXTURE_2D,0, 0,0, 0,0,texture->w,texture->h);
-  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void bi_texture_delete(BiTexture* texture)

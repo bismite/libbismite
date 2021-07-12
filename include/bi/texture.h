@@ -6,11 +6,9 @@
 #include <bi/bi_gl.h>
 #include <bi/bi_sdl.h>
 
-struct _BiTexture;
 typedef struct _BiTexture BiTexture;
-
-struct _BiTextureMapping;
 typedef struct _BiTextureMapping BiTextureMapping;
+typedef struct _BiLayerGroup BiLayerGroup;
 
 struct _BiTexture {
   GLuint texture_id;
@@ -30,7 +28,7 @@ struct _BiTextureMapping {
 extern bool bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias);
 extern bool bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool antialiase);
 extern bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool antialiase);
-extern void bi_texture_init_with_screen(BiTexture* texture,bool antialias);
+extern void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *layer_group,bool antialias);
 
 extern void bi_texture_delete(BiTexture* texture);
 

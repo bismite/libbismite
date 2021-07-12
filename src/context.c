@@ -40,6 +40,7 @@ PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
+PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
 #define GLP(name) do{ name = SDL_GL_GetProcAddress( #name ); }while(0)
 #endif
 #endif
@@ -74,6 +75,7 @@ static void enable_gl_extensions(BiContext* context)
     GLP(glVertexAttribPointer);
     GLP(glGenFramebuffers);
     GLP(glFramebufferTexture2D);
+    GLP(glBlendFuncSeparate);
 #endif
 
 #ifndef GL_GLEXT_PROTOTYPES
@@ -124,33 +126,6 @@ static void enable_gl_extensions(BiContext* context)
 
 void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
-    context->program_start_at = bi_get_now();
-
-    context->rendering_nodes_queue_size = 0;
-    context->callback_planned_nodes_size = 0;
-    bi_layer_group_init(&context->layers);
-
-    // timers
-    context->timers.size = 0;
-    context->timers.timers = NULL;
-
-    //
-    bi_profile_init(&context->profile,fps,bi_get_now());
-
-    context->debug = false;
-
-    context->running = true;
-
-    context->w = w;
-    context->h = h;
-    context->camera_x = 0;
-    context->camera_y = 0;
-
-    context->color[0] = 0;
-    context->color[1] = 0;
-    context->color[2] = 0;
-    context->color[3] = 0;
-
     if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
         LOG("SDL_Init fail.");
         return;
@@ -178,6 +153,33 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     enable_gl_extensions(context);
     glEnable(GL_BLEND);
+
+    context->program_start_at = bi_get_now();
+
+    context->rendering_nodes_queue_size = 0;
+    context->callback_planned_nodes_size = 0;
+    bi_layer_group_init(&context->layers);
+
+    // timers
+    context->timers.size = 0;
+    context->timers.timers = NULL;
+
+    //
+    bi_profile_init(&context->profile,fps,bi_get_now());
+
+    context->debug = false;
+
+    context->running = true;
+
+    context->w = w;
+    context->h = h;
+    context->camera_x = 0;
+    context->camera_y = 0;
+
+    context->color[0] = 0;
+    context->color[1] = 0;
+    context->color[2] = 0;
+    context->color[3] = 0;
 
     // default shader
     bi_shader_init(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);

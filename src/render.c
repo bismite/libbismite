@@ -390,9 +390,7 @@ void bi_render(BiContext* context)
   context->profile.rendering_nodes_queue_size = 0;
 
   // rendering
-  for(int i=0;i<context->layers.layers.size;i++) {
-    render_layer_group(context,&context->layers,0);
-  }
+  render_layer_group(context,&context->layers,0);
 
   //
   SDL_GL_SwapWindow(context->window);

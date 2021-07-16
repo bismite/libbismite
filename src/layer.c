@@ -52,10 +52,9 @@ void bi_layer_group_init(BiLayerGroup* layer_group)
   create_framebuffer(&layer_group->framebuffer,&layer_group->texture,&layer_group->w,&layer_group->h);
 }
 
-void bi_post_process_init(BiPostProcess* post_process)
+void bi_post_process_init(BiPostProcess* post_process,BiShader* shader)
 {
-  // shader
-  post_process->shader = NULL;
+  post_process->shader = shader;
   create_framebuffer(&post_process->framebuffer,&post_process->texture,&post_process->w,&post_process->h);
 }
 

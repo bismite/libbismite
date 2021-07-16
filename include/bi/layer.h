@@ -60,7 +60,7 @@ struct _BiPostProcess {
 
 extern void bi_layer_init(BiLayer* layer);
 extern void bi_layer_group_init(BiLayerGroup* layer_group);
-extern void bi_post_process_init(BiPostProcess* post_process);
+extern void bi_post_process_init(BiPostProcess* post_process,BiShader* shader);
 
 //
 // layer

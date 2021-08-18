@@ -48,7 +48,7 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
     shader->optional_attributes_location = glGetUniformLocation(program_id, "optional_attributes");
 }
 
-void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source)
+void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source)
 {
     load_shader(shader,vertex_shader_source,fragment_shader_source);
 

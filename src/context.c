@@ -182,7 +182,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     context->color[3] = 0;
 
     // default shader
-    bi_shader_init(&context->default_shader,context->w,context->h, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+    bi_shader_init(&context->default_shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
 
     // default texture
     uint8_t pixels[4] = {0,0,0,0};

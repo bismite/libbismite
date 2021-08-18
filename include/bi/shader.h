@@ -34,6 +34,6 @@ struct _BiShader {
     GLint optional_attributes_location;
 };
 
-extern void bi_shader_init(BiShader* shader,int w,int h,const char* vertex_shader_source, const char* fragment_shader_source);
+extern void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source);
 
 #endif

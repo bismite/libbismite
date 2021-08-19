@@ -16,7 +16,7 @@ struct _BiTimer {
     int64_t last_fire_at; // msec
     timer_callback callback;
     void* userdata;
-    bool finished;
+    int _state;
 };
 
 extern void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, int repeat, void* userdata);

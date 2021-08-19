@@ -2,6 +2,12 @@
 #include <bi/context.h>
 #include <stdlib.h>
 
+enum BiTimerState {
+  BI_TIMER_STATE_READY,
+  BI_TIMER_STATE_RUNNING,
+  BI_TIMER_STATE_FINISHED
+};
+
 void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, int repeat, void* userdata)
 {
     timer->repeat = repeat;
@@ -10,12 +16,12 @@ void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, in
     timer->last_fire_at = 0;
     timer->callback = callback;
     timer->userdata = userdata;
-    timer->finished = false;
+    timer->_state = BI_TIMER_STATE_READY;
 }
 
 void bi_finish_timer(BiTimer* timer)
 {
-  timer->finished = true;
+  timer->_state = BI_TIMER_STATE_READY;
 }
 
 //
@@ -32,8 +38,13 @@ void bi_run_timers(BiContext* context, BiTimers* timers)
       continue;
     }
 
+    // skip new timer
+    if(t->_state == BI_TIMER_STATE_READY) {
+      continue;
+    }
+
     // skip finished timer
-    if(t->finished){
+    if(t->_state == BI_TIMER_STATE_FINISHED){
       continue;
     }
 
@@ -52,6 +63,12 @@ void bi_run_timers(BiContext* context, BiTimers* timers)
         }
         t->will_fire_at += t->interval;
       }
+    }
+  }
+  // start timer
+  for(int i=0;i<timers->size;i++){
+    if( timers->timers[i] && timers->timers[i]->_state == BI_TIMER_STATE_READY ) {
+      timers->timers[i]->_state = BI_TIMER_STATE_RUNNING;
     }
   }
   // compaction

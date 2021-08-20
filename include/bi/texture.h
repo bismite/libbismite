@@ -32,7 +32,7 @@ extern void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *la
 
 extern void bi_texture_delete(BiTexture* texture);
 
-extern void bi_texture_mapping_init(BiTextureMapping* texture_mapping);
+extern void bi_texture_mapping_init(BiTextureMapping* texture_mapping,BiTexture* texture);
 extern void bi_texture_mapping_set_bound(BiTextureMapping* texture_mapping, uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 
 #endif

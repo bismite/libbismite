@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <bi/array.h>
 
+#define BI_LAYER_MAX_TEXTURES 16
+
 typedef struct _BiNode BiNode;
 typedef struct _BiTexture BiTexture;
 typedef struct _BiShader BiShader;
@@ -34,7 +36,7 @@ struct _BiLayer {
   GLenum blend_dst;
   GLenum blend_alpha_src;
   GLenum blend_alpha_dst;
-  BiTexture* textures[8];
+  BiTexture* textures[BI_LAYER_MAX_TEXTURES];
   BiShader *shader;
   GLfloat optional_shader_attributes[4];
 };

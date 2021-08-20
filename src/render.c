@@ -308,10 +308,8 @@ static void render_framebuffer(BiContext* context, GLuint texture, GLfloat attri
   t._texture_unit = 0;
 
   BiTextureMapping m;
-  bi_texture_mapping_init(&m);
+  bi_texture_mapping_init(&m,&t);
   m.flip_vertical = true;
-  m.texture = &t;
-  bi_texture_mapping_set_bound(&m,0,0,m.texture->w,m.texture->h);
 
   BiNode n;
   bi_node_init(&n);

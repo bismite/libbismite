@@ -13,7 +13,7 @@ void bi_layer_init(BiLayer* layer)
   layer->blend_dst = GL_ONE_MINUS_SRC_ALPHA;
   layer->blend_alpha_src = GL_ONE;
   layer->blend_alpha_dst = GL_ONE;
-  for(int i=0;i<8;i++) {
+  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     layer->textures[i] = NULL;
   }
   layer->shader = NULL;

@@ -134,14 +134,17 @@ void bi_texture_delete(BiTexture* texture)
   texture->_texture_unit = 0;
 }
 
-void bi_texture_mapping_init(BiTextureMapping* texture_mapping)
+void bi_texture_mapping_init(BiTextureMapping* texture_mapping,BiTexture* texture)
 {
-  texture_mapping->texture = NULL;
+  texture_mapping->texture = texture;
   texture_mapping->x = 0;
   texture_mapping->y = 0;
   texture_mapping->w = 0;
   texture_mapping->h = 0;
   for(int i=0;i<4;i++) texture_mapping->boundary[i] = 0;
+  if(texture){
+    bi_texture_mapping_set_bound(texture_mapping,0,0,texture->w,texture->h);
+  }
   texture_mapping->flip_vertical = false;
   texture_mapping->flip_horizontal = false;
 }

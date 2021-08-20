@@ -371,7 +371,7 @@ static void render_layer_group(BiContext* context, BiLayerGroup *layer_group, GL
   // finalize
   if( layer_group->post_processes.size > 0 ) {
     BiPostProcess *pp = layer_group->post_processes.objects[layer_group->post_processes.size-1];
-    render_framebuffer(context,pp->texture,pp->optional_shader_attributes,pp->shader);
+    render_framebuffer(context,pp->texture,NULL,NULL);
   }else{
     render_framebuffer(context,layer_group->texture,NULL,NULL);
   }

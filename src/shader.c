@@ -125,6 +125,7 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
 
     // set sampler2D
     glUseProgram(shader->program_id);
-    const int texture_location_indexes[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    glUniform1iv(shader->texture_locations[0], 8, texture_location_indexes);
+    int texture_location_indexes[BI_LAYER_MAX_TEXTURES];
+    for(int i=0; i<BI_LAYER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
+    glUniform1iv(shader->texture_locations[0], BI_LAYER_MAX_TEXTURES, texture_location_indexes);
 }

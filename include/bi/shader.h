@@ -2,6 +2,7 @@
 #define __BI_CORE_SHADER_H__
 
 #include <bi/bi_gl.h>
+#include <bi/layer.h>
 
 typedef struct _BiShader BiShader;
 
@@ -16,7 +17,7 @@ struct _BiShader {
     GLuint transform_buffer;
 
     // uniform location
-    GLint texture_locations[8];
+    GLint texture_locations[BI_LAYER_MAX_TEXTURES];
     GLint projection_location;
     GLint view_location;
 

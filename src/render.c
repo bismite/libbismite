@@ -207,7 +207,7 @@ static void render_layer(BiContext* context,BiLayer* layer)
     glUniform4fv(shader->optional_attributes_location, 1, layer->optional_shader_attributes );
 
     // Textures
-    for(int i=0;i<8;i++) {
+    for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
       // texture bind
       glActiveTexture(GL_TEXTURE0+i);
       if( layer->textures[i] == NULL ) {

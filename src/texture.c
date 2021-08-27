@@ -87,21 +87,13 @@ bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, boo
 
 void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *layer_group,bool antialias)
 {
-  int w,h;
-  GLuint src_texture;
-  GLuint framebuffer;
+  BiFramebuffer src;
   int pp_size = layer_group->post_processes.size;
   if(pp_size>0){
     BiPostProcess* pp = layer_group->post_processes.objects[pp_size-1];
-    framebuffer = pp->framebuffer;
-    src_texture = pp->texture;
-    w = pp->w;
-    h = pp->h;
+    src = pp->framebuffer;
   }else{
-    framebuffer = layer_group->framebuffer;
-    src_texture = layer_group->texture;
-    w = layer_group->w;
-    h = layer_group->h;
+    src = layer_group->framebuffer;
   }
 
   GLuint texture_id;
@@ -114,15 +106,15 @@ void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *layer_gro
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   // copy
-  glBindFramebuffer(GL_FRAMEBUFFER,framebuffer);
-  glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, 0,0, w,h, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER,src.framebuffer_id);
+  glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, 0,0, src.w,src.h, 0);
   // unbind
   glBindTexture(GL_TEXTURE_2D, 0);
 
   //
   texture->texture_id = texture_id;
-  texture->w = w;
-  texture->h = h;
+  texture->w = src.w;
+  texture->h = src.h;
 }
 
 void bi_texture_delete(BiTexture* texture)

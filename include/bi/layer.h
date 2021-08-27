@@ -14,6 +14,7 @@ typedef struct _BiLayerHeader BiLayerHeader;
 typedef struct _BiLayer BiLayer;
 typedef struct _BiLayerGroup BiLayerGroup;
 typedef struct _BiPostProcess BiPostProcess;
+typedef struct _BiFramebuffer BiFramebuffer;
 
 typedef enum {
   BI_LAYER_TYPE_LAYER,
@@ -41,22 +42,23 @@ struct _BiLayer {
   GLfloat optional_shader_attributes[4];
 };
 
-struct _BiLayerGroup {
-  BiLayerHeader header;
-  Array layers;
-  Array post_processes;
-  GLuint framebuffer;
-  GLuint texture;
+struct _BiFramebuffer {
+  GLuint framebuffer_id;
+  GLuint texture_id;
   int w;
   int h;
 };
 
+struct _BiLayerGroup {
+  BiLayerHeader header;
+  Array layers;
+  Array post_processes;
+  BiFramebuffer framebuffer;
+};
+
 struct _BiPostProcess {
   BiShader* shader;
-  GLuint framebuffer;
-  GLuint texture;
-  int w;
-  int h;
+  BiFramebuffer framebuffer;
   GLfloat optional_shader_attributes[4];
 };
 

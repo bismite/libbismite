@@ -20,6 +20,13 @@ void bi_layer_init(BiLayer* layer)
   for(int i=0;i<4;i++) {
     layer->optional_shader_attributes[i] = 0;
   }
+  layer->post_process = NULL;
+  // framebuffer
+  layer->_framebuffer_enabled = false;
+  layer->_framebuffer.framebuffer_id = 0;
+  layer->_framebuffer.texture_id = 0;
+  layer->_framebuffer.w = 0;
+  layer->_framebuffer.h = 0;
 }
 
 static void create_framebuffer(BiFramebuffer *fb)
@@ -48,7 +55,6 @@ void bi_layer_group_init(BiLayerGroup* layer_group)
   layer_group->header.type = BI_LAYER_TYPE_LAYER_GROUP;
   layer_group->header.z_order = 0;
   array_init(&layer_group->layers);
-  array_init(&layer_group->post_processes);
   create_framebuffer(&layer_group->framebuffer);
 }
 
@@ -57,6 +63,17 @@ void bi_post_process_init(BiPostProcess* post_process,BiShader* shader)
   post_process->shader = shader;
   create_framebuffer(&post_process->framebuffer);
 }
+
+//
+// Layer
+//
+
+void bi_layer_set_framebuffer_enabled(BiLayer* layer,bool framebuffer_enabled)
+{
+  layer->_framebuffer_enabled = framebuffer_enabled;
+  create_framebuffer(&layer->_framebuffer);
+}
+
 
 //
 // Layer Group
@@ -97,14 +114,4 @@ void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj
 void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
 {
   array_remove_object(&layer_group->layers,obj);
-}
-
-void bi_layer_group_add_post_process(BiLayerGroup* layer_group, BiPostProcess *obj)
-{
-  array_add_object(&layer_group->post_processes,obj);
-}
-
-void bi_layer_group_remove_post_process(BiLayerGroup* layer_group, BiPostProcess *obj)
-{
-  array_remove_object(&layer_group->post_processes,obj);
 }

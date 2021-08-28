@@ -299,7 +299,7 @@ static void render_layer(BiContext* context,BiLayer* layer)
     glBindVertexArray(0);
 }
 
-static void render_framebuffer(BiContext* context, GLuint texture, GLfloat attributes[4], BiShader* shader)
+static void render_texture(BiContext* context, GLuint texture, BiLayer* layer)
 {
   BiTexture t;
   t.texture_id = texture;
@@ -322,59 +322,68 @@ static void render_framebuffer(BiContext* context, GLuint texture, GLfloat attri
   l.root = &n;
   l.textures[0] = &t;
 
-  if(attributes){
-    memcpy(l.optional_shader_attributes, attributes, sizeof(GLfloat)*4 );
-  }
-  if(shader) {
-    l.shader = shader;
+  if(layer){
+    BiTexture t2;
+    t2.texture_id = layer->_framebuffer.texture_id;
+    t2.w = context->w;
+    t2.h = context->h;
+    t2._texture_unit = 0;
+    l.textures[1] = &t2;
+    memcpy(l.optional_shader_attributes, layer->post_process->attributes, sizeof(GLfloat)*4 );
+    l.shader = layer->post_process->shader;
   }
 
   render_layer(context,&l);
 }
 
-static void render_layer_group(BiContext* context, BiLayerGroup *layer_group, GLuint parent_framebuffer)
-{
-  GLuint framebuffer = layer_group->framebuffer.framebuffer_id;
 
-  // select framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+static void target_and_clear_framebuffer(GLuint framebuffer_id)
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
   glClearColor(0,0,0,0);
   glClear(GL_COLOR_BUFFER_BIT);
+}
+
+static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint parent_framebuffer)
+{
+  BiFramebuffer *fb = &lg->framebuffer;
+  target_and_clear_framebuffer(fb->framebuffer_id);
 
   // render
-  for( int i=0; i<layer_group->layers.size; i++ ) {
-    if( ((BiLayerHeader*)layer_group->layers.objects[i])->type == BI_LAYER_TYPE_LAYER_GROUP ) {
-      render_layer_group( context, layer_group->layers.objects[i], framebuffer );
+  for( int i=0; i<lg->layers.size; i++ ) {
+    BiLayerHeader* header = lg->layers.objects[i];
+    if( header->type == BI_LAYER_TYPE_LAYER_GROUP ) {
+      // Layer Group
+      render_layer_group( context, (BiLayerGroup*)header, fb->framebuffer_id );
     } else {
-      render_layer( context, layer_group->layers.objects[i] );
+      // Layer
+      BiLayer *layer = (BiLayer*)header;
+      if(layer->_framebuffer_enabled){
+        // render to framebuffer
+        target_and_clear_framebuffer(layer->_framebuffer.framebuffer_id);
+      }
+      render_layer( context, layer );
+      if(layer->post_process){
+        // post process
+        BiPostProcess *pp = layer->post_process;
+        // target new framebuffer
+        target_and_clear_framebuffer(pp->framebuffer.framebuffer_id);
+        // render
+        render_texture(context,fb->texture_id,layer);
+        // swap framebuffer
+        BiFramebuffer tmp = *fb;
+        *fb = pp->framebuffer;
+        pp->framebuffer = tmp;
+      }else{
+        // back
+        glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+      }
     }
   }
-
-  // chain post processing
-  if( layer_group->post_processes.size > 0 ) {
-    GLuint src_texture = layer_group->framebuffer.texture_id;
-    for( int i=0; i<layer_group->post_processes.size; i++) {
-      BiPostProcess* pp = layer_group->post_processes.objects[i];
-      // target new framebuffer
-      glBindFramebuffer(GL_FRAMEBUFFER, pp->framebuffer.framebuffer_id);
-      glClearColor(0,0,0,0);
-      glClear(GL_COLOR_BUFFER_BIT);
-      // render
-      render_framebuffer(context,src_texture,pp->optional_shader_attributes,pp->shader);
-      src_texture = pp->framebuffer.texture_id;
-    }
-  }
-
-  // reset
-  glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer);
 
   // finalize
-  if( layer_group->post_processes.size > 0 ) {
-    BiPostProcess *pp = layer_group->post_processes.objects[layer_group->post_processes.size-1];
-    render_framebuffer(context,pp->framebuffer.texture_id,NULL,NULL);
-  }else{
-    render_framebuffer(context,layer_group->framebuffer.texture_id,NULL,NULL);
-  }
+  glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer);
+  render_texture(context,fb->texture_id,NULL);
 }
 
 void bi_render(BiContext* context)

@@ -87,14 +87,7 @@ bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, boo
 
 void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *layer_group,bool antialias)
 {
-  BiFramebuffer src;
-  int pp_size = layer_group->post_processes.size;
-  if(pp_size>0){
-    BiPostProcess* pp = layer_group->post_processes.objects[pp_size-1];
-    src = pp->framebuffer;
-  }else{
-    src = layer_group->framebuffer;
-  }
+  BiFramebuffer src = layer_group->framebuffer;
 
   GLuint texture_id;
   glGenTextures(1, &texture_id);

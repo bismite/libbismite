@@ -27,6 +27,13 @@ struct _BiLayerHeader {
   int index;
 };
 
+struct _BiFramebuffer {
+  GLuint framebuffer_id;
+  GLuint texture_id;
+  int w;
+  int h;
+};
+
 struct _BiLayer {
   BiLayerHeader header;
   GLfloat camera_x;
@@ -40,26 +47,21 @@ struct _BiLayer {
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
   BiShader *shader;
   GLfloat optional_shader_attributes[4];
-};
-
-struct _BiFramebuffer {
-  GLuint framebuffer_id;
-  GLuint texture_id;
-  int w;
-  int h;
+  BiPostProcess *post_process;
+  BiFramebuffer _framebuffer;
+  bool _framebuffer_enabled;
 };
 
 struct _BiLayerGroup {
   BiLayerHeader header;
   Array layers;
-  Array post_processes;
   BiFramebuffer framebuffer;
 };
 
 struct _BiPostProcess {
   BiShader* shader;
   BiFramebuffer framebuffer;
-  GLfloat optional_shader_attributes[4];
+  GLfloat attributes[4];
 };
 
 extern void bi_layer_init(BiLayer* layer);
@@ -69,6 +71,7 @@ extern void bi_post_process_init(BiPostProcess* post_process,BiShader* shader);
 //
 // layer
 //
+void bi_layer_set_framebuffer_enabled(BiLayer* layer,bool framebuffer_enabled);
 static inline int bi_layer_get_z_order(BiLayer* layer){ return layer->header.z_order; }
 static inline void bi_layer_set_z_order(BiLayer* layer,int z){ layer->header.z_order = z; }
 
@@ -83,7 +86,5 @@ extern void bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj)
 extern void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_update_order(BiLayerGroup* layer_group);
-extern void bi_layer_group_add_post_process(BiLayerGroup* layer_group, BiPostProcess *obj);
-extern void bi_layer_group_remove_post_process(BiLayerGroup* layer_group, BiPostProcess *obj);
 
 #endif

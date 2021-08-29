@@ -28,6 +28,7 @@ typedef struct {
   BiTimer **timers;
 } BiTimers;
 
+extern void bi_timers_init(BiTimers* timers);
 extern void bi_run_timers(BiContext* context, BiTimers* timers);
 
 extern void bi_add_timer(BiTimers* timers, BiTimer* timer);

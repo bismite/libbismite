@@ -8,6 +8,7 @@
 #include <bi/profile.h>
 #include <bi/node.h>
 #include <bi/layer.h>
+#include <bi/array.h>
 
 #define BI_CORE_MAJOR_VERSION 0
 #define BI_CORE_MINOR_VERSION 13
@@ -42,13 +43,9 @@ struct _BiContext {
     // Layers
     BiLayerGroup layers;
 
-    // rendering queue
-    BiNode* rendering_nodes_queue[0xFFFF];
-    int rendering_nodes_queue_size;
-
-    // event and update callback
-    BiNode* callback_planned_nodes[0xFFFF];
-    int callback_planned_nodes_size;
+    // queue
+    Array _rendering_queue;
+    Array _callback_queue;
 
     // global timers
     BiTimers timers;

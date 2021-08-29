@@ -72,7 +72,7 @@ static void main_loop( void* arg )
 
     bi_profile_record(&context->profile,now);
 
-    context->profile.callback_planned_nodes_size = context->callback_planned_nodes_size;
+    context->profile.callback_planned_nodes_size = context->_callback_queue.size;
 
     //
     // callback and event handling
@@ -86,8 +86,8 @@ static void main_loop( void* arg )
     SDL_PumpEvents();
     int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
     // callback
-    for(int i=context->callback_planned_nodes_size-1;i>=0;i--){
-      BiNode* n = context->callback_planned_nodes[i];
+    for(int i=context->_callback_queue.size-1;i>=0;i--){
+      BiNode* n = context->_callback_queue.objects[i];
       if( n == NULL ){
         continue;
       }
@@ -116,7 +116,7 @@ static void main_loop( void* arg )
     }
 
     // reset queue
-    context->callback_planned_nodes_size = 0;
+    array_clear(&context->_callback_queue);
 
     int64_t phase2 = bi_get_now();
 

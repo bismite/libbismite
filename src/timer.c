@@ -28,6 +28,12 @@ void bi_finish_timer(BiTimer* timer)
 // Timers
 //
 
+void bi_timers_init(BiTimers* timers)
+{
+  timers->size = 0;
+  timers->timers = NULL;
+}
+
 void bi_run_timers(BiContext* context, BiTimers* timers)
 {
   for(int i=0;i<timers->size;i++){

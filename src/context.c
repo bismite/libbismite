@@ -156,13 +156,13 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     context->program_start_at = bi_get_now();
 
-    context->rendering_nodes_queue_size = 0;
-    context->callback_planned_nodes_size = 0;
+    array_init(&context->_rendering_queue);
+    array_init(&context->_callback_queue);
+
     bi_layer_group_init(&context->layers);
 
     // timers
-    context->timers.size = 0;
-    context->timers.timers = NULL;
+    bi_timers_init(&context->timers);
 
     //
     bi_profile_init(&context->profile,fps,bi_get_now());

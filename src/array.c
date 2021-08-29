@@ -1,6 +1,8 @@
 #include <bi/array.h>
 #include <stdlib.h>
 
+#define ARRAY_INITIAL_CAPACITY 4
+
 void array_init(Array *a)
 {
   a->size = 0;
@@ -18,7 +20,7 @@ void array_add_object(Array* a, void* object)
   a->size+=1;
   if(a->size > a->capacity) {
     if(a->capacity==0) {
-      a->capacity = 4; // initial capacity
+      a->capacity = ARRAY_INITIAL_CAPACITY;
     }else{
       a->capacity = a->capacity * 2;
     }
@@ -64,4 +66,11 @@ void* array_remove_object(Array* a, void* object)
     return NULL;
   }
   return array_remove_object_at(a,index);
+}
+
+void array_clear(Array* a)
+{
+  a->capacity = ARRAY_INITIAL_CAPACITY;
+  a->objects = realloc( a->objects, sizeof(void*) * a->capacity );
+  a->size = 0;
 }

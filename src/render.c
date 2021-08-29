@@ -141,14 +141,12 @@ static void draw(BiContext* context, BiNode* n, bool visible)
 
     // add callback
     if( node_has_event_handler(n) || n->timers.size > 0 ) {
-      context->callback_planned_nodes[context->callback_planned_nodes_size] = n;
-      context->callback_planned_nodes_size += 1;
+      array_add_object(&context->_callback_queue, n);
     }
 
     // skip: invisible, zero-size node, transparent node
     if( visible==true && n->visible==true && n->w!=0 && n->h!=0 && n->color[3]!=0) {
-      context->rendering_nodes_queue[context->rendering_nodes_queue_size] = n;
-      context->rendering_nodes_queue_size += 1;
+      array_add_object(&context->_rendering_queue,n);
     }
 
     //
@@ -177,14 +175,14 @@ static void render_layer(BiContext* context,BiLayer* layer)
     }
 
     // reset rendering queue
-    context->rendering_nodes_queue_size = 0;
+    array_clear(&context->_rendering_queue);
 
     //
     // recursive visit nodes
     //
     draw(context, layer->root, true);
 
-    const size_t len = context->rendering_nodes_queue_size;
+    const size_t len = context->_rendering_queue.size;
 
     if(len==0) return; // eraly exit
 
@@ -227,7 +225,7 @@ static void render_layer(BiContext* context,BiLayer* layer)
     GLfloat mod_color[len][4];
     for(int i=0;i<len;i++){
 
-      BiNode* node = context->rendering_nodes_queue[i];
+      BiNode* node = context->_rendering_queue.objects[i];
 
       // texture_uv
       texture_z[i] = -1; // no-texture

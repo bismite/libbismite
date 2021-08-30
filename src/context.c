@@ -195,6 +195,9 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    bi_framebuffer_init(&context->_layer_framebuffer);
+    bi_framebuffer_init(&context->_post_process_framebuffer);
 }
 
 void bi_set_title(BiContext* context, const char* title)

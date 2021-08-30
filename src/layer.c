@@ -18,67 +18,28 @@ void bi_layer_init(BiLayer* layer)
   }
   layer->shader = NULL;
   for(int i=0;i<4;i++) {
-    layer->optional_shader_attributes[i] = 0;
+    layer->shader_attributes[i] = 0;
   }
-  layer->post_process = NULL;
-  // framebuffer
-  layer->_framebuffer_enabled = false;
-  layer->_framebuffer.framebuffer_id = 0;
-  layer->_framebuffer.texture_id = 0;
-  layer->_framebuffer.w = 0;
-  layer->_framebuffer.h = 0;
+  // Post Process
+  layer->post_process_shader = NULL;
+  layer->post_process_framebuffer_enabled = false;
+  for(int i=0;i<4;i++) {
+    layer->post_process_shader_attributes[i] = 0;
+  }
 }
 
-static void create_framebuffer(BiFramebuffer *fb)
-{
-  glGenFramebuffers(1, &fb->framebuffer_id);
-  glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
-  glGenTextures(1, &fb->texture_id);
-  glBindTexture(GL_TEXTURE_2D, fb->texture_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  GLint dims[4] = {0};
-  glGetIntegerv(GL_VIEWPORT, dims);
-  fb->w = dims[2];
-  fb->h = dims[3];
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb->w,fb->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb->texture_id, 0);
-  // unbind
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
+//
+// Layer Group
+//
 void bi_layer_group_init(BiLayerGroup* layer_group)
 {
   layer_group->header.type = BI_LAYER_TYPE_LAYER_GROUP;
   layer_group->header.z_order = 0;
   array_init(&layer_group->layers);
-  create_framebuffer(&layer_group->framebuffer);
+  bi_framebuffer_init(&layer_group->framebuffer);
   layer_group->interaction_enabled = true;
 }
 
-void bi_post_process_init(BiPostProcess* post_process,BiShader* shader)
-{
-  post_process->shader = shader;
-  create_framebuffer(&post_process->framebuffer);
-}
-
-//
-// Layer
-//
-
-void bi_layer_set_framebuffer_enabled(BiLayer* layer,bool framebuffer_enabled)
-{
-  layer->_framebuffer_enabled = framebuffer_enabled;
-  create_framebuffer(&layer->_framebuffer);
-}
-
-
-//
-// Layer Group
-//
 static int layer_order_compare(const void *_a, const void *_b )
 {
   const BiLayerHeader *a = *(BiLayerHeader**)_a;

@@ -4,6 +4,7 @@
 #include <bi/bi_gl.h>
 #include <stdbool.h>
 #include <bi/array.h>
+#include <bi/framebuffer.h>
 
 #define BI_LAYER_MAX_TEXTURES 16
 
@@ -14,7 +15,6 @@ typedef struct _BiLayerHeader BiLayerHeader;
 typedef struct _BiLayer BiLayer;
 typedef struct _BiLayerGroup BiLayerGroup;
 typedef struct _BiPostProcess BiPostProcess;
-typedef struct _BiFramebuffer BiFramebuffer;
 
 typedef enum {
   BI_LAYER_TYPE_LAYER,
@@ -25,13 +25,6 @@ struct _BiLayerHeader {
   BiLayerType type;
   int z_order;
   int index;
-};
-
-struct _BiFramebuffer {
-  GLuint framebuffer_id;
-  GLuint texture_id;
-  int w;
-  int h;
 };
 
 struct _BiLayer {
@@ -46,10 +39,11 @@ struct _BiLayer {
   GLenum blend_alpha_dst;
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
   BiShader *shader;
-  GLfloat optional_shader_attributes[4];
-  BiPostProcess *post_process;
-  BiFramebuffer _framebuffer;
-  bool _framebuffer_enabled;
+  GLfloat shader_attributes[4];
+  // Post Process
+  BiShader* post_process_shader;
+  GLfloat post_process_shader_attributes[4];
+  bool post_process_framebuffer_enabled;
 };
 
 struct _BiLayerGroup {
@@ -59,20 +53,12 @@ struct _BiLayerGroup {
   bool interaction_enabled;
 };
 
-struct _BiPostProcess {
-  BiShader* shader;
-  BiFramebuffer framebuffer;
-  GLfloat attributes[4];
-};
-
 extern void bi_layer_init(BiLayer* layer);
 extern void bi_layer_group_init(BiLayerGroup* layer_group);
-extern void bi_post_process_init(BiPostProcess* post_process,BiShader* shader);
 
 //
 // layer
 //
-void bi_layer_set_framebuffer_enabled(BiLayer* layer,bool framebuffer_enabled);
 static inline int bi_layer_get_z_order(BiLayer* layer){ return layer->header.z_order; }
 static inline void bi_layer_set_z_order(BiLayer* layer,int z){ layer->header.z_order = z; }
 

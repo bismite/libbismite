@@ -9,6 +9,7 @@
 #include <bi/node.h>
 #include <bi/layer.h>
 #include <bi/array.h>
+#include <bi/framebuffer.h>
 
 #define BI_CORE_MAJOR_VERSION 0
 #define BI_CORE_MINOR_VERSION 13
@@ -58,6 +59,10 @@ struct _BiContext {
 
     // default texture
     GLuint default_texture;
+
+    //
+    BiFramebuffer _layer_framebuffer;
+    BiFramebuffer _post_process_framebuffer;
 
     //
     void* userdata;

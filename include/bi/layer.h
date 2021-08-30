@@ -56,6 +56,7 @@ struct _BiLayerGroup {
   BiLayerHeader header;
   Array layers;
   BiFramebuffer framebuffer;
+  bool interaction_enabled;
 };
 
 struct _BiPostProcess {

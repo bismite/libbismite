@@ -6,6 +6,13 @@
 #include <bi/bi_gl.h>
 #include <math.h>
 
+// context
+typedef struct _RenderingContext{
+  bool visible;
+  bool interaction_enabled;
+} RenderingContext;
+
+
 static void set_projection(BiShader* shader,int w, int h, bool centering)
 {
     if(centering) {
@@ -135,13 +142,18 @@ static bool node_has_event_handler(BiNode* n)
   return false;
 }
 
-static void draw(BiContext* context, BiNode* n, bool visible)
+static void draw(BiContext* context, BiNode* n, RenderingContext render_context)
 {
+    bool visible = render_context.visible;
+    bool interaction_enabled = render_context.interaction_enabled;
+
     n->_final_visibility = n->visible && visible;
 
     // add callback
-    if( node_has_event_handler(n) || n->timers.size > 0 ) {
-      array_add_object(&context->_callback_queue, n);
+    if(interaction_enabled){
+      if( node_has_event_handler(n) || n->timers.size > 0 ) {
+        array_add_object(&context->_callback_queue, n);
+      }
     }
 
     // skip: invisible, zero-size node, transparent node
@@ -159,16 +171,17 @@ static void draw(BiContext* context, BiNode* n, bool visible)
     }
 
     //
+    render_context.visible = visible && n->visible;
     bi_node_sort(n);
     for( int i=0; i<n->children.size; i++ ){
       if( bi_node_child_at(n,i)->matrix_cached == true && matrix_update_require ) {
           bi_node_child_at(n,i)->matrix_cached = false;
       }
-      draw(context, bi_node_child_at(n,i), visible && n->visible ? true : false);
+      draw(context, bi_node_child_at(n,i), render_context);
     }
 }
 
-static void render_layer(BiContext* context,BiLayer* layer)
+static void render_layer(BiContext* context,BiLayer* layer, RenderingContext render_context)
 {
     if( layer->root == NULL ) {
       return;
@@ -180,7 +193,7 @@ static void render_layer(BiContext* context,BiLayer* layer)
     //
     // recursive visit nodes
     //
-    draw(context, layer->root, true);
+    draw(context, layer->root, render_context);
 
     const size_t len = context->_rendering_queue.size;
 
@@ -331,7 +344,8 @@ static void render_texture(BiContext* context, GLuint texture, BiLayer* layer)
     l.shader = layer->post_process->shader;
   }
 
-  render_layer(context,&l);
+  RenderingContext rcontext = {true,false};
+  render_layer(context,&l,rcontext);
 }
 
 
@@ -342,8 +356,9 @@ static void target_and_clear_framebuffer(GLuint framebuffer_id)
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
-static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint parent_framebuffer)
+static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint parent_framebuffer_id, RenderingContext rcontext)
 {
+  rcontext.interaction_enabled = rcontext.interaction_enabled && lg->interaction_enabled;
   BiFramebuffer *fb = &lg->framebuffer;
   target_and_clear_framebuffer(fb->framebuffer_id);
 
@@ -352,7 +367,7 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
     BiLayerHeader* header = lg->layers.objects[i];
     if( header->type == BI_LAYER_TYPE_LAYER_GROUP ) {
       // Layer Group
-      render_layer_group( context, (BiLayerGroup*)header, fb->framebuffer_id );
+      render_layer_group( context, (BiLayerGroup*)header, fb->framebuffer_id, rcontext );
     } else {
       // Layer
       BiLayer *layer = (BiLayer*)header;
@@ -360,7 +375,7 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
         // render to framebuffer
         target_and_clear_framebuffer(layer->_framebuffer.framebuffer_id);
       }
-      render_layer( context, layer );
+      render_layer( context, layer, rcontext );
       if(layer->post_process){
         // post process
         BiPostProcess *pp = layer->post_process;
@@ -380,7 +395,7 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
   }
 
   // finalize
-  glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer_id);
   render_texture(context,fb->texture_id,NULL);
 }
 
@@ -395,7 +410,8 @@ void bi_render(BiContext* context)
   context->profile.rendering_nodes_queue_size = 0;
 
   // rendering
-  render_layer_group(context,&context->layers,0);
+  RenderingContext rc = {true,true};
+  render_layer_group(context,&context->layers,0,rc);
 
   //
   SDL_GL_SwapWindow(context->window);

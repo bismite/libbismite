@@ -56,6 +56,7 @@ void bi_layer_group_init(BiLayerGroup* layer_group)
   layer_group->header.z_order = 0;
   array_init(&layer_group->layers);
   create_framebuffer(&layer_group->framebuffer);
+  layer_group->interaction_enabled = true;
 }
 
 void bi_post_process_init(BiPostProcess* post_process,BiShader* shader)

@@ -85,31 +85,6 @@ bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, boo
     return load_texture_from_image( texture, SDL_RWFromFile(filename,"rb"), antialias );
 }
 
-void bi_texture_init_with_layer_group(BiTexture* texture,BiLayerGroup *layer_group,bool antialias)
-{
-  BiFramebuffer src = layer_group->framebuffer;
-
-  GLuint texture_id;
-  glGenTextures(1, &texture_id);
-  glBindTexture(GL_TEXTURE_2D,texture_id);
-  // no antialias
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  // CLAMP_TO_EDGE
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  // copy
-  glBindFramebuffer(GL_FRAMEBUFFER,src.framebuffer_id);
-  glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGBA, 0,0, src.w,src.h, 0);
-  // unbind
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  //
-  texture->texture_id = texture_id;
-  texture->w = src.w;
-  texture->h = src.h;
-}
-
 void bi_texture_delete(BiTexture* texture)
 {
   glDeleteTextures(1,&texture->texture_id);

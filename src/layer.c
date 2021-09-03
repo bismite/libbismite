@@ -5,14 +5,16 @@ void bi_layer_init(BiLayer* layer)
 {
   layer->header.type = BI_LAYER_TYPE_LAYER;
   layer->header.z_order = 0;
+
+  layer->blend_factor.src = GL_SRC_ALPHA;
+  layer->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
+  layer->blend_factor.alpha_src = GL_ONE;
+  layer->blend_factor.alpha_dst = GL_ONE_MINUS_SRC_ALPHA;
+
   layer->root = NULL;
   layer->camera_x = 0;
   layer->camera_y = 0;
   layer->projection_centering = false;
-  layer->blend_src = GL_SRC_ALPHA;
-  layer->blend_dst = GL_ONE_MINUS_SRC_ALPHA;
-  layer->blend_alpha_src = GL_ONE;
-  layer->blend_alpha_dst = GL_ONE;
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     layer->textures[i] = NULL;
   }
@@ -21,11 +23,15 @@ void bi_layer_init(BiLayer* layer)
     layer->shader_attributes[i] = 0;
   }
   // Post Process
-  layer->post_process_shader = NULL;
-  layer->post_process_framebuffer_enabled = false;
+  layer->post_process.shader = NULL;
+  layer->post_process.framebuffer_enabled = false;
   for(int i=0;i<4;i++) {
-    layer->post_process_shader_attributes[i] = 0;
+    layer->post_process.shader_attributes[i] = 0;
   }
+  layer->post_process.blend_factor.src = GL_ONE;
+  layer->post_process.blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
+  layer->post_process.blend_factor.alpha_src = GL_ONE;
+  layer->post_process.blend_factor.alpha_dst = GL_ONE_MINUS_SRC_ALPHA;
 }
 
 //
@@ -35,6 +41,12 @@ void bi_layer_group_init(BiLayerGroup* layer_group)
 {
   layer_group->header.type = BI_LAYER_TYPE_LAYER_GROUP;
   layer_group->header.z_order = 0;
+
+  layer_group->blend_factor.src = GL_ONE;
+  layer_group->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
+  layer_group->blend_factor.alpha_src = GL_ONE;
+  layer_group->blend_factor.alpha_dst = GL_ONE_MINUS_SRC_ALPHA;
+
   array_init(&layer_group->layers);
   bi_framebuffer_init(&layer_group->framebuffer);
   layer_group->interaction_enabled = true;

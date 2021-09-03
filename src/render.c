@@ -300,7 +300,12 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     set_camera(shader, layer->camera_x, layer->camera_y);
 
     // blend function
-    glBlendFuncSeparate(layer->blend_src,layer->blend_dst,layer->blend_alpha_src,layer->blend_alpha_dst);
+    glBlendFuncSeparate(
+      layer->blend_factor.src,
+      layer->blend_factor.dst,
+      layer->blend_factor.alpha_src,
+      layer->blend_factor.alpha_dst
+    );
 
     //
     // Draw instances
@@ -310,7 +315,7 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     glBindVertexArray(0);
 }
 
-static void render_texture(BiContext* context, GLuint texture, BiLayer* layer)
+static void render_texture(BiContext* context, GLuint texture, BiLayerHeader* header)
 {
   BiTexture t;
   t.texture_id = texture;
@@ -334,16 +339,23 @@ static void render_texture(BiContext* context, GLuint texture, BiLayer* layer)
   l.textures[0] = &t;
 
   BiTexture t2;
-  if(layer){
-    if(layer->post_process_framebuffer_enabled){
-      t2.texture_id = context->_layer_framebuffer.texture_id;
-      t2.w = context->w;
-      t2.h = context->h;
-      t2._texture_unit = 0;
-      l.textures[1] = &t2;
+  if(header){
+    if(header->type == BI_LAYER_TYPE_LAYER_GROUP) {
+      BiLayerGroup *lg = (BiLayerGroup*)header;
+      l.blend_factor = lg->blend_factor;
+    }else{
+      BiLayer *layer = (BiLayer*)header;
+      if(layer->post_process.framebuffer_enabled){
+        t2.texture_id = context->_layer_framebuffer.texture_id;
+        t2.w = context->w;
+        t2.h = context->h;
+        t2._texture_unit = 0;
+        l.textures[1] = &t2;
+      }
+      memcpy(l.shader_attributes, layer->post_process.shader_attributes, sizeof(GLfloat)*4 );
+      l.shader = layer->post_process.shader;
+      l.blend_factor = layer->post_process.blend_factor;
     }
-    memcpy(l.shader_attributes, layer->post_process_shader_attributes, sizeof(GLfloat)*4 );
-    l.shader = layer->post_process_shader;
   }
 
   RenderingContext rcontext = {true,false};
@@ -372,16 +384,16 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
     } else {
       // Layer
       BiLayer *layer = (BiLayer*)header;
-      if(layer->post_process_framebuffer_enabled){
+      if(layer->post_process.framebuffer_enabled){
         // render to framebuffer
         target_and_clear_framebuffer(context->_layer_framebuffer.framebuffer_id);
       }
       render_layer( context, layer, rcontext );
-      if(layer->post_process_shader){
+      if(layer->post_process.shader){
         // target new framebuffer
         target_and_clear_framebuffer(context->_post_process_framebuffer.framebuffer_id);
         // render
-        render_texture(context,lg->framebuffer.texture_id,layer);
+        render_texture(context,lg->framebuffer.texture_id,(BiLayerHeader*)layer);
         // swap framebuffer
         BiFramebuffer tmp = lg->framebuffer;
         lg->framebuffer = context->_post_process_framebuffer;
@@ -394,7 +406,7 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
 
   // finalize
   glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer_id);
-  render_texture(context,lg->framebuffer.texture_id,NULL);
+  render_texture(context,lg->framebuffer.texture_id,(BiLayerHeader*)lg);
 }
 
 void bi_render(BiContext* context)

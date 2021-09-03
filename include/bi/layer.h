@@ -12,6 +12,7 @@ typedef struct _BiNode BiNode;
 typedef struct _BiTexture BiTexture;
 typedef struct _BiShader BiShader;
 typedef struct _BiLayerHeader BiLayerHeader;
+typedef struct _BiLayerBlendFactor BiLayerBlendFactor;
 typedef struct _BiLayer BiLayer;
 typedef struct _BiLayerGroup BiLayerGroup;
 typedef struct _BiPostProcess BiPostProcess;
@@ -27,27 +28,35 @@ struct _BiLayerHeader {
   int index;
 };
 
+struct _BiLayerBlendFactor {
+  GLenum src;
+  GLenum dst;
+  GLenum alpha_src;
+  GLenum alpha_dst;
+};
+
 struct _BiLayer {
   BiLayerHeader header;
+  BiLayerBlendFactor blend_factor;
   GLfloat camera_x;
   GLfloat camera_y;
   bool projection_centering;
   BiNode* root;
-  GLenum blend_src;
-  GLenum blend_dst;
-  GLenum blend_alpha_src;
-  GLenum blend_alpha_dst;
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
   BiShader *shader;
   GLfloat shader_attributes[4];
   // Post Process
-  BiShader* post_process_shader;
-  GLfloat post_process_shader_attributes[4];
-  bool post_process_framebuffer_enabled;
+  struct {
+    BiShader* shader;
+    BiLayerBlendFactor blend_factor;
+    GLfloat shader_attributes[4];
+    bool framebuffer_enabled;
+  } post_process;
 };
 
 struct _BiLayerGroup {
   BiLayerHeader header;
+  BiLayerBlendFactor blend_factor;
   Array layers;
   BiFramebuffer framebuffer;
   bool interaction_enabled;
@@ -73,5 +82,13 @@ extern void bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj)
 extern void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_update_order(BiLayerGroup* layer_group);
+
+//
+static inline void bi_set_blend_factor(BiLayerBlendFactor* b, GLenum src, GLenum dst, GLenum alpha_src, GLenum alpha_dst ) {
+  b->src = src;
+  b->dst = dst;
+  b->alpha_src = alpha_src;
+  b->alpha_dst = alpha_dst;
+}
 
 #endif

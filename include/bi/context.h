@@ -23,8 +23,6 @@ struct _BiContext {
     // geometry
     int w;
     int h;
-    int camera_x;
-    int camera_y;
 
     // background color
     uint8_t color[4];

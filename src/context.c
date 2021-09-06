@@ -173,8 +173,6 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     context->w = w;
     context->h = h;
-    context->camera_x = 0;
-    context->camera_y = 0;
 
     context->color[0] = 0;
     context->color[1] = 0;

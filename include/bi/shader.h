@@ -32,6 +32,7 @@ struct _BiShader {
     //
     GLint time_location;
     GLint resolution_location;
+    GLint scale_location;
     GLint optional_attributes_location;
 };
 

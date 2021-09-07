@@ -210,10 +210,12 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
 
     // time
     glUniform1f(shader->time_location, (context->program_start_at - context->frame_start_at)/1000.0 );
-    // resolution - retina display scaled x2
+    // resolution
+    glUniform2f(shader->resolution_location, context->w, context->h );
+    // scale
     int drawable_w,drawable_h;
     SDL_GL_GetDrawableSize(context->window, &drawable_w, &drawable_h);
-    glUniform2f(shader->resolution_location, drawable_w, drawable_h );
+    glUniform1f(shader->scale_location, (float)drawable_h / context->h );
     // optional attributes
     glUniform4fv(shader->optional_attributes_location, 1, layer->shader_attributes );
 

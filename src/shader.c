@@ -45,6 +45,7 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
     shader->texture_locations[0] = glGetUniformLocation(program_id, "sampler[0]");
     shader->time_location = glGetUniformLocation(program_id, "time");
     shader->resolution_location = glGetUniformLocation(program_id, "resolution");
+    shader->scale_location = glGetUniformLocation(program_id, "scale");
     shader->optional_attributes_location = glGetUniformLocation(program_id, "optional_attributes");
 }
 

@@ -24,7 +24,7 @@ static char* read_shader(const char* filename)
   return string;
 }
 
-static BiShader* __attribute__((unused)) create_shader(const char* vert, const char* frag)
+__attribute__((unused)) static BiShader* create_shader(const char* vert, const char* frag)
 {
   char* vartex_shader = read_shader(vert);
   char* fragment_shader = read_shader(frag);
@@ -62,14 +62,14 @@ static BiNode* make_sprite_from_mapping(BiTextureMapping *mapping)
   return sprite;
 }
 
-static BiNode* __attribute__((unused)) make_sprite(const char* name)
+__attribute__((unused)) static BiNode* make_sprite(const char* name)
 {
   // load texture
   BiTextureMapping *mapping = make_texture_mapping(name);
   return make_sprite_from_mapping(mapping);
 }
 
-static void __attribute__ ((unused)) print_info(BiContext *context)
+__attribute__((unused)) static void print_info(BiContext *context)
 {
   printf("Window Size: %d,%d\n",context->w,context->h);
   printf("bismite version: %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);

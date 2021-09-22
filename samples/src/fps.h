@@ -13,7 +13,7 @@ static bool label_fps_indicate(BiContext* context, BiTimer* timer)
   return true;
 }
 
-static BiFontAtlas* __attribute__((unused))load_font()
+__attribute__((unused)) static BiFontAtlas* load_font()
 {
   // texture
   BiTexture *font_texture = malloc(sizeof(BiTexture));
@@ -43,7 +43,7 @@ static BiNode* create_fps_label(BiContext* context, BiFontAtlas *font)
     return label;
 }
 
-static void __attribute__((unused))add_fps_layer(BiContext* context,BiFontAtlas *font)
+__attribute__((unused)) static void add_fps_layer(BiContext* context,BiFontAtlas *font)
 {
     // Layer Group
     BiLayerGroup* layer_group = malloc(sizeof(BiLayerGroup));

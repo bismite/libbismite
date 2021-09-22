@@ -26,7 +26,7 @@ clean:
 	rm -rf build/macos
 
 $(SDL_TGZ):
-	curl -L $(SDL_TGZ_URL) -o $(SDL_TGZ)
+	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
 
 $(SDL_DIR): $(SDL_TGZ)
 	mkdir -p $@

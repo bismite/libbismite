@@ -1,14 +1,6 @@
-#include <bi/util.h>
-#include <bi/node.h>
-#include <bi/context.h>
-#include <bi/main_loop.h>
-#include <bi/texture.h>
-#include <bi/layer.h>
-#include <bi/logger.h>
-
+#include <bi/bismite.h>
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "fps.h"
 
 
@@ -90,7 +82,7 @@ static void __attribute__ ((unused)) print_info(BiContext *context)
   printf("clang %s\n", __clang_version__);
 #endif
   printf("GCC compatible %s\n", __VERSION__);
-  printf("bi-core %d.%d.%d\n", BI_CORE_MAJOR_VERSION, BI_CORE_MINOR_VERSION, BI_CORE_PATCHLEVEL);
+  printf("bi-core %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);
   SDL_version compiled;
   SDL_version linked;
   SDL_VERSION(&compiled);

@@ -11,10 +11,6 @@
 #include <bi/array.h>
 #include <bi/framebuffer.h>
 
-#define BI_CORE_MAJOR_VERSION 0
-#define BI_CORE_MINOR_VERSION 13
-#define BI_CORE_PATCHLEVEL 0
-
 typedef struct _BiContext BiContext;
 
 struct _BiContext {

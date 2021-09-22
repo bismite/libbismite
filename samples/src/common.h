@@ -77,10 +77,7 @@ static void __attribute__ ((unused)) print_info(BiContext *context)
 #ifdef EMSCRIPTEN
   printf("emscripten version: %d.%d.%d\n", __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__ );
 #endif
-#ifdef __clang_version__
-  printf("clang version: %s\n", __clang_version__);
-#endif
-  printf("gcc version: %s\n", __VERSION__);
+  printf("compiler: %s\n", __VERSION__);
   SDL_version compiled;
   SDL_version linked;
   SDL_VERSION(&compiled);

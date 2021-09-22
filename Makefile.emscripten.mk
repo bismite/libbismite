@@ -1,23 +1,40 @@
 CC=emcc
 AR=emar
-CFLAGS=-Wall -Oz -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png]
+CFLAGS=-std=gnu11 -Wall -Oz -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png]
 INCLUDE_PATHS=
 
-BUILD_DIR=build/emscripten
-SOURCES = $(wildcard src/*.c)
-OBJECTS = $(addprefix $(BUILD_DIR)/, $(notdir $(SOURCES:.c=.o)))
-TARGET=$(BUILD_DIR)/libbismite-core.a
+TARGET=build/emscripten/libbismite.a
+OBJ_DIR=build/emscripten/objs
+SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
+OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-all: $(BUILD_DIR) $(TARGET)
+SAMPLE_DIR=build/emscripten/samples
+SAMPLE_SOURCES = $(wildcard samples/src/*.c)
+SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.html)
+SAMPLE_CFLAGS=-s WASM=1 --embed-file samples/assets@assets -s ALLOW_MEMORY_GROWTH=1 -s SINGLE_FILE=1
+SAMPLE_LIBS = -lbismite
+SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
-$(BUILD_DIR):
-	mkdir -p $@
+# ----
 
-$(BUILD_DIR)/%.o: src/%.c
+all: $(OBJ_DIR) $(TARGET)
+samples: all $(SAMPLE_DIR) $(SAMPLE_EXES)
+clean:
+	rm -rf build/emscripten
+
+$(OBJ_DIR):
+	mkdir -p $@/ext
+
+$(OBJ_DIR)/%.o: src/%.c
 	$(CC) -c $^ -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
 
-clean:
-	rm -rf $(BUILD_DIR)
+# ----
+
+$(SAMPLE_DIR):
+	mkdir -p $@
+
+$(SAMPLE_DIR)/%.html: samples/src/%.c
+	$(CC) $^ -o $@ -I include $(CFLAGS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) -Lbuild/emscripten

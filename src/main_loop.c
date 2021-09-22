@@ -66,91 +66,90 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 
 static void main_loop( void* arg )
 {
-    int64_t now = bi_get_now();
-    BiContext *context = (BiContext*)arg;
-    context->frame_start_at = now;
+  int64_t now = bi_get_now();
+  BiContext *context = (BiContext*)arg;
+  context->frame_start_at = now;
 
-    bi_profile_record(&context->profile,now);
+  bi_profile_record(&context->profile,now);
 
-    context->profile.callback_planned_nodes_size = context->_callback_queue.size;
+  context->profile.callback_planned_nodes_size = context->_callback_queue.size;
 
-    //
-    // callback and event handling
-    //
+  //
+  // callback and event handling
+  //
 
-    // Global Timers
-    bi_run_timers(context,&context->timers);
+  // Global Timers
+  bi_run_timers(context,&context->timers);
 
-    const int PUMP_EVENT_MAX = 32;
-    SDL_Event e[PUMP_EVENT_MAX];
-    SDL_PumpEvents();
-    int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
-    // callback
-    for(int i=context->_callback_queue.size-1;i>=0;i--){
-      BiNode* n = context->_callback_queue.objects[i];
-      if( n == NULL ){
-        continue;
-      }
-      // on update
-      if(n->_on_update) n->_on_update(context,n);
-      // Timer
-      bi_run_timers(context,&n->timers);
-      // Event Handler
-      if( n->_final_visibility ) {
-        for(int i=0;i<event_size;i++) {
-          if(e[i].type == 0) continue;
-          bool swallow = node_event_handle(n,context,&e[i]);
-          if(swallow) {
-            e[i].type = 0; // XXX: swallow
-          }
+  const int PUMP_EVENT_MAX = 32;
+  SDL_Event e[PUMP_EVENT_MAX];
+  SDL_PumpEvents();
+  int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
+  // callback
+  for(int i=context->_callback_queue.size-1;i>=0;i--){
+    BiNode* n = context->_callback_queue.objects[i];
+    if( n == NULL ){
+      continue;
+    }
+    // on update
+    if(n->_on_update) n->_on_update(context,n);
+    // Timer
+    bi_run_timers(context,&n->timers);
+    // Event Handler
+    if( n->_final_visibility ) {
+      for(int i=0;i<event_size;i++) {
+        if(e[i].type == 0) continue;
+        bool swallow = node_event_handle(n,context,&e[i]);
+        if(swallow) {
+          e[i].type = 0; // XXX: swallow
         }
       }
     }
+  }
 
-    // failsafe
-    for(int i=0;i<event_size;i++) {
-      if(e[i].type==SDL_QUIT){
-          LOG("Program quit after %i ticks", e[i].quit.timestamp);
-          context->running = false;
-      }
+  // failsafe
+  for(int i=0;i<event_size;i++) {
+    if(e[i].type==SDL_QUIT){
+        context->running = false;
     }
+  }
 
-    // reset queue
-    array_clear(&context->_callback_queue);
+  // reset queue
+  array_clear(&context->_callback_queue);
 
-    int64_t phase2 = bi_get_now();
+  int64_t phase2 = bi_get_now();
 
-    //
-    // rendering
-    //
-    bi_render(context);
+  //
+  // rendering
+  //
+  bi_render(context);
 
-    //
-    int64_t phase3 = bi_get_now();
+  //
+  int64_t phase3 = bi_get_now();
 
-    //
-    context->profile.time_spent_on_callback = phase2 - now;
-    context->profile.time_spent_on_rendering = phase3 - phase2;
+  //
+  context->profile.time_spent_on_callback = phase2 - now;
+  context->profile.time_spent_on_rendering = phase3 - phase2;
 }
 
 void bi_start_run_loop(BiContext* context)
 {
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop_arg(main_loop, context, context->profile.target_fps, false);
+  emscripten_set_main_loop_arg(main_loop, context, context->profile.target_fps, false);
 #else
-    // fallback
-    if( context->profile.target_fps == 0 ) {
-      context->profile.target_fps = 60;
-    }
-    SDL_GL_SetSwapInterval(0);
-    while (context->running) {
-        double start_at = bi_get_now();
-        main_loop(context);
-        double end_at = bi_get_now();
-        int sleep = 1;
-        if(context->profile.target_fps>0) { sleep = (1.0 / context->profile.target_fps) * 1000 - (end_at - start_at); }
-        if(sleep<=0) { sleep = 1; }
-        SDL_Delay(sleep);
-    }
+  // fallback
+  if( context->profile.target_fps == 0 ) {
+    context->profile.target_fps = 60;
+  }
+  SDL_GL_SetSwapInterval(0);
+  while (context->running) {
+    double start_at = bi_get_now();
+    main_loop(context);
+    double end_at = bi_get_now();
+    int sleep = 1;
+    if(context->profile.target_fps>0) { sleep = (1.0 / context->profile.target_fps) * 1000 - (end_at - start_at); }
+    if(sleep<=0) { sleep = 1; }
+    SDL_Delay(sleep);
+  }
 #endif
 }

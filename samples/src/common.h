@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "fps.h"
 
-
 #ifdef __EMSCRIPTEN__
 #define SHADER_HEADER "#version 100\n" "precision highp float;\n"
 #else
@@ -72,36 +71,32 @@ static BiNode* __attribute__((unused)) make_sprite(const char* name)
 
 static void __attribute__ ((unused)) print_info(BiContext *context)
 {
-  printf("Window Size %d,%d\n",context->w,context->h);
+  printf("Window Size: %d,%d\n",context->w,context->h);
+  printf("bismite version: %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);
 
 #ifdef EMSCRIPTEN
-  printf("emscripten %d.%d.%d\n", __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__ );
+  printf("emscripten version: %d.%d.%d\n", __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__ );
 #endif
 #ifdef __clang_version__
-  printf("clang %d.%d.%d\n", __clang_major__, __clang_minor__, __clang_patchlevel__ );
-  printf("clang %s\n", __clang_version__);
+  printf("clang version: %s\n", __clang_version__);
 #endif
-  printf("GCC compatible %s\n", __VERSION__);
-  printf("bi-core %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);
+  printf("gcc version: %s\n", __VERSION__);
   SDL_version compiled;
   SDL_version linked;
   SDL_VERSION(&compiled);
   SDL_GetVersion(&linked);
-  printf("SDL(compile) %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
-  printf("SDL(link) %d.%d.%d\n", linked.major, linked.minor, linked.patch);
+  printf("SDL(compile): %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
+  printf("SDL(link): %d.%d.%d\n", linked.major, linked.minor, linked.patch);
 
   printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
   printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
   printf("OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
   printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-  printf("Extensions: %s\n", glGetString(GL_EXTENSIONS));
 
-  // iphone7: 4096
   GLint max_texture_size;
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
   printf("GL_MAX_TEXTURE_SIZE: %d\n",max_texture_size);
 
-  // iphone7: 8
   GLint max_texture_image_units;
   glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_image_units);
   printf("GL_MAX_TEXTURE_IMAGE_UNITS: %d\n",max_texture_image_units);

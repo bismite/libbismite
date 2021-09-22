@@ -8,20 +8,7 @@ static bool label_fps_indicate(BiContext* context, BiTimer* timer)
   BiNode *node = timer->userdata;
   BiFontAtlas *font = node->userdata;
   char text[1024];
-  snprintf(text,1024,"FPS:%.2f CB:%ld RE:%ld ma:%ld OT:%.2f / %d,%d / %d,%d",
-    context->profile.stats.fps,
-    (long)context->profile.stats.time_spent_on_callback,
-    (long)context->profile.stats.time_spent_on_rendering,
-    (long)context->profile.stats.matrix_updated,
-
-    context->profile.stats.fps == 0 ? 0 : 1000.0 / context->profile.stats.fps - context->profile.stats.time_spent_on_callback - context->profile.stats.time_spent_on_rendering,
-
-    context->profile.on_update_callbacks_size,
-    context->profile.callback_planned_nodes_size,
-
-    context->profile.matrix_updated,
-    context->profile.rendering_nodes_queue_size
-  );
+  snprintf(text,1024,"FPS:%.2f", context->profile.stats.fps );
   bi_update_label(node, text, font, 0xff,0xff,0xff,0xff);
   return true;
 }

@@ -19,7 +19,7 @@ SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
 SAMPLE_LDFLAGS =-L$(LIB_DIR) -Lbuild/macos/SDL/lib -lSDL2 -lSDL2_image -framework OpenGL -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
-ARCHIVE=build/macos/libbismite.tgz
+ARCHIVE=build/macos/libbismite-macos.tgz
 
 # ----
 
@@ -67,4 +67,4 @@ copysdl:
 $(ARCHIVE):
 	cp -R include build/macos
 	cp LICENSE.txt build/macos/LICENSE.txt
-	tar -cz -C build/macos -f build/macos/libbismite.tgz lib LICENSE.txt include
+	tar -cz -C build/macos -f $(ARCHIVE) lib LICENSE.txt include

@@ -1,22 +1,21 @@
-name: Build macOS
+name: Build Emscripten
 on:
   push:
     tags:
       - '*'
 jobs:
-  macOS:
-    runs-on: macos-10.15
-    env:
-      SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+  build:
+    runs-on: ubuntu-20.04
     steps:
+      - uses: mymindstorm/setup-emsdk@v9
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: make -f Makefile.macos.mk release
+      - run: make -f Makefile.emscripten.mk release
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/macos/libbismite-macos.tgz
-          asset_name: libbismite-macos.tgz
+          file: tmp/bismite-mruby-emscripten.tgz
+          asset_name: bismite-mruby-emscripten.tgz
           tag: ${{ github.ref }}
           overwrite: true

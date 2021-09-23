@@ -16,6 +16,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/emscripten/libbismite-emscripten.tgz
-          asset_name: build/emscripten/libbismite-emscripten.tgz
+          asset_name: libbismite-emscripten.tgz
           tag: ${{ github.ref }}
           overwrite: true

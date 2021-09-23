@@ -13,7 +13,7 @@ SAMPLE_DIR=build/emscripten/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.html)
 SAMPLE_CFLAGS=-s WASM=1 --embed-file samples/assets@assets -s ALLOW_MEMORY_GROWTH=1 -s SINGLE_FILE=1
-SAMPLE_LDFLAGS =-Lbuild/emscripten -lbismite
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=build/emscripten/libbismite-emscripten.tgz

@@ -12,7 +12,7 @@ OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 SAMPLE_DIR=build/linux/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS =-Lbuild/linux -lbismite `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm -lGL
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm -lGL
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=build/linux/libbismite-linux.tgz
@@ -21,6 +21,7 @@ ARCHIVE=build/linux/libbismite-linux.tgz
 
 all: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
 samples: all $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets
+release: all $(ARCHIVE)
 clean:
 	rm -rf build/linux
 

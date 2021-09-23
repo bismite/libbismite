@@ -4,7 +4,7 @@ CFLAGS=-std=gnu11 -Wall -Oz -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMAT
 INCLUDE_PATHS=-Iinclude
 
 LIB_DIR=build/emscripten/lib
-TARGET=build/emscripten/lib/libbismite.a
+TARGET=$(LIB_DIR)/libbismite.a
 OBJ_DIR=build/emscripten/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)

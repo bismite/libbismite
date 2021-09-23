@@ -1,7 +1,7 @@
 # libbismite
 
 # Change Log
-## 1.0.6 - 2021/09/23
+## 1.0.7 - 2021/09/23
 - ext and samples have been merged.
 - renamed to libbismite
 ## 0.13.0 - 2021/09/07

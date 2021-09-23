@@ -1,6 +1,6 @@
 CC=clang
 AR=ar
-CFLAGS=-Wall -O3
+CFLAGS=-Wall -O3 -fPIC -arch arm64 -arch x86_64
 INCLUDE_PATHS=-Iinclude -Ibuild/macos/SDL/include/SDL2
 
 LIB_DIR=build/macos/lib

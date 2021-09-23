@@ -1,9 +1,10 @@
 CC=clang
 AR=ar
 CFLAGS=-Wall -O3
-INCLUDE_PATHS=-Ibuild/macos/SDL/include/SDL2
+INCLUDE_PATHS=-Iinclude -Ibuild/macos/SDL/include/SDL2
 
-TARGET=build/macos/libbismite.a
+LIB_DIR=build/macos/lib
+TARGET=$(LIB_DIR)/libbismite.a
 OBJ_DIR=build/macos/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
@@ -15,13 +16,16 @@ SDL_DIR=build/macos/SDL
 SAMPLE_DIR=build/macos/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LIBS = -lSDL2 -lSDL2_image -framework OpenGL -lbismite
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -Lbuild/macos/SDL/lib -lSDL2 -lSDL2_image -framework OpenGL -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
+
+ARCHIVE=build/macos/libbismite.tgz
 
 # ----
 
-all: $(OBJ_DIR) $(SDL_DIR) $(TARGET)
+all: $(OBJ_DIR) $(LIB_DIR) $(SDL_DIR) $(TARGET)
 samples: all $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
+release: all $(ARCHIVE)
 clean:
 	rm -rf build/macos
 
@@ -32,11 +36,14 @@ $(SDL_DIR): $(SDL_TGZ)
 	mkdir -p $@
 	tar --strip-component 1 -zxf $(SDL_TGZ) -C $@
 
+$(LIB_DIR):
+	mkdir -p $@
+
 $(OBJ_DIR):
 	mkdir -p $@/ext
 
 $(OBJ_DIR)/%.o: src/%.c
-	$(CC) -c $^ -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS)
+	$(CC) -c $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
@@ -47,10 +54,17 @@ $(SAMPLE_DIR):
 	mkdir -p $@
 
 $(SAMPLE_DIR)/%.exe: samples/src/%.c
-	$(CC) $^ -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) -Lbuild/macos/SDL/lib -Lbuild/macos
+	$(CC) $^ -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 	install_name_tool -add_rpath @executable_path/lib $@
 
 copyassets:
 	cp -R samples/assets $(SAMPLE_DIR)
 copysdl:
 	cp -R build/macos/SDL/lib build/macos/SDL/licenses $(SAMPLE_DIR)
+
+# ----
+
+$(ARCHIVE):
+	cp -R include build/macos
+	cp LICENSE.txt build/macos/LICENSE.txt
+	tar -cz -C build/macos -f build/macos/libbismite.tgz lib LICENSE.txt include

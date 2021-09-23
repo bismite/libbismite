@@ -1,6 +1,6 @@
 CC=emcc
 AR=emar
-CFLAGS=-std=gnu11 -Wall -Oz -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png]
+CFLAGS=-std=gnu11 -Wall -Oz -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png] -fPIC
 INCLUDE_PATHS=-Iinclude
 
 LIB_DIR=build/emscripten/lib

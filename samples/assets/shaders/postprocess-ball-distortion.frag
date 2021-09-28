@@ -40,7 +40,7 @@ void main()
     ORBIT_R * sin(time) + resolution.y * 0.5
   );
   if( distance(xy,orbit) < BALL_SIZE ) {
-    float offset = cos(uv.x * 10 + time*5.0) * AMPLITUDE / resolution.y;
+    float offset = cos(uv.x * 10.0 + time*5.0) * AMPLITUDE / resolution.y;
     gl_FragColor = getTextureColor(int(uv.z), vec2(uv.x,uv.y+offset) );
   } else {
     gl_FragColor = getTextureColor(int(uv.z), uv.xy);

@@ -17,6 +17,7 @@ void bi_transition_init(BiTransition *transition,
   transition->callback = callback;
   transition->invert = invert;
   transition->userdata = NULL;
+  transition->delay_count = 0;
   // shader
   transition->shader = shader;
   // layer
@@ -24,9 +25,14 @@ void bi_transition_init(BiTransition *transition,
   transition->layer.post_process.shader = transition->shader;
 }
 
-static bool transition_update(BiContext* context,BiTimer* timer)
+static void transition_update(BiContext* context,BiTimer* timer)
 {
   BiTransition *transition = timer->userdata;
+
+  if(transition->delay_count > 0){
+    transition->delay_count -= 1;
+    return;
+  }
 
   if(transition->_start_at == UINT64_MAX) {
     transition->_start_at = context->frame_start_at;
@@ -34,8 +40,7 @@ static bool transition_update(BiContext* context,BiTimer* timer)
   float progress = (context->frame_start_at - transition->_start_at) / (double)transition->duration;
   if(transition->_done){
     // finish
-    bi_finish_timer(&transition->timer);
-    bi_remove_timer(&context->timers,&transition->timer);
+    bi_timer_manager_remove_timer(&context->timers,&transition->timer);
     bi_layer_group_remove_layer(transition->layer_group,&transition->layer);
     transition->layer_group->interaction_enabled = true;
     if(transition->callback){
@@ -48,8 +53,6 @@ static bool transition_update(BiContext* context,BiTimer* timer)
     }
     transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0-progress : progress;
   }
-
-  return true;
 }
 
 void bi_transition_start(BiContext* context, BiTransition* transition)
@@ -58,6 +61,7 @@ void bi_transition_start(BiContext* context, BiTransition* transition)
   bi_layer_group_add_layer(transition->layer_group,&transition->layer);
   transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0 : 0.0;
   transition->_start_at = UINT64_MAX;
+  transition->delay_count = 1;
   bi_timer_init(&transition->timer,transition_update,0,-1,transition);
-  bi_add_timer(&context->timers,&transition->timer);
+  bi_timer_manager_add_timer(&context->timers,&transition->timer);
 }

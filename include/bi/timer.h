@@ -1,37 +1,45 @@
 #ifndef __BI_CORE_TIMER_H__
 #define __BI_CORE_TIMER_H__
 
-#include <stdbool.h>
 #include <stdint.h>
 
 typedef struct _BiTimer BiTimer;
+typedef struct _BiTimerManager BiTimerManager;
 typedef struct _BiContext BiContext;
 
-typedef bool (*timer_callback)(BiContext*,BiTimer*); // context,timer
+typedef void (*timer_callback)(BiContext*,BiTimer*);
+
+typedef enum {
+  BI_TIMER_STATE_PAUSED,
+  BI_TIMER_STATE_RUNNING,
+} BiTimerState;
 
 struct _BiTimer {
-    int repeat; // -1:infinity, 0:oneshot, 1:twice...
-    int64_t interval; // msec
-    int64_t will_fire_at; // msec
-    int64_t last_fire_at; // msec
-    timer_callback callback;
-    void* userdata;
-    int _state;
+  int count;
+  int64_t interval; // msec
+  int64_t will_fire_at; // msec
+  timer_callback callback;
+  void* userdata;
+  BiTimerState state;
+  BiTimerManager* manager;
 };
 
-extern void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, int repeat, void* userdata);
-extern void bi_finish_timer(BiTimer* timer);
+extern void bi_timer_init(BiTimer* timer,
+                          timer_callback callback,
+                          int64_t interval,
+                          int count,
+                          void* userdata);
+extern void bi_timer_pause(BiTimer* timer);
+extern void bi_timer_resume(BiTimer* timer);
 
-// timers
-typedef struct {
+struct _BiTimerManager {
   int size;
   BiTimer **timers;
-} BiTimers;
+};
 
-extern void bi_timers_init(BiTimers* timers);
-extern void bi_run_timers(BiContext* context, BiTimers* timers);
-
-extern void bi_add_timer(BiTimers* timers, BiTimer* timer);
-extern BiTimer* bi_remove_timer(BiTimers* timers, BiTimer* timer);
+extern void bi_timer_manager_init(BiTimerManager* timers);
+extern void bi_timer_manager_run(BiContext* context, BiTimerManager* timers);
+extern void bi_timer_manager_add_timer(BiTimerManager* timers, BiTimer* timer);
+extern void bi_timer_manager_remove_timer(BiTimerManager* timers, BiTimer* timer);
 
 #endif

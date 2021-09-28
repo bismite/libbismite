@@ -1,4 +1,5 @@
 #include <bi/main_loop.h>
+#include <bi/timer.h>
 #include <bi/context.h>
 #include <bi/node.h>
 #include <bi/render.h>
@@ -79,7 +80,7 @@ static void main_loop( void* arg )
   //
 
   // Global Timers
-  bi_run_timers(context,&context->timers);
+  bi_timer_manager_run(context,&context->timers);
 
   const int PUMP_EVENT_MAX = 32;
   SDL_Event e[PUMP_EVENT_MAX];
@@ -94,7 +95,7 @@ static void main_loop( void* arg )
     // on update
     if(n->_on_update) n->_on_update(context,n);
     // Timer
-    bi_run_timers(context,&n->timers);
+    bi_timer_manager_run(context,&n->timers);
     // Event Handler
     if( n->_final_visibility ) {
       for(int i=0;i<event_size;i++) {

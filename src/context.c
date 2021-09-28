@@ -162,7 +162,7 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
     bi_layer_group_init(&context->layers);
 
     // timers
-    bi_timers_init(&context->timers);
+    bi_timer_manager_init(&context->timers);
 
     //
     bi_profile_init(&context->profile,fps,bi_get_now());

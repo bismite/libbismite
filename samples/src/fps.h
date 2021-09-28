@@ -3,14 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static bool label_fps_indicate(BiContext* context, BiTimer* timer)
+static void label_fps_indicate(BiContext* context, BiTimer* timer)
 {
   BiNode *node = timer->userdata;
   BiFontAtlas *font = node->userdata;
   char text[1024];
   snprintf(text,1024,"FPS:%.2f", context->profile.stats.fps );
   bi_update_label(node, text, font, 0xff,0xff,0xff,0xff);
-  return true;
 }
 
 __attribute__((unused)) static BiFontAtlas* load_font()
@@ -38,7 +37,7 @@ static BiNode* create_fps_label(BiContext* context, BiFontAtlas *font)
     // timer
     BiTimer *timer = malloc(sizeof(BiTimer));
     bi_timer_init(timer, label_fps_indicate, 100, -1, label);
-    bi_add_timer(&label->timers,timer);
+    bi_timer_manager_add_timer(&label->timers,timer);
 
     return label;
 }

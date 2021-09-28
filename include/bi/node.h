@@ -55,7 +55,7 @@ struct _BiNode {
   on_keyinput_callback _on_keyinput;
   on_textinput_callback _on_textinput;
 
-  BiTimers timers;
+  BiTimerManager timers;
 
   void* userdata;
 };

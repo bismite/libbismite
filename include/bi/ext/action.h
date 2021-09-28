@@ -20,7 +20,7 @@ struct _BiAction {
   double start_at;
   double duration;
   void* action_data;
-  BiTimer* timer;
+  BiTimer timer;
   BiNode* node;
   void* on_finish_callback_context;
 };

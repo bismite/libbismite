@@ -22,6 +22,7 @@ struct _BiTransition {
   int64_t _start_at;
   bool _done;
   void* userdata;
+  int delay_count;
 };
 
 extern void bi_transition_init(BiTransition *transition,

@@ -43,7 +43,7 @@ struct _BiContext {
     Array _callback_queue;
 
     // global timers
-    BiTimers timers;
+    BiTimerManager timers;
 
     // default shader
     BiShader default_shader;

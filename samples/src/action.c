@@ -16,7 +16,6 @@ static BiAction* alloc_action(size_t size, void* func, void* payload)
 {
   BiAction* action = malloc(sizeof(BiAction));
   bi_action_init(action);
-  action->timer = malloc(sizeof(BiTimer));
   action->action_data = malloc(size);
   action->on_finish = func;
   action->on_finish_callback_context = payload;
@@ -26,7 +25,6 @@ static BiAction* alloc_action(size_t size, void* func, void* payload)
 static void dealloc_action(BiAction *action)
 {
   free(action->action_data);
-  free(action->timer);
   free(action);
 }
 

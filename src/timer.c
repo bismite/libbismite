@@ -2,112 +2,95 @@
 #include <bi/context.h>
 #include <stdlib.h>
 
-enum BiTimerState {
-  BI_TIMER_STATE_READY,
-  BI_TIMER_STATE_RUNNING,
-  BI_TIMER_STATE_FINISHED
-};
-
-void bi_timer_init(BiTimer* timer, timer_callback callback, int64_t interval, int repeat, void* userdata)
+void bi_timer_init(BiTimer* timer,
+                   timer_callback callback,
+                   int64_t interval,
+                   int count,
+                   void* userdata)
 {
-    timer->repeat = repeat;
-    timer->interval = interval;
-    timer->will_fire_at = 0; // XXX: set at next frame start
-    timer->last_fire_at = 0;
-    timer->callback = callback;
-    timer->userdata = userdata;
-    timer->_state = BI_TIMER_STATE_READY;
+  timer->count = count;
+  timer->interval = interval;
+  timer->will_fire_at = 0;
+  timer->callback = callback;
+  timer->userdata = userdata;
+  timer->state = BI_TIMER_STATE_RUNNING;
+  timer->manager = NULL;
 }
 
-void bi_finish_timer(BiTimer* timer)
+void bi_timer_pause(BiTimer* timer)
 {
-  timer->_state = BI_TIMER_STATE_READY;
+  timer->state = BI_TIMER_STATE_PAUSED;
+}
+void bi_timer_resume(BiTimer* timer)
+{
+  timer->state = BI_TIMER_STATE_RUNNING;
 }
 
 //
-// Timers
+// TimerManager
 //
 
-void bi_timers_init(BiTimers* timers)
+void bi_timer_manager_init(BiTimerManager* timer_manager)
 {
-  timers->size = 0;
-  timers->timers = NULL;
+  timer_manager->size = 0;
+  timer_manager->timers = NULL;
 }
 
-void bi_run_timers(BiContext* context, BiTimers* timers)
+void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager)
 {
-  for(int i=0;i<timers->size;i++){
-    BiTimer* t = timers->timers[i];
+  for(int i=0;i<timer_manager->size;i++){
+    BiTimer* t = timer_manager->timers[i];
+    // skip
+    if(t==NULL) continue;
+    if(t->state == BI_TIMER_STATE_PAUSED) continue;
+    if(t->count == 0) continue;
+    // check schedule
+    if(t->will_fire_at == 0) t->will_fire_at = context->frame_start_at + t->interval;
+    if(t->will_fire_at > context->frame_start_at ) continue;
+    // Fire
+    t->will_fire_at += t->interval;
+    if(t->count > 0) t->count -= 1;
+    t->callback(context,t);
+  }
 
-    // skip if NULL
-    if(t==NULL){
-      continue;
-    }
-
-    // skip new timer
-    if(t->_state == BI_TIMER_STATE_READY) {
-      continue;
-    }
-
-    // skip finished timer
-    if(t->_state == BI_TIMER_STATE_FINISHED){
-      continue;
-    }
-
-    // add in previous frame
-    if(t->will_fire_at==0) {
-      t->will_fire_at = context->frame_start_at + t->interval;
-    }
-
-    if( context->frame_start_at >= t->will_fire_at ) {
-      t->callback(context,t);
-      if(t->repeat == 0) {
-        bi_finish_timer(t);
-      }else{
-        if(t->repeat > 0){
-          t->repeat -= 1;
-        }
-        t->will_fire_at += t->interval;
-      }
+  // remove and resize
+  int new_size = 0;
+  for(int i=0;i<timer_manager->size;i++){
+    BiTimer *t = timer_manager->timers[i];
+    if(t!=NULL && t->count != 0){
+      timer_manager->timers[new_size] = timer_manager->timers[i];
+      new_size++;
     }
   }
-  // start timer
-  for(int i=0;i<timers->size;i++){
-    if( timers->timers[i] && timers->timers[i]->_state == BI_TIMER_STATE_READY ) {
-      timers->timers[i]->_state = BI_TIMER_STATE_RUNNING;
-    }
-  }
-  // compaction
-  int actual_size = 0;
-  for(int i=0;i<timers->size;i++){
-    if(timers->timers[i]!=NULL){
-      timers->timers[actual_size] = timers->timers[i];
-      actual_size++;
-    }
-  }
-  if( timers->size != actual_size ){
-    timers->size = actual_size;
-    timers->timers = realloc( timers->timers, sizeof(BiTimer*) * timers->size );
+  if( timer_manager->size != new_size ){
+    timer_manager->size = new_size;
+    timer_manager->timers = realloc( timer_manager->timers, sizeof(BiTimer*) * timer_manager->size );
   }
 }
 
-void bi_add_timer(BiTimers* timers, BiTimer* timer)
+void bi_timer_manager_add_timer(BiTimerManager* timer_manager, BiTimer* timer)
 {
-    // TODO: duplicate check
-    timers->size += 1;
-    timers->timers = realloc(timers->timers, sizeof(BiTimer*)*timers->size);
-    timers->timers[timers->size-1] = timer;
-}
-
-BiTimer* bi_remove_timer(BiTimers* timers, BiTimer* timer)
-{
-  BiTimer* tmp = NULL;
-  for(int i=0;i<timers->size;i++){
-    if(timers->timers[i] == timer){
-      tmp = timers->timers[i];
-      timers->timers[i] = NULL;
-      break;
+  if(timer==NULL) return;
+  if(timer->manager) return;
+  timer->manager = timer_manager;
+  for(int i=0;i<timer_manager->size;i++){
+    if(timer_manager->timers[i] == timer){
+      return; // already
     }
   }
-  return tmp;
+  timer_manager->size += 1;
+  timer_manager->timers = realloc(timer_manager->timers, sizeof(BiTimer*)*timer_manager->size);
+  timer_manager->timers[timer_manager->size-1] = timer;
+}
+
+void bi_timer_manager_remove_timer(BiTimerManager* timer_manager, BiTimer* timer)
+{
+  if(timer==NULL) return;
+  timer->manager = NULL;
+  for(int i=0;i<timer_manager->size;i++){
+    if(timer_manager->timers[i] == timer){
+      timer_manager->timers[i] = NULL;
+      return;
+    }
+  }
 }

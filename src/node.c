@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void bi_node_init(BiNode* n)
+BiNode* bi_node_init(BiNode* n)
 {
   n->x = 0;
   n->y = 0;
@@ -38,6 +38,7 @@ void bi_node_init(BiNode* n)
   // timers
   n->timers.size = 0;
   n->timers.timers = NULL;
+  n->time_scale = 1.0;
 
   // callbacks
   n->_on_update = NULL;
@@ -49,6 +50,8 @@ void bi_node_init(BiNode* n)
   n->_on_textinput = NULL;
 
   n->userdata = NULL;
+
+  return n;
 }
 
 //

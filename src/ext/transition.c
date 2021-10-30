@@ -25,7 +25,7 @@ void bi_transition_init(BiTransition *transition,
   transition->layer.post_process.shader = transition->shader;
 }
 
-static void transition_update(BiContext* context,BiTimer* timer)
+static void transition_update(BiContext* context,BiTimer* timer,int delta_time)
 {
   BiTransition *transition = timer->userdata;
 
@@ -34,10 +34,8 @@ static void transition_update(BiContext* context,BiTimer* timer)
     return;
   }
 
-  if(transition->_start_at == UINT64_MAX) {
-    transition->_start_at = context->frame_start_at;
-  }
-  float progress = (context->frame_start_at - transition->_start_at) / (double)transition->duration;
+  transition->progress += delta_time / (double)transition->duration;
+
   if(transition->_done){
     // finish
     bi_timer_manager_remove_timer(&context->timers,&transition->timer);
@@ -48,10 +46,10 @@ static void transition_update(BiContext* context,BiTimer* timer)
     }
   } else {
     // progress
-    if( progress >= 1.0 ) {
+    if( transition->progress >= 1.0 ) {
       transition->_done = true;
     }
-    transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0-progress : progress;
+    transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0-transition->progress : transition->progress;
   }
 }
 
@@ -62,6 +60,7 @@ void bi_transition_start(BiContext* context, BiTransition* transition)
   transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0 : 0.0;
   transition->_start_at = UINT64_MAX;
   transition->delay_count = 1;
+  transition->progress = 0.0;
   bi_timer_init(&transition->timer,transition_update,0,-1,transition);
   bi_timer_manager_add_timer(&context->timers,&transition->timer);
 }

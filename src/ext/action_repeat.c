@@ -1,34 +1,32 @@
 #include <bi/ext/action.h>
 #include <stdlib.h>
 
-static void bi_action_repeat_start(BiNode* node, BiAction* action,double now)
+static void bi_action_repeat_start(BiAction* action)
 {
-  action->start_at = now;
-  action->node = node;
   BiActionRepeat* rep = action->action_data;
-  bi_action_start(node,rep->action,now);
+  rep->action->node = action->node;
+  bi_action_start(rep->action);
 }
 
-static void bi_action_repeat_update(BiNode* node, BiAction* action, double rate)
+static void bi_action_repeat_update(BiAction* action, double rate,int delta_time)
 {
   BiActionRepeat* rep = action->action_data;
-
-  if(rate >= 1.0) {
-    // finish
-    bi_action_update( node, rep->action, 1.0 );
-    // restart
-    action->start_at += rep->action->duration;
-    bi_action_start(node,rep->action,action->start_at);
-    rate = 0;
+  rep->cursor = rep->cursor+delta_time;
+  if(rep->cursor >= action->duration) {
+    rep->action->update(rep->action,1.0,delta_time);
+    bi_action_start(rep->action);
+    delta_time = rep->cursor % action->duration;
   }
-
-  bi_action_update( node, rep->action, rate );
+  rep->cursor = rep->cursor % action->duration;
+  rate = (double)rep->cursor / action->duration;
+  rep->action->update(rep->action,rate,delta_time);
 }
 
 void bi_action_repeat_init(BiAction* action,BiAction* target)
 {
   BiActionRepeat* rep = action->action_data;
   rep->action = target;
+  rep->cursor = 0;
   action->update = bi_action_repeat_update;
   action->start = bi_action_repeat_start;
   action->duration = target->duration;

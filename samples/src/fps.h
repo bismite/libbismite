@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void label_fps_indicate(BiContext* context, BiTimer* timer)
+static void label_fps_indicate(BiContext* context, BiTimer* timer,int dt)
 {
   BiNode *node = timer->userdata;
   BiFontAtlas *font = node->userdata;

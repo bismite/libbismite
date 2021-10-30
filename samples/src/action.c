@@ -33,11 +33,11 @@ static void add_action(BiNode *node)
   // move, call, move
   BiAction* call0 = alloc_action( 0, callback_change_color, node );
   bi_action_base_init(call0);
-  BiAction* move1 = alloc_action( sizeof(BiActionMoveTo), NULL, NULL );
+  BiAction* move1 = alloc_action( sizeof(BiActionMove), NULL, NULL );
   bi_action_move_to_init(move1,1000,0,0);
   BiAction* call1 = alloc_action( 0, callback_change_color, node );
   bi_action_base_init(call1);
-  BiAction* move2 = alloc_action( sizeof(BiActionMoveTo), NULL, NULL );
+  BiAction* move2 = alloc_action( sizeof(BiActionMove), NULL, NULL );
   bi_action_move_to_init(move2,1000,480,320);
   BiAction* call2 = alloc_action( 0, callback_change_color, node );
   bi_action_base_init(call2);
@@ -50,13 +50,13 @@ static void add_action(BiNode *node)
   bi_action_repeat_init(repeat,seq);
   // add action to node
   bi_add_action(node,repeat);
-  bi_action_start(node,repeat,bi_get_now());
+  bi_action_start(repeat);
 
   // add rotate action
-  BiAction* rot = alloc_action( sizeof(BiActionRotateBy), NULL, NULL );
+  BiAction* rot = alloc_action( sizeof(BiActionRotate), NULL, NULL );
   bi_action_rotate_by_init(rot,2000,360);
   bi_add_action(node,rot);
-  bi_action_start(node,rot,bi_get_now());
+  bi_action_start(rot);
 
   struct ActionsContainer *container = malloc(sizeof(struct ActionsContainer));
   container->actions[7] = rot;

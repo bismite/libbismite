@@ -1,15 +1,14 @@
 #include <bi/ext/action.h>
 #include <stdlib.h>
 
-static void bi_action_base_update(BiNode* node, BiAction* action, double rate)
+static void bi_action_base_update(BiAction* action, double rate,int delta_time)
 {
   // nop
 }
 
-static void bi_action_base_start(BiNode* node, BiAction* action,double now)
+static void bi_action_base_start(BiAction* action)
 {
-  action->start_at = now;
-  action->node = node;
+  // nop
 }
 
 void bi_action_base_init(BiAction* action)

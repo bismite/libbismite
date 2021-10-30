@@ -7,7 +7,7 @@ typedef struct _BiTimer BiTimer;
 typedef struct _BiTimerManager BiTimerManager;
 typedef struct _BiContext BiContext;
 
-typedef void (*timer_callback)(BiContext*,BiTimer*);
+typedef void (*timer_callback)(BiContext*,BiTimer*,int);
 
 typedef enum {
   BI_TIMER_STATE_PAUSED,
@@ -16,8 +16,8 @@ typedef enum {
 
 struct _BiTimer {
   int count;
-  int64_t interval; // msec
-  int64_t will_fire_at; // msec
+  int interval; // msec
+  int wait; // msec
   timer_callback callback;
   void* userdata;
   BiTimerState state;
@@ -26,7 +26,7 @@ struct _BiTimer {
 
 extern void bi_timer_init(BiTimer* timer,
                           timer_callback callback,
-                          int64_t interval,
+                          int interval,
                           int count,
                           void* userdata);
 extern void bi_timer_pause(BiTimer* timer);
@@ -35,10 +35,11 @@ extern void bi_timer_resume(BiTimer* timer);
 struct _BiTimerManager {
   int size;
   BiTimer **timers;
+  double scale;
 };
 
 extern void bi_timer_manager_init(BiTimerManager* timers);
-extern void bi_timer_manager_run(BiContext* context, BiTimerManager* timers);
+extern void bi_timer_manager_run(BiContext* context, BiTimerManager* timers,int delta_time);
 extern void bi_timer_manager_add_timer(BiTimerManager* timers, BiTimer* timer);
 extern void bi_timer_manager_remove_timer(BiTimerManager* timers, BiTimer* timer);
 

@@ -56,12 +56,13 @@ struct _BiNode {
   on_textinput_callback _on_textinput;
 
   BiTimerManager timers;
+  double time_scale;
 
   void* userdata;
 };
 
 
-extern void bi_node_init(BiNode* n);
+extern BiNode* bi_node_init(BiNode* n);
 
 // scene graph
 static inline BiNode* bi_node_child_at(BiNode* node,int index){ return (BiNode*)node->children.objects[index]; }
@@ -81,6 +82,7 @@ static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->w,h);
 extern void bi_node_set_scale(BiNode* n, float x, float y);
 static inline void bi_node_set_scale_x(BiNode* n, float x) { bi_node_set_scale(n,x,n->scale_y); }
 static inline void bi_node_set_scale_y(BiNode* n, float y) { bi_node_set_scale(n,n->scale_x,y); }
+static inline void bi_node_set_anchor(BiNode* n, float x, float y) { n->anchor_x=x; n->anchor_y=y; }
 extern void bi_node_set_angle(BiNode* n, float angle);
 static inline void bi_node_set_degree(BiNode* n, float degree) { bi_node_set_angle(n,degree*(M_PI/180.f)); }
 static inline double bi_node_get_degree(BiNode* n) { return n->angle*(180.f/M_PI); }

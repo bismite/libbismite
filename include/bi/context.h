@@ -26,9 +26,6 @@ struct _BiContext {
     //
     int64_t program_start_at;
 
-    // time of frame start(millisecond)
-    int64_t frame_start_at;
-
     // fps, etc...
     BiProfile profile;
 
@@ -42,8 +39,12 @@ struct _BiContext {
     Array _rendering_queue;
     Array _callback_queue;
 
-    // global timers
+    // timers
     BiTimerManager timers;
+    double time_scale;
+    int64_t _frame_start_at;
+    int64_t _last_update;
+
 
     // default shader
     BiShader default_shader;

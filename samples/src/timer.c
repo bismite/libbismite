@@ -1,12 +1,12 @@
 #include "common.h"
 
-static void rotate_face(BiContext* context,BiTimer* timer)
+static void rotate_face(BiContext* context,BiTimer* timer,int dt)
 {
   BiNode *node = timer->userdata;
   bi_node_set_angle(node, node->angle + 1 * M_PI/180);
 }
 
-static void pause_rotate(BiContext* context,BiTimer* timer)
+static void pause_rotate(BiContext* context,BiTimer* timer,int dt)
 {
   BiTimer* timer_rotate_face = timer->userdata;
   bi_timer_pause(timer_rotate_face);
@@ -17,7 +17,7 @@ static void pause_rotate(BiContext* context,BiTimer* timer)
     free(timer);
   }
 }
-static void resume_rotate(BiContext* context,BiTimer* timer)
+static void resume_rotate(BiContext* context,BiTimer* timer,int dt)
 {
   BiTimer* timer_rotate_face = timer->userdata;
   bi_timer_resume(timer_rotate_face);
@@ -29,12 +29,12 @@ static void resume_rotate(BiContext* context,BiTimer* timer)
   }
 }
 
-static void enlarge(BiContext *context,BiTimer* timer)
+static void enlarge(BiContext *context,BiTimer* timer,int dt)
 {
   static int counter = 0;
   BiNode *node = timer->userdata;
   bi_node_set_scale(node,node->scale_x*1.2,node->scale_y*1.2);
-  printf("%lld [%d]: scale:%f\n", (long long)context->frame_start_at, counter, node->scale_x);
+  printf("%d: scale:%f\n", counter, node->scale_x);
   counter++;
   if(counter>2){
     printf("enlarge timer sucide\n");
@@ -43,11 +43,11 @@ static void enlarge(BiContext *context,BiTimer* timer)
   }
 }
 
-static void change_color(BiContext* context,BiTimer* timer)
+static void change_color(BiContext* context,BiTimer* timer,int dt)
 {
   BiNode *node = timer->userdata;
   bi_set_color( node->color, rand()%0xFF, rand()%0xFF, rand()%0xFF, 0xFF);
-  printf("change color: %lld\n", (long long)context->frame_start_at);
+  printf("change color\n");
 }
 
 int main(int argc,char* argv[])

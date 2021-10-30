@@ -15,38 +15,34 @@ void bi_action_init(BiAction *action)
   action->finit = false;
   action->started = false;
   action->finished = false;
-  action->start_at = 0;
   action->duration = 0;
+  action->progress = 0.0;
   action->action_data = NULL;
   action->node = NULL;
   action->on_finish_callback_context = NULL;
 }
 
-void bi_action_start(BiNode *node, BiAction *action,double now)
+void bi_action_start(BiAction *action)
 {
-  action->start(node,action,now);
+  action->started = true;
+  action->start(action);
 }
 
-void bi_action_update(BiNode *node, BiAction *action, double rate)
-{
-  action->update(node,action,rate);
-}
-
-static void do_actions(BiContext* context,BiTimer* timer)
+static void do_actions(BiContext* context,BiTimer* timer,int delta_time)
 {
   BiAction* a = timer->userdata;
-  double rate = 0;
 
   if(a->duration==0){
-    rate = 1.0;
+    a->progress = 1.0;
   }else{
-    rate = (context->frame_start_at - a->start_at) / a->duration;
+    a->progress += (double)delta_time / a->duration;
   }
-  if(rate<0.0){ rate = 0.0; }
-  if(rate>=1.0){ rate = 1.0; }
-  bi_action_update(a->node,a,rate);
+  if(a->progress<0.0){ a->progress = 0.0; }
+  if(a->progress>1.0){ a->progress = 1.0; }
 
-  if( rate >= 1.0 ) {
+  a->update(a,a->progress,delta_time);
+
+  if( a->progress >= 1.0 ) {
     if( a->finished == false && a->on_finish ) {
       a->on_finish(a,a->on_finish_callback_context);
     }

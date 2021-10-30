@@ -10,6 +10,7 @@
 typedef struct _RenderingContext{
   bool visible;
   bool interaction_enabled;
+  double time_scale;
 } RenderingContext;
 
 
@@ -147,6 +148,8 @@ static void draw(BiContext* context, BiNode* n, RenderingContext render_context)
     bool visible = render_context.visible;
     bool interaction_enabled = render_context.interaction_enabled;
 
+    n->timers.scale = render_context.time_scale * n->time_scale;
+
     n->_final_visibility = n->visible && visible;
 
     // add callback
@@ -187,6 +190,8 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
       return;
     }
 
+    render_context.time_scale *= layer->time_scale;
+
     // reset rendering queue
     array_clear(&context->_rendering_queue);
 
@@ -209,7 +214,7 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     glUseProgram(shader->program_id);
 
     // time
-    glUniform1f(shader->time_location, (context->program_start_at - context->frame_start_at)/1000.0 );
+    glUniform1f(shader->time_location, (context->program_start_at - context->_frame_start_at)/1000.0 );
     // resolution
     glUniform2f(shader->resolution_location, context->w, context->h );
     // scale
@@ -377,6 +382,8 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
   rcontext.interaction_enabled = rcontext.interaction_enabled && lg->interaction_enabled;
   target_and_clear_framebuffer(lg->framebuffer.framebuffer_id);
 
+  rcontext.time_scale *= lg->time_scale;
+
   // render
   for( int i=0; i<lg->layers.size; i++ ) {
     BiLayerHeader* header = lg->layers.objects[i];
@@ -422,7 +429,7 @@ void bi_render(BiContext* context)
   context->profile.rendering_nodes_queue_size = 0;
 
   // rendering
-  RenderingContext rc = {true,true};
+  RenderingContext rc = {true,true,context->time_scale};
   render_layer_group(context,&context->layers,0,rc);
 
   //

@@ -51,12 +51,9 @@ static BiTextureMapping* make_texture_mapping(const char* name)
 
 static BiNode* make_sprite_from_mapping(BiTextureMapping *mapping)
 {
-  BiNode* sprite = malloc(sizeof(BiNode));
-  bi_node_init(sprite);
-  sprite->w = mapping->texture->w;
-  sprite->h = mapping->texture->h;
-  sprite->anchor_x = 0.5;
-  sprite->anchor_y = 0.5;
+  BiNode* sprite = bi_node_init(malloc(sizeof(BiNode)));
+  bi_node_set_size(sprite, mapping->texture->w, mapping->texture->h);
+  bi_node_set_anchor(sprite,0.5,0.5);
   sprite->texture_mapping = mapping;
   bi_set_color( sprite->color, 0xFF, 0xFF, 0xFF, 0xFF);
   return sprite;

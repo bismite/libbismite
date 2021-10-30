@@ -6,8 +6,8 @@
 
 typedef struct _BiAction BiAction;
 
-typedef void (*bi_action_start_function)(BiNode*,BiAction*,double); // target-node,action,now
-typedef void (*bi_action_update_function)(BiNode*,BiAction*,double); // target-node,action,rate
+typedef void (*bi_action_start_function)(BiAction*); // action
+typedef void (*bi_action_update_function)(BiAction*,double,int); // action,rate,delta_time
 typedef void (*bi_action_on_finish_callback)(BiAction*,void*); // action,context
 
 struct _BiAction {
@@ -17,8 +17,8 @@ struct _BiAction {
   bool finit;
   bool started;
   bool finished;
-  double start_at;
-  double duration;
+  int duration;
+  double progress;
   void* action_data;
   BiTimer timer;
   BiNode* node;
@@ -26,9 +26,7 @@ struct _BiAction {
 };
 
 extern void bi_action_init(BiAction *action);
-extern void bi_action_start(BiNode *node, BiAction *action,double now);
-extern void bi_action_update(BiNode *node, BiAction *action, double rate);
-
+extern void bi_action_start(BiAction *action);
 extern void bi_add_action(BiNode* node, BiAction* action);
 extern void bi_remove_action(BiNode* node, BiAction* action);
 
@@ -40,50 +38,54 @@ extern void bi_remove_action(BiNode* node, BiAction* action);
 
 extern void bi_action_base_init(BiAction* action);
 
-// Rotate To
-
+// Fade In / Fade Out
 typedef struct {
   int from;
-  int to;
-} BiActionRotateTo;
+} BiActionFade;
+extern void bi_action_fade_in_init(BiAction* action,int duration);
+extern void bi_action_fade_out_init(BiAction* action,int duration);
 
-extern void bi_action_rotate_to_init(BiAction* action,double duration,double angle);
-
-// Rotate By
-
+// Rotate To / Rotate By
 typedef struct {
-  int from;
-  int by;
-} BiActionRotateBy;
+  double from;
+  double angle;
+} BiActionRotate;
+extern void bi_action_rotate_to_init(BiAction* action,int duration,double angle);
+extern void bi_action_rotate_by_init(BiAction* action,int duration,double angle);
 
-extern void bi_action_rotate_by_init(BiAction* action,double duration,double angle);
-
-// Move To
-
+// Move To / Move By
 typedef struct {
   int from_x;
   int from_y;
-  int to_x;
-  int to_y;
-} BiActionMoveTo;
+  int dx;
+  int dy;
+} BiActionMove;
+extern void bi_action_move_to_init(BiAction* action,int duration,int dx,int dy);
+extern void bi_action_move_by_init(BiAction* action,int duration,int dx,int dy);
 
-extern void bi_action_move_to_init(BiAction* action,double duration,int x,int y);
+// Scale To / Scale By
+typedef struct {
+  double from_x;
+  double from_y;
+  double dx;
+  double dy;
+} BiActionScale;
+extern void bi_action_scale_to_init(BiAction* action,int duration,double dx,double dy);
+extern void bi_action_scale_by_init(BiAction* action,int duration,double dx,double dy);
 
 // Sequence
-
 typedef struct {
   BiAction* actions[0xFF]; // XXX: finite
   int actions_size;
+  int progress;
 } BiActionSequence;
-
 extern void bi_action_sequence_init(BiAction* action,size_t num,BiAction** actions);
 
 // Repeat
-
 typedef struct {
   BiAction* action;
+  int cursor;
 } BiActionRepeat;
-
 extern void bi_action_repeat_init(BiAction* action,BiAction* target);
 
 #endif

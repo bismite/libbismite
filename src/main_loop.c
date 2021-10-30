@@ -67,11 +67,12 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 
 static void main_loop( void* arg )
 {
-  int64_t now = bi_get_now();
   BiContext *context = (BiContext*)arg;
-  context->frame_start_at = now;
+  context->_frame_start_at = bi_get_now();
+  int deltatime = context->_last_update==0 ? 0 : (context->_frame_start_at - context->_last_update);
+  context->_last_update = context->_frame_start_at;
 
-  bi_profile_record(&context->profile,now);
+  bi_profile_record(&context->profile,context->_frame_start_at);
 
   context->profile.callback_planned_nodes_size = context->_callback_queue.size;
 
@@ -80,7 +81,8 @@ static void main_loop( void* arg )
   //
 
   // Global Timers
-  bi_timer_manager_run(context,&context->timers);
+  context->timers.scale = context->time_scale;
+  bi_timer_manager_run(context,&context->timers,deltatime);
 
   const int PUMP_EVENT_MAX = 32;
   SDL_Event e[PUMP_EVENT_MAX];
@@ -95,7 +97,7 @@ static void main_loop( void* arg )
     // on update
     if(n->_on_update) n->_on_update(context,n);
     // Timer
-    bi_timer_manager_run(context,&n->timers);
+    bi_timer_manager_run(context,&n->timers,deltatime);
     // Event Handler
     if( n->_final_visibility ) {
       for(int i=0;i<event_size;i++) {
@@ -129,7 +131,7 @@ static void main_loop( void* arg )
   int64_t phase3 = bi_get_now();
 
   //
-  context->profile.time_spent_on_callback = phase2 - now;
+  context->profile.time_spent_on_callback = phase2 - context->_frame_start_at;
   context->profile.time_spent_on_rendering = phase3 - phase2;
 }
 

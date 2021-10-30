@@ -37,6 +37,7 @@ struct _BiLayerBlendFactor {
 
 struct _BiLayer {
   BiLayerHeader header;
+  double time_scale;
   BiLayerBlendFactor blend_factor;
   GLfloat camera_x;
   GLfloat camera_y;
@@ -56,6 +57,7 @@ struct _BiLayer {
 
 struct _BiLayerGroup {
   BiLayerHeader header;
+  double time_scale;
   BiLayerBlendFactor blend_factor;
   Array layers;
   BiFramebuffer framebuffer;

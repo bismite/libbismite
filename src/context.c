@@ -163,6 +163,8 @@ void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const
 
     // timers
     bi_timer_manager_init(&context->timers);
+    context->time_scale = 1.0;
+    context->_last_update = 0;
 
     //
     bi_profile_init(&context->profile,fps,bi_get_now());

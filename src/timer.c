@@ -4,13 +4,13 @@
 
 void bi_timer_init(BiTimer* timer,
                    timer_callback callback,
-                   int64_t interval,
+                   int interval,
                    int count,
                    void* userdata)
 {
   timer->count = count;
   timer->interval = interval;
-  timer->will_fire_at = 0;
+  timer->wait = interval;
   timer->callback = callback;
   timer->userdata = userdata;
   timer->state = BI_TIMER_STATE_RUNNING;
@@ -34,10 +34,13 @@ void bi_timer_manager_init(BiTimerManager* timer_manager)
 {
   timer_manager->size = 0;
   timer_manager->timers = NULL;
+  timer_manager->scale = 1.0;
 }
 
-void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager)
+void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager,int delta_time)
 {
+  delta_time *= timer_manager->scale;
+
   for(int i=0;i<timer_manager->size;i++){
     BiTimer* t = timer_manager->timers[i];
     // skip
@@ -45,12 +48,12 @@ void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager)
     if(t->state == BI_TIMER_STATE_PAUSED) continue;
     if(t->count == 0) continue;
     // check schedule
-    if(t->will_fire_at == 0) t->will_fire_at = context->frame_start_at + t->interval;
-    if(t->will_fire_at > context->frame_start_at ) continue;
-    // Fire
-    t->will_fire_at += t->interval;
-    if(t->count > 0) t->count -= 1;
-    t->callback(context,t);
+    t->wait -= delta_time;
+    if(t->wait < 0) {
+      t->callback(context,t,delta_time);
+      t->wait = t->interval;
+      t->count -= 1;
+    }
   }
 
   // remove and resize

@@ -6,6 +6,8 @@ void bi_layer_init(BiLayer* layer)
   layer->header.type = BI_LAYER_TYPE_LAYER;
   layer->header.z_order = 0;
 
+  layer->time_scale = 1.0;
+
   layer->blend_factor.src = GL_SRC_ALPHA;
   layer->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
   layer->blend_factor.alpha_src = GL_ONE;
@@ -41,6 +43,8 @@ void bi_layer_group_init(BiLayerGroup* layer_group)
 {
   layer_group->header.type = BI_LAYER_TYPE_LAYER_GROUP;
   layer_group->header.z_order = 0;
+
+  layer_group->time_scale = 1.0;
 
   layer_group->blend_factor.src = GL_ONE;
   layer_group->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;

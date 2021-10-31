@@ -3,22 +3,22 @@
 
 static void run(BiAction *a,double rate,int delta_time)
 {
-  if(a->finished) return;
+  if(a->state == BI_ACTION_STATE_FINISHED) return;
   if(rate<0.0) rate = 0.0;
   if(rate>1.0) rate = 1.0;
 
-  if(a->started==false){
+  if(a->state == BI_ACTION_STATE_READY){
     bi_action_start(a);
-    a->started = true;
+    a->state = BI_ACTION_STATE_RUNNING;
   }
 
   a->update(a,rate,delta_time);
 
   if(rate >= 1.0) {
-    if( a->finished == false && a->on_finish ) {
+    if( a->state != BI_ACTION_STATE_FINISHED && a->on_finish ) {
+      a->state = BI_ACTION_STATE_FINISHED;
       a->on_finish(a,a->on_finish_callback_context);
     }
-    a->finished = true;
   }
 }
 
@@ -50,8 +50,7 @@ static void bi_action_sequence_start(BiAction* action)
 {
   BiActionSequence* seq = action->action_data;
   for(int i=0;i<seq->actions_size;i++) {
-    seq->actions[i]->started = false;
-    seq->actions[i]->finished = false;
+    seq->actions[i]->state = BI_ACTION_STATE_READY;
     seq->actions[i]->node = action->node;
   }
   seq->progress = 0;

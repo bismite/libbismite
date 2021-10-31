@@ -12,9 +12,7 @@ void bi_action_init(BiAction *action)
   action->start = NULL;
   action->update = NULL;
   action->on_finish = NULL;
-  action->finit = false;
-  action->started = false;
-  action->finished = false;
+  action->state = BI_ACTION_STATE_READY;
   action->duration = 0;
   action->progress = 0.0;
   action->action_data = NULL;
@@ -24,7 +22,7 @@ void bi_action_init(BiAction *action)
 
 void bi_action_start(BiAction *action)
 {
-  action->started = true;
+  action->state = BI_ACTION_STATE_RUNNING;
   action->start(action);
 }
 
@@ -43,10 +41,10 @@ static void do_actions(BiContext* context,BiTimer* timer,int delta_time)
   a->update(a,a->progress,delta_time);
 
   if( a->progress >= 1.0 ) {
-    if( a->finished == false && a->on_finish ) {
+    if( a->state != BI_ACTION_STATE_FINISHED && a->on_finish ) {
+      a->state = BI_ACTION_STATE_FINISHED;
       a->on_finish(a,a->on_finish_callback_context);
     }
-    a->finished = true;
   }
 }
 

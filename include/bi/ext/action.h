@@ -10,13 +10,17 @@ typedef void (*bi_action_start_function)(BiAction*); // action
 typedef void (*bi_action_update_function)(BiAction*,double,int); // action,rate,delta_time
 typedef void (*bi_action_on_finish_callback)(BiAction*,void*); // action,context
 
+typedef enum {
+  BI_ACTION_STATE_READY,
+  BI_ACTION_STATE_RUNNING,
+  BI_ACTION_STATE_FINISHED
+} BiActionState;
+
 struct _BiAction {
   bi_action_start_function start;
   bi_action_update_function update;
   bi_action_on_finish_callback on_finish;
-  bool finit;
-  bool started;
-  bool finished;
+  BiActionState state;
   int duration;
   double progress;
   void* action_data;

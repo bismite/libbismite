@@ -70,6 +70,7 @@ static void main_loop( void* arg )
   BiContext *context = (BiContext*)arg;
   context->_frame_start_at = bi_get_now();
   int deltatime = context->_last_update==0 ? 0 : (context->_frame_start_at - context->_last_update);
+  if(deltatime > context->max_delta) deltatime = context->max_delta;
   context->_last_update = context->_frame_start_at;
 
   bi_profile_record(&context->profile,context->_frame_start_at);

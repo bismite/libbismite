@@ -44,7 +44,7 @@ struct _BiContext {
     double time_scale;
     int64_t _frame_start_at;
     int64_t _last_update;
-
+    int max_delta;
 
     // default shader
     BiShader default_shader;

@@ -18,6 +18,7 @@ int main(int argc,char* argv[])
   bi_node_set_anchor(root,0,0);
 
   // sprites
+  float TIMESCALES[3] = {2.0, 1.0, 0.5};
   BiTextureMapping* m = make_texture_mapping("assets/face01.png");
   for(int i=0;i<3;i++){
     BiNode* face = make_sprite_from_mapping(m);
@@ -26,7 +27,7 @@ int main(int argc,char* argv[])
     BiTimer *timer_rotate_face = malloc(sizeof(BiTimer));
     bi_timer_init(timer_rotate_face, rotate_face, 0, -1, face);
     bi_timer_manager_add_timer(&face->timers,timer_rotate_face);
-    face->time_scale = 1.0 / (i+1);
+    face->time_scale = TIMESCALES[i];
   }
 
   // layer

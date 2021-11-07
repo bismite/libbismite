@@ -11,15 +11,26 @@ static void bi_action_repeat_start(BiAction* action)
 static void bi_action_repeat_update(BiAction* action, double rate,int delta_time)
 {
   BiActionRepeat* rep = action->action_data;
-  rep->cursor = rep->cursor+delta_time;
-  if(rep->cursor >= action->duration) {
-    rep->action->update(rep->action,1.0,delta_time);
-    bi_action_start(rep->action);
-    delta_time = rep->cursor % action->duration;
+  BiAction *a = rep->action;
+
+  while(delta_time > 0){
+    int to_end = action->duration - rep->cursor;
+    if( to_end > delta_time ) {
+      rep->cursor = rep->cursor+delta_time;
+      rate = (double)rep->cursor / action->duration;
+      a->update(a,rate,delta_time);
+      delta_time = 0;
+    }else{
+      a->update(a,1.0,to_end);
+      if( a->state != BI_ACTION_STATE_FINISHED && a->on_finish ){
+        a->state = BI_ACTION_STATE_FINISHED;
+        a->on_finish(a,a->on_finish_callback_context);
+      }
+      rep->cursor = 0;
+      bi_action_start(rep->action);
+      delta_time -= to_end;
+    }
   }
-  rep->cursor = rep->cursor % action->duration;
-  rate = (double)rep->cursor / action->duration;
-  rep->action->update(rep->action,rate,delta_time);
 }
 
 void bi_action_repeat_init(BiAction* action,BiAction* target)

@@ -11,7 +11,7 @@
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
 
-typedef void (*on_update_callback)(BiContext*, BiNode*);
+typedef void (*on_update_callback)(BiContext*, BiNode*, double); // delta_time
 typedef bool (*on_click_callback)(BiContext*, BiNode*, int, int, int, bool); // x,y,button,pressed
 typedef bool (*on_move_cursor_callback)(BiContext*, BiNode*, int, int); // x, y
 typedef bool (*on_move_finger_callback)(BiContext*, BiNode*, float, float, int64_t); // x, y, fingerID

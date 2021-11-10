@@ -25,7 +25,7 @@ void bi_transition_init(BiTransition *transition,
   transition->layer.post_process.shader = transition->shader;
 }
 
-static void transition_update(BiContext* context,BiTimer* timer,int delta_time)
+static void transition_update(BiContext* context,BiTimer* timer,double delta_time)
 {
   BiTransition *transition = timer->userdata;
 

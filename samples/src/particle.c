@@ -7,7 +7,7 @@ struct particle_data {
   float vy;
 };
 
-static void random_move(BiContext* c,BiNode* node)
+static void random_move(BiContext* c,BiNode* node,double dt)
 {
   struct particle_data *p = node->userdata;
 

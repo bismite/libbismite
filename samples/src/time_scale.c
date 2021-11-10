@@ -1,6 +1,6 @@
 #include "common.h"
 
-static void rotate_face(BiContext* context,BiTimer* timer,int dt)
+static void rotate_face(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
   bi_node_set_angle(node, node->angle + dt * M_PI/180);

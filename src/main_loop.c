@@ -69,8 +69,9 @@ static void main_loop( void* arg )
 {
   BiContext *context = (BiContext*)arg;
   context->_frame_start_at = bi_get_now();
-  int deltatime = context->_last_update==0 ? 0 : (context->_frame_start_at - context->_last_update);
-  if(deltatime > context->max_delta) deltatime = context->max_delta;
+  double delta_time = context->_last_update==0 ? 0 : (context->_frame_start_at - context->_last_update);
+  delta_time *= context->time_scale;
+  if(delta_time > context->max_delta) delta_time = context->max_delta;
   context->_last_update = context->_frame_start_at;
 
   bi_profile_record(&context->profile,context->_frame_start_at);
@@ -82,8 +83,7 @@ static void main_loop( void* arg )
   //
 
   // Global Timers
-  context->timers.scale = context->time_scale;
-  bi_timer_manager_run(context,&context->timers,deltatime);
+  bi_timer_manager_run(context,&context->timers,delta_time);
 
   const int PUMP_EVENT_MAX = 32;
   SDL_Event e[PUMP_EVENT_MAX];
@@ -96,9 +96,11 @@ static void main_loop( void* arg )
       continue;
     }
     // on update
-    if(n->_on_update) n->_on_update(context,n);
+    if(n->_on_update){
+      if(n->timers.scale * delta_time > 0) n->_on_update(context,n, n->timers.scale * delta_time);
+    }
     // Timer
-    bi_timer_manager_run(context,&n->timers,deltatime);
+    bi_timer_manager_run(context,&n->timers,delta_time);
     // Event Handler
     if( n->_final_visibility ) {
       for(int i=0;i<event_size;i++) {

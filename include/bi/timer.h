@@ -7,7 +7,7 @@ typedef struct _BiTimer BiTimer;
 typedef struct _BiTimerManager BiTimerManager;
 typedef struct _BiContext BiContext;
 
-typedef void (*timer_callback)(BiContext*,BiTimer*,int);
+typedef void (*timer_callback)(BiContext*,BiTimer*,double);
 
 typedef enum {
   BI_TIMER_STATE_PAUSED,
@@ -39,7 +39,7 @@ struct _BiTimerManager {
 };
 
 extern void bi_timer_manager_init(BiTimerManager* timers);
-extern void bi_timer_manager_run(BiContext* context, BiTimerManager* timers,int delta_time);
+extern void bi_timer_manager_run(BiContext* context, BiTimerManager* timers,double delta_time);
 extern void bi_timer_manager_add_timer(BiTimerManager* timers, BiTimer* timer);
 extern void bi_timer_manager_remove_timer(BiTimerManager* timers, BiTimer* timer);
 

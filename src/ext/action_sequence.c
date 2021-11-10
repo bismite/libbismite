@@ -15,9 +15,9 @@ static void run(BiAction *a,double rate,int delta_time)
   a->update(a,rate,delta_time);
 
   if(rate >= 1.0) {
-    if( a->state != BI_ACTION_STATE_FINISHED && a->on_finish ) {
+    if( a->state != BI_ACTION_STATE_FINISHED ) {
       a->state = BI_ACTION_STATE_FINISHED;
-      a->on_finish(a,a->on_finish_callback_context);
+      if(a->on_finish) a->on_finish(a,a->on_finish_callback_context);
     }
   }
 }

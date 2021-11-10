@@ -37,7 +37,7 @@ void bi_timer_manager_init(BiTimerManager* timer_manager)
   timer_manager->scale = 1.0;
 }
 
-void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager,int delta_time)
+void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager,double delta_time)
 {
   delta_time *= timer_manager->scale;
 

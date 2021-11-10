@@ -10,7 +10,7 @@ static void scene_a(BiContext* context);
 static void scene_b(BiContext* context);
 static bool on_click_to_transition(BiContext *context,BiNode* n, int x, int y, int button, bool pressed);
 
-static void on_update_rotate_face(BiContext* c, BiNode* n)
+static void on_update_rotate_face(BiContext* c, BiNode* n,double dt)
 {
   bi_node_set_angle(n,n->angle+0.1);
 }

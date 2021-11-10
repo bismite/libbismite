@@ -26,7 +26,7 @@ void bi_action_start(BiAction *action)
   action->start(action);
 }
 
-static void do_actions(BiContext* context,BiTimer* timer,int delta_time)
+static void do_actions(BiContext* context,BiTimer* timer,double delta_time)
 {
   BiAction* a = timer->userdata;
 
@@ -41,9 +41,9 @@ static void do_actions(BiContext* context,BiTimer* timer,int delta_time)
   a->update(a,a->progress,delta_time);
 
   if( a->progress >= 1.0 ) {
-    if( a->state != BI_ACTION_STATE_FINISHED && a->on_finish ) {
+    if( a->state != BI_ACTION_STATE_FINISHED ) {
       a->state = BI_ACTION_STATE_FINISHED;
-      a->on_finish(a,a->on_finish_callback_context);
+      if(a->on_finish) a->on_finish(a,a->on_finish_callback_context);
     }
   }
 }

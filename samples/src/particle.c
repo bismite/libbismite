@@ -7,8 +7,9 @@ struct particle_data {
   float vy;
 };
 
-static void random_move(BiContext* c,BiNode* node,double dt)
+static void random_move(BiContext* c,BiTimer* t,double dt)
 {
+  BiNode *node = (BiNode*)t->node;
   struct particle_data *p = node->userdata;
 
   p->x += p->vx;
@@ -47,7 +48,7 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
   bi_set_color(node->color, rand()%0xFF, rand()%0xFF, rand()%0xFF, 1+rand()%0xFE);
 
   // on update callback
-  bi_node_set_on_update(node,random_move);
+  onupdate(node,random_move);
 
   // velocity
   struct particle_data* p = malloc(sizeof(struct particle_data));

@@ -9,6 +9,13 @@
 #define SHADER_HEADER "#version 120\n"
 #endif
 
+__attribute__((unused)) static BiTimer* onupdate(BiNode* n,timer_callback func)
+{
+  BiTimer *t = bi_timer_init(malloc(sizeof(BiTimer)),func,0,-1,NULL);
+  bi_node_add_timer(n,t);
+  return t;
+}
+
 static char* read_shader(const char* filename)
 {
   int header_size = strlen(SHADER_HEADER);

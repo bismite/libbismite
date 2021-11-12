@@ -37,11 +37,10 @@ struct _BiContext {
 
   // queue
   Array _rendering_queue;
-  Array _callback_queue;
+  Array _interaction_queue;
+  Array _timer_queue;
 
   // timers
-  BiTimerManager timers;
-  double time_scale;
   int64_t _frame_start_at;
   int64_t _last_update;
   int max_delta;
@@ -65,7 +64,7 @@ struct _BiContext {
 
 typedef void (*InitializeFunction)(BiContext*);
 
-extern void bi_init_context(BiContext* context,int w, int h, int fps, bool highdpi, const char* title );
+extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, bool highdpi, const char* title );
 extern void bi_set_title(BiContext* context,const char* title);
 
 // Convenient Layer functions

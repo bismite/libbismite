@@ -6,9 +6,9 @@
 
 BiNode* bi_node_init(BiNode* n)
 {
+  bi_raw_node_init((BiRawNode*)n,BI_NODE_TYPE_NODE);
   n->x = 0;
   n->y = 0;
-  n->z = 0;
   n->w = 0;
   n->h = 0;
   n->angle = 0;
@@ -19,10 +19,6 @@ BiNode* bi_node_init(BiNode* n)
   n->matrix_include_anchor_translate = false;
   n->visible = true;
   n->_final_visibility = true;
-  n->color[0] = 0;
-  n->color[1] = 0;
-  n->color[2] = 0;
-  n->color[3] = 0;
 
   bi_mat4_identity(n->transform);
   bi_mat4_identity(n->draw);
@@ -35,13 +31,7 @@ BiNode* bi_node_init(BiNode* n)
   n->parent = NULL;
   n->children_order_cached = true;
 
-  // timers
-  n->timers.size = 0;
-  n->timers.timers = NULL;
-  n->time_scale = 1.0;
-
   // callbacks
-  n->_on_update = NULL;
   n->_on_click = NULL;
   n->_on_move_cursor = NULL;
   n->_on_move_finger = NULL;
@@ -74,22 +64,6 @@ BiNode* bi_node_remove_at(BiNode* node,int index)
 BiNode* bi_node_remove_node(BiNode* node,BiNode* child)
 {
   return array_remove_object(&node->children,child);
-}
-
-static int node_order_compare(const void *_a, const void *_b )
-{
-  const BiNode *a = *(BiNode**)_a;
-  const BiNode *b = *(BiNode**)_b;
-  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
-}
-
-void bi_node_sort(BiNode* node)
-{
-  if( node->children_order_cached == false ) {
-    for( int i=0; i<node->children.size; i++ ){ bi_node_child_at(node,i)->_index = i; }
-    qsort( node->children.objects, node->children.size, sizeof(BiNode*), node_order_compare);
-    node->children_order_cached = true;
-  }
 }
 
 //

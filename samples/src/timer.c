@@ -1,9 +1,9 @@
 #include "common.h"
 
-static void rotate_face(BiContext* context,BiTimer* timer,double dt)
+static void rotate(BiContext* context,BiTimer* timer,double dt)
 {
-  BiNode *node = timer->userdata;
-  bi_node_set_angle(node, node->angle + 1 * M_PI/180);
+  BiNode *node = (BiNode*)timer->node;
+  bi_node_set_angle(node, node->angle + dt*0.01);
 }
 
 static void pause_rotate(BiContext* context,BiTimer* timer,double dt)
@@ -64,29 +64,6 @@ int main(int argc,char* argv[])
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_add_node(root,face);
 
-  // add global timer
-  BiTimer *global_timer = malloc(sizeof(BiTimer));
-  bi_timer_init(global_timer, enlarge, 1000, -1, face);
-  bi_timer_manager_add_timer(&context->timers,global_timer);
-
-  // add global timer2
-  BiTimer *global_timer2 = malloc(sizeof(BiTimer));
-  bi_timer_init(global_timer2, change_color, 500, 3, face);
-  bi_timer_manager_add_timer(&context->timers,global_timer2);
-
-  // rotate
-  BiTimer *timer_rotate_face = malloc(sizeof(BiTimer));
-  bi_timer_init(timer_rotate_face, rotate_face, 10, -1, face);
-  bi_timer_manager_add_timer(&face->timers,timer_rotate_face);
-  // pause rotate
-  BiTimer *timer = malloc(sizeof(BiTimer));
-  bi_timer_init(timer, pause_rotate, 1000, 1, timer_rotate_face);
-  bi_timer_manager_add_timer(&face->timers,timer);
-  // resume rotate
-  timer = malloc(sizeof(BiTimer));
-  bi_timer_init(timer, resume_rotate, 2000, 1, timer_rotate_face);
-  bi_timer_manager_add_timer(&face->timers,timer);
-
   // layer
   BiLayer *layer = malloc(sizeof(BiLayer));
   bi_layer_init(layer);
@@ -94,6 +71,19 @@ int main(int argc,char* argv[])
   layer->textures[1] = face->texture_mapping->texture;
   bi_add_layer(context,layer);
   layer->root = root;
+
+  // timer on layer group
+  bi_node_add_timer(&context->layers,bi_timer_init(malloc(sizeof(BiTimer)),enlarge,1000,-1,face));
+  // timer on layer
+  bi_node_add_timer(layer,bi_timer_init(malloc(sizeof(BiTimer)),change_color,500,3,face));
+
+  // rotate
+  BiTimer *rotate_timer = bi_timer_init(malloc(sizeof(BiTimer)),rotate,10,-1,NULL);
+  bi_node_add_timer(face,rotate_timer);
+  // pause rotate
+  bi_node_add_timer(face,bi_timer_init(malloc(sizeof(BiTimer)),pause_rotate,1000,1,rotate_timer));
+  // resume rotate
+  bi_node_add_timer(face,bi_timer_init(malloc(sizeof(BiTimer)),resume_rotate,2000,1,rotate_timer));
 
   // fps layer
   BiFontAtlas *font = load_font();

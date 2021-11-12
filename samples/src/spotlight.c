@@ -1,8 +1,9 @@
 #include "common.h"
 #include <stdlib.h>
 
-static void spin(BiContext* context,BiNode* node,double dt)
+static void spin(BiContext* context,BiTimer* t,double dt)
 {
+  BiNode *node = (BiNode*)t->node;
   bi_node_set_angle(node, node->angle + 0.01);
 }
 
@@ -22,7 +23,7 @@ static BiNode* create_spotlight(BiTexture* texture,float x, float y)
   bi_set_color( sprite->color, 0xFF, 0xFF, 0xFF, 0xFF);
   bi_node_set_position(sprite,x,y);
   // spin spotlight
-  bi_node_set_on_update(sprite,spin);
+  onupdate(sprite,spin);
   return sprite;
 }
 

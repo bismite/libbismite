@@ -2,11 +2,11 @@
 #include <bi/context.h>
 #include <stdlib.h>
 
-void bi_timer_init(BiTimer* timer,
-                   timer_callback callback,
-                   int interval,
-                   int count,
-                   void* userdata)
+BiTimer* bi_timer_init(BiTimer* timer,
+                       timer_callback callback,
+                       int interval,
+                       int count,
+                       void* userdata)
 {
   timer->count = count;
   timer->interval = interval;
@@ -15,6 +15,8 @@ void bi_timer_init(BiTimer* timer,
   timer->userdata = userdata;
   timer->state = BI_TIMER_STATE_RUNNING;
   timer->manager = NULL;
+  timer->node = NULL;
+  return timer;
 }
 
 void bi_timer_pause(BiTimer* timer)

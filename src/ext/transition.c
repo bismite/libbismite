@@ -4,7 +4,7 @@
 
 void bi_transition_init(BiTransition *transition,
                         BiLayerGroup *layer_group,
-                        uint32_t duration,
+                        double duration,
                         bi_transition_callback callback,
                         BiShader* shader,
                         bool invert
@@ -34,11 +34,11 @@ static void transition_update(BiContext* context,BiTimer* timer,double delta_tim
     return;
   }
 
-  transition->progress += delta_time / (double)transition->duration;
+  transition->progress += delta_time / transition->duration;
 
   if(transition->_done){
     // finish
-    bi_timer_manager_remove_timer(&context->timers,&transition->timer);
+    bi_node_remove_timer(transition->layer_group,&transition->timer);
     bi_layer_group_remove_layer(transition->layer_group,&transition->layer);
     transition->layer_group->interaction_enabled = true;
     if(transition->callback){
@@ -49,7 +49,8 @@ static void transition_update(BiContext* context,BiTimer* timer,double delta_tim
     if( transition->progress >= 1.0 ) {
       transition->_done = true;
     }
-    transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0-transition->progress : transition->progress;
+    transition->layer.post_process.shader_attributes[0] =
+      transition->invert ? 1.0-transition->progress : transition->progress;
   }
 }
 
@@ -62,5 +63,5 @@ void bi_transition_start(BiContext* context, BiTransition* transition)
   transition->delay_count = 1;
   transition->progress = 0.0;
   bi_timer_init(&transition->timer,transition_update,0,-1,transition);
-  bi_timer_manager_add_timer(&context->timers,&transition->timer);
+  bi_node_add_timer(transition->layer_group,&transition->timer);
 }

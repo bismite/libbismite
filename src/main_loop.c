@@ -70,42 +70,38 @@ static void main_loop( void* arg )
   BiContext *context = (BiContext*)arg;
   context->_frame_start_at = bi_get_now();
   double delta_time = context->_last_update==0 ? 0 : (context->_frame_start_at - context->_last_update);
-  delta_time *= context->time_scale;
   if(delta_time > context->max_delta) delta_time = context->max_delta;
   context->_last_update = context->_frame_start_at;
 
   bi_profile_record(&context->profile,context->_frame_start_at);
 
-  context->profile.callback_planned_nodes_size = context->_callback_queue.size;
+  context->profile.callback_planned_nodes_size = context->_interaction_queue.size;
 
   //
   // callback and event handling
   //
-
-  // Global Timers
-  bi_timer_manager_run(context,&context->timers,delta_time);
-
   const int PUMP_EVENT_MAX = 32;
   SDL_Event e[PUMP_EVENT_MAX];
   SDL_PumpEvents();
   int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
-  // callback
-  for(int i=context->_callback_queue.size-1;i>=0;i--){
-    BiNode* n = context->_callback_queue.objects[i];
-    if( n == NULL ){
-      continue;
-    }
-    // on update
-    if(n->_on_update){
-      if(n->timers.scale * delta_time > 0) n->_on_update(context,n, n->timers.scale * delta_time);
-    }
+  // timer
+  for(int i=context->_timer_queue.size-1;i>=0;i--){
+    BiRawNode *n = context->_timer_queue.objects[i];
+    if( n == NULL ) continue;
     // Timer
     bi_timer_manager_run(context,&n->timers,delta_time);
+  }
+  // callback
+  for(int i=context->_interaction_queue.size-1;i>=0;i--){
+    BiRawNode *n = context->_interaction_queue.objects[i];
+    if( n == NULL ) continue;
     // Event Handler
-    if( n->_final_visibility ) {
+    if( n->type != BI_NODE_TYPE_NODE ) continue;
+    BiNode* node = (BiNode*)n;
+    if( node->_final_visibility ) {
       for(int i=0;i<event_size;i++) {
         if(e[i].type == 0) continue;
-        bool swallow = node_event_handle(n,context,&e[i]);
+        bool swallow = node_event_handle(node,context,&e[i]);
         if(swallow) {
           e[i].type = 0; // XXX: swallow
         }
@@ -113,7 +109,7 @@ static void main_loop( void* arg )
     }
   }
 
-  // failsafe
+  // quit
   for(int i=0;i<event_size;i++) {
     if(e[i].type==SDL_QUIT){
         context->running = false;
@@ -121,7 +117,8 @@ static void main_loop( void* arg )
   }
 
   // reset queue
-  array_clear(&context->_callback_queue);
+  array_clear(&context->_interaction_queue);
+  array_clear(&context->_timer_queue);
 
   int64_t phase2 = bi_get_now();
 

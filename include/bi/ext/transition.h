@@ -15,7 +15,7 @@ struct _BiTransition {
   BiLayerGroup *layer_group;
   BiLayer layer;
   BiShader* shader;
-  uint32_t duration;
+  double duration;
   bi_transition_callback callback;
   BiTimer timer;
   bool invert;
@@ -28,7 +28,7 @@ struct _BiTransition {
 
 extern void bi_transition_init(BiTransition *transition,
                                BiLayerGroup *layer_group,
-                               uint32_t duration,
+                               double duration,
                                bi_transition_callback callback,
                                BiShader* shader,
                                bool invert

@@ -6,6 +6,7 @@
 typedef struct _BiTimer BiTimer;
 typedef struct _BiTimerManager BiTimerManager;
 typedef struct _BiContext BiContext;
+typedef struct _BiRawNode BiRawNode;
 
 typedef void (*timer_callback)(BiContext*,BiTimer*,double);
 
@@ -22,13 +23,14 @@ struct _BiTimer {
   void* userdata;
   BiTimerState state;
   BiTimerManager* manager;
+  BiRawNode *node;
 };
 
-extern void bi_timer_init(BiTimer* timer,
-                          timer_callback callback,
-                          int interval,
-                          int count,
-                          void* userdata);
+extern BiTimer* bi_timer_init(BiTimer* timer,
+                              timer_callback callback,
+                              int interval,
+                              int count,
+                              void* userdata);
 extern void bi_timer_pause(BiTimer* timer);
 extern void bi_timer_resume(BiTimer* timer);
 

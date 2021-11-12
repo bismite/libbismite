@@ -1,12 +1,9 @@
 #include <bi/layer.h>
 #include <bi/node.h>
 
-void bi_layer_init(BiLayer* layer)
+BiLayer* bi_layer_init(BiLayer* layer)
 {
-  layer->header.type = BI_LAYER_TYPE_LAYER;
-  layer->header.z_order = 0;
-
-  layer->time_scale = 1.0;
+  bi_raw_node_init((BiRawNode*)layer,BI_NODE_TYPE_LAYER);
 
   layer->blend_factor.src = GL_SRC_ALPHA;
   layer->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -34,17 +31,15 @@ void bi_layer_init(BiLayer* layer)
   layer->post_process.blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
   layer->post_process.blend_factor.alpha_src = GL_ONE;
   layer->post_process.blend_factor.alpha_dst = GL_ONE_MINUS_SRC_ALPHA;
+  return layer;
 }
 
 //
 // Layer Group
 //
-void bi_layer_group_init(BiLayerGroup* layer_group)
+BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
 {
-  layer_group->header.type = BI_LAYER_TYPE_LAYER_GROUP;
-  layer_group->header.z_order = 0;
-
-  layer_group->time_scale = 1.0;
+  bi_raw_node_init((BiRawNode*)layer_group,BI_NODE_TYPE_LAYER_GROUP);
 
   layer_group->blend_factor.src = GL_ONE;
   layer_group->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -53,23 +48,33 @@ void bi_layer_group_init(BiLayerGroup* layer_group)
 
   array_init(&layer_group->layers);
   bi_framebuffer_init(&layer_group->framebuffer);
-  layer_group->interaction_enabled = true;
+  return layer_group;
 }
 
 static int layer_order_compare(const void *_a, const void *_b )
 {
-  const BiLayerHeader *a = *(BiLayerHeader**)_a;
-  const BiLayerHeader *b = *(BiLayerHeader**)_b;
-  return a->z_order == b->z_order ? a->index - b->index : a->z_order - b->z_order;
+  const BiRawNode *a = *(BiRawNode**)_a;
+  const BiRawNode *b = *(BiRawNode**)_b;
+  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
 }
 
 void bi_layer_group_update_order(BiLayerGroup* layer_group)
 {
   int size = layer_group->layers.size;
-  BiLayerHeader** objects = (BiLayerHeader**)layer_group->layers.objects;
-  for( int i=0; i<size; i++ ) { objects[i]->index = i; }
+  BiRawNode** objects = (BiRawNode**)layer_group->layers.objects;
+  for( int i=0; i<size; i++ ) { objects[i]->_index = i; }
   qsort( objects, size, sizeof(void*), layer_order_compare );
-  for( int i=0; i<size; i++ ) { objects[i]->index = i; }
+  for( int i=0; i<size; i++ ) { objects[i]->_index = i; }
+}
+
+int bi_layer_group_get_z_order(BiLayerGroup* layer_group)
+{
+  return layer_group->z;
+}
+
+void bi_layer_group_set_z_order(BiLayerGroup* layer_group,int z)
+{
+  layer_group->z = z;
 }
 
 void bi_layer_group_add_layer(BiLayerGroup* layer_group, BiLayer* obj)

@@ -13,6 +13,36 @@ typedef struct _RenderingContext{
   double time_scale;
 } RenderingContext;
 
+static int node_order_compare(const void *_a, const void *_b )
+{
+  const BiNode *a = *(BiNode**)_a;
+  const BiNode *b = *(BiNode**)_b;
+  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
+}
+
+static void node_sort(BiNode* node)
+{
+  if( node->children_order_cached == false ) {
+    for( int i=0; i<node->children.size; i++ ){ bi_node_child_at(node,i)->_index = i; }
+    qsort( node->children.objects, node->children.size, sizeof(BiNode*), node_order_compare);
+    node->children_order_cached = true;
+  }
+}
+
+static int layer_order_compare(const void *_a, const void *_b )
+{
+  const BiRawNode *a = *(BiRawNode**)_a;
+  const BiRawNode *b = *(BiRawNode**)_b;
+  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
+}
+
+static void layer_sort(BiLayerGroup* layer_group)
+{
+  Array* a = &layer_group->layers;
+  for( int i=0; i<a->size; i++ ){ ((BiRawNode*)(a->objects[i]))->_index = i; }
+  qsort( a->objects, a->size, sizeof(BiRawNode*), layer_order_compare);
+}
+
 
 static void set_projection(BiShader* shader,int w, int h, bool centering)
 {
@@ -130,8 +160,7 @@ static void update_matrix(BiNode* n)
 
 static bool node_has_event_handler(BiNode* n)
 {
-  if(n->_on_update != NULL ||
-     n->_on_move_cursor != NULL ||
+  if(n->_on_move_cursor != NULL ||
      n->_on_click != NULL ||
      n->_on_move_finger != NULL ||
      n->_on_keyinput != NULL ||
@@ -146,17 +175,18 @@ static bool node_has_event_handler(BiNode* n)
 static void draw(BiContext* context, BiNode* n, RenderingContext render_context)
 {
     bool visible = render_context.visible;
-    bool interaction_enabled = render_context.interaction_enabled;
+    bool interaction_enabled = render_context.interaction_enabled && n->interaction_enabled;
 
+    render_context.interaction_enabled = interaction_enabled;
     n->timers.scale = render_context.time_scale * n->time_scale;
-
     n->_final_visibility = n->visible && visible;
 
-    // add callback
-    if(interaction_enabled){
-      if( node_has_event_handler(n) || n->timers.size > 0 ) {
-        array_add_object(&context->_callback_queue, n);
-      }
+    // event handler and timer
+    if( interaction_enabled && node_has_event_handler(n) ) {
+      array_add_object(&context->_interaction_queue, n);
+    }
+    if( n->timers.size > 0 ) {
+      array_add_object(&context->_timer_queue, n);
     }
 
     // skip: invisible, zero-size node, transparent node
@@ -175,7 +205,7 @@ static void draw(BiContext* context, BiNode* n, RenderingContext render_context)
 
     //
     render_context.visible = visible && n->visible;
-    bi_node_sort(n);
+    node_sort(n);
     for( int i=0; i<n->children.size; i++ ){
       if( bi_node_child_at(n,i)->matrix_cached == true && matrix_update_require ) {
           bi_node_child_at(n,i)->matrix_cached = false;
@@ -191,6 +221,11 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     }
 
     render_context.time_scale *= layer->time_scale;
+
+    // timer
+    if( layer->timers.size > 0 ) {
+      array_add_object(&context->_timer_queue, layer);
+    }
 
     // reset rendering queue
     array_clear(&context->_rendering_queue);
@@ -281,9 +316,9 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     // update vbo
     // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
     //
-    // texture_z
+    // texture_z (texture index send as float. not integer.)
     glBindBuffer(GL_ARRAY_BUFFER, shader->texture_z_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW); // XXX: float. not int.
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, texture_z);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // uv
@@ -322,7 +357,7 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     glBindVertexArray(0);
 }
 
-static void render_texture(BiContext* context, GLuint texture, BiLayerHeader* header)
+static void render_texture(BiContext* context, GLuint texture, BiRawNode* target)
 {
   BiTexture t;
   t.texture_id = texture;
@@ -346,12 +381,12 @@ static void render_texture(BiContext* context, GLuint texture, BiLayerHeader* he
   l.textures[0] = &t;
 
   BiTexture t2;
-  if(header){
-    if(header->type == BI_LAYER_TYPE_LAYER_GROUP) {
-      BiLayerGroup *lg = (BiLayerGroup*)header;
+  if(target){
+    if(target->type == BI_NODE_TYPE_LAYER_GROUP) {
+      BiLayerGroup *lg = (BiLayerGroup*)target;
       l.blend_factor = lg->blend_factor;
-    }else{
-      BiLayer *layer = (BiLayer*)header;
+    }else if(target->type == BI_NODE_TYPE_LAYER) {
+      BiLayer *layer = (BiLayer*)target;
       if(layer->post_process.framebuffer_enabled){
         t2.texture_id = context->_layer_framebuffer.texture_id;
         t2.w = context->w;
@@ -377,22 +412,32 @@ static void target_and_clear_framebuffer(GLuint framebuffer_id)
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
-static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint parent_framebuffer_id, RenderingContext rcontext)
+static void render_layer_group(BiContext* context,
+                               BiLayerGroup *lg,
+                               GLuint parent_framebuffer_id,
+                               RenderingContext rcontext
+                              )
 {
   rcontext.interaction_enabled = rcontext.interaction_enabled && lg->interaction_enabled;
   target_and_clear_framebuffer(lg->framebuffer.framebuffer_id);
 
   rcontext.time_scale *= lg->time_scale;
 
+  // timer
+  if( lg->timers.size > 0 ) {
+    array_add_object(&context->_timer_queue, lg);
+  }
+
   // render
+  layer_sort(lg);
   for( int i=0; i<lg->layers.size; i++ ) {
-    BiLayerHeader* header = lg->layers.objects[i];
-    if( header->type == BI_LAYER_TYPE_LAYER_GROUP ) {
+    BiRawNode* n = lg->layers.objects[i];
+    if( n->type == BI_NODE_TYPE_LAYER_GROUP ) {
       // Layer Group
-      render_layer_group( context, (BiLayerGroup*)header, lg->framebuffer.framebuffer_id, rcontext );
-    } else {
+      render_layer_group( context, (BiLayerGroup*)n, lg->framebuffer.framebuffer_id, rcontext );
+    } else if( n->type == BI_NODE_TYPE_LAYER ) {
       // Layer
-      BiLayer *layer = (BiLayer*)header;
+      BiLayer *layer = (BiLayer*)n;
       if(layer->post_process.framebuffer_enabled){
         // render to framebuffer
         target_and_clear_framebuffer(context->_layer_framebuffer.framebuffer_id);
@@ -402,7 +447,7 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
         // target new framebuffer
         target_and_clear_framebuffer(context->_post_process_framebuffer.framebuffer_id);
         // render
-        render_texture(context,lg->framebuffer.texture_id,(BiLayerHeader*)layer);
+        render_texture(context,lg->framebuffer.texture_id,n);
         // swap framebuffer
         BiFramebuffer tmp = lg->framebuffer;
         lg->framebuffer = context->_post_process_framebuffer;
@@ -415,13 +460,16 @@ static void render_layer_group(BiContext* context, BiLayerGroup *lg, GLuint pare
 
   // finalize
   glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer_id);
-  render_texture(context,lg->framebuffer.texture_id,(BiLayerHeader*)lg);
+  render_texture(context,lg->framebuffer.texture_id,(BiRawNode*)lg);
 }
 
 void bi_render(BiContext* context)
 {
   // clear
-  glClearColor( context->color[0]/255.f, context->color[1]/255.f, context->color[2]/255.f, context->color[3]/255.f );
+  glClearColor(context->color[0]/255.f,
+               context->color[1]/255.f,
+               context->color[2]/255.f,
+               context->color[3]/255.f );
   glClear(GL_COLOR_BUFFER_BIT);
 
   // reset stats
@@ -429,7 +477,7 @@ void bi_render(BiContext* context)
   context->profile.rendering_nodes_queue_size = 0;
 
   // rendering
-  RenderingContext rc = {true,true,context->time_scale};
+  RenderingContext rc = {true,true,1.0};
   render_layer_group(context,&context->layers,0,rc);
 
   //

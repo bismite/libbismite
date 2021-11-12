@@ -124,81 +124,82 @@ static void enable_gl_extensions(BiContext* context)
 #endif
 }
 
-void bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
+BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
-    if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
-        LOG("SDL_Init fail.");
-        return;
-    }
+  if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
+      LOG("SDL_Init fail.");
+      return NULL;
+  }
 
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
+  SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
 #ifdef __EMSCRIPTEN__
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
 
-    Uint32 flag = SDL_WINDOW_OPENGL;
-    if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
-    context->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
+  Uint32 flag = SDL_WINDOW_OPENGL;
+  if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
+  context->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
 
-    SDL_GLContext *glcontext = SDL_GL_CreateContext(context->window);
-    if(glcontext==NULL){
-      printf("SDL_GL_CreateContext failed: %s\n",SDL_GetError());
-      exit(1);
-    }
+  SDL_GLContext *glcontext = SDL_GL_CreateContext(context->window);
+  if(glcontext==NULL){
+    printf("SDL_GL_CreateContext failed: %s\n",SDL_GetError());
+    exit(1);
+  }
 
-    enable_gl_extensions(context);
-    glEnable(GL_BLEND);
+  enable_gl_extensions(context);
+  glEnable(GL_BLEND);
 
-    context->program_start_at = bi_get_now();
+  context->program_start_at = bi_get_now();
 
-    array_init(&context->_rendering_queue);
-    array_init(&context->_callback_queue);
+  array_init(&context->_rendering_queue);
+  array_init(&context->_interaction_queue);
+  array_init(&context->_timer_queue);
 
-    bi_layer_group_init(&context->layers);
+  bi_layer_group_init(&context->layers);
 
-    // timers
-    bi_timer_manager_init(&context->timers);
-    context->time_scale = 1.0;
-    context->_last_update = 0;
-    context->max_delta = 100;
+  // timers
+  context->_last_update = 0;
+  context->max_delta = 100;
 
-    //
-    bi_profile_init(&context->profile,fps,bi_get_now());
+  //
+  bi_profile_init(&context->profile,fps,bi_get_now());
 
-    context->debug = false;
+  context->debug = false;
 
-    context->running = true;
+  context->running = true;
 
-    context->w = w;
-    context->h = h;
+  context->w = w;
+  context->h = h;
 
-    context->color[0] = 0;
-    context->color[1] = 0;
-    context->color[2] = 0;
-    context->color[3] = 0;
+  context->color[0] = 0;
+  context->color[1] = 0;
+  context->color[2] = 0;
+  context->color[3] = 0;
 
-    // default shader
-    bi_shader_init(&context->default_shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+  // default shader
+  bi_shader_init(&context->default_shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
 
-    // default texture
-    uint8_t pixels[4] = {0,0,0,0};
-    glGenTextures(1, &context->default_texture);
-    glBindTexture(GL_TEXTURE_2D, context->default_texture);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
+  // default texture
+  uint8_t pixels[4] = {0,0,0,0};
+  glGenTextures(1, &context->default_texture);
+  glBindTexture(GL_TEXTURE_2D, context->default_texture);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
-    bi_framebuffer_init(&context->_layer_framebuffer);
-    bi_framebuffer_init(&context->_post_process_framebuffer);
+  bi_framebuffer_init(&context->_layer_framebuffer);
+  bi_framebuffer_init(&context->_post_process_framebuffer);
+
+  return context;
 }
 
 void bi_set_title(BiContext* context, const char* title)

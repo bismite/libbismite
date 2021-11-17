@@ -52,9 +52,9 @@ void bi_timer_manager_run(BiContext* context, BiTimerManager* timer_manager,doub
     // check schedule
     t->wait -= delta_time;
     if(t->wait < 0) {
+      t->count -= 1;
       t->callback(context,t,delta_time);
       t->wait = t->interval;
-      t->count -= 1;
     }
   }
 

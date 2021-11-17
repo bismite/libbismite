@@ -81,9 +81,9 @@ int main(int argc,char* argv[])
   BiTimer *rotate_timer = bi_timer_init(malloc(sizeof(BiTimer)),rotate,10,-1,NULL);
   bi_node_add_timer(face,rotate_timer);
   // pause rotate
-  bi_node_add_timer(face,bi_timer_init(malloc(sizeof(BiTimer)),pause_rotate,1000,1,rotate_timer));
+  bi_node_add_timer(face,bi_timer_init(malloc(sizeof(BiTimer)),pause_rotate,1000,2,rotate_timer));
   // resume rotate
-  bi_node_add_timer(face,bi_timer_init(malloc(sizeof(BiTimer)),resume_rotate,2000,1,rotate_timer));
+  bi_node_add_timer(face,bi_timer_init(malloc(sizeof(BiTimer)),resume_rotate,1500,2,rotate_timer));
 
   // fps layer
   BiFontAtlas *font = load_font();

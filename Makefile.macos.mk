@@ -9,7 +9,7 @@ OBJ_DIR=build/macos/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-SDL_TGZ=build/macos/SDL-macOS-UniversalBinaries.tgz
+SDL_TGZ=build/SDL-macOS-UniversalBinaries.tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-macOS-UniversalBinaries/releases/download/1.1/SDL-macOS-UniversalBinaries.tgz
 SDL_DIR=build/macos/SDL
 
@@ -46,7 +46,7 @@ $(OBJ_DIR)/%.o: src/%.c
 	$(CC) -c $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
-	$(AR) rcs $@ $^
+	libtool -static -o $@ $^
 
 # ----
 

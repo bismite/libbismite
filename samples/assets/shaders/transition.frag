@@ -1,6 +1,7 @@
 
 varying vec3 uv;
-varying vec4 color;
+varying vec4 _tint_color;
+varying float _opacity;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
@@ -38,8 +39,8 @@ void main()
   xy = floor(xy / S_GRID_SIZE) * S_GRID_SIZE;
   vec2 tmp = fract(xy / GRID_SIZE);
   if ( tmp.x + tmp.y > progress * 2.0 ) {
-    vec4 c = color * getTextureColor(int(uv.z), uv.xy);
-    gl_FragColor = vec4( c.r, c.g, c.b, c.a );
+    vec4 c = getTextureColor(int(uv.z), uv.xy);
+    gl_FragColor = vec4(_tint_color.rgb + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
   }else{
     discard;
   }

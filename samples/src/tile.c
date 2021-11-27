@@ -1,58 +1,46 @@
 #include "common.h"
-#include <stdlib.h>
 
-static BiNode* create_new_node(int x, int y,BiTexture *tex)
+#define TILE_SIZE 64
+
+static BiNode* create_tile(int x, int y,BiTexture *tex)
 {
-  BiNode* node = malloc(sizeof(BiNode));
-  bi_node_init(node);
-
+  BiNode* node = bi_node_init(malloc(sizeof(BiNode)));
   // texture mapping
-  node->texture_mapping = malloc(sizeof(BiTextureMapping));
-  bi_texture_mapping_init(node->texture_mapping,tex);
-  int tw = 32;
-  int th = 32;
-  int tx = rand()%(tex->w/tw) * tw;
-  int ty = rand()%(tex->h/th) * th;
-  bi_texture_mapping_set_bound(node->texture_mapping,tx,ty,tw,th);
+  node->texture_mapping = bi_texture_mapping_init(malloc(sizeof(BiTextureMapping)),tex);
+  int tx = rand()%(tex->w/TILE_SIZE) * TILE_SIZE;
+  int ty = rand()%(tex->h/TILE_SIZE) * TILE_SIZE;
+  bi_texture_mapping_set_bound(node->texture_mapping,tx,ty,TILE_SIZE,TILE_SIZE);
   bi_node_set_position(node,x,y);
-  bi_node_set_size(node,tw,th);
-  bi_set_color( node->color, 0xFF, 0xFF, 0xFF, 0xFF);
+  bi_node_set_size(node,TILE_SIZE,TILE_SIZE);
   return node;
 }
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, false, __FILE__);
+  BiContext* context = bi_init_context(malloc(sizeof(BiContext)), 480, 320, 0, false, __FILE__);
   print_info(context);
 
   // texture
-  BiTexture *img = malloc(sizeof(BiTexture));
-  bi_texture_init_with_filename(img,"assets/tile.png",false);
-
-  // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
-
-  const int NEW_NODE = (context->w/32) * (context->h/32);
-
-  for(int i=0; i<NEW_NODE; i++){
-    int x = i % (context->w/32) * 32;
-    int y = i / (context->w/32) * 32;
-    BiNode* node = create_new_node(x,y,img);
-    bi_node_add_node(root,node);
-  }
+  BiTexture *texture = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),"assets/tester.png",false);
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
+  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   bi_add_layer(context,layer);
-  layer->root = root;
-  layer->textures[0] = img;
+  layer->root = make_sprite_with_anchor("assets/map.png",0,0);
+  layer->textures[0] = layer->root->texture_mapping->texture;
+  layer->textures[1] = texture;
+
+  const int W = context->w/TILE_SIZE+1;
+  const int H = context->h/TILE_SIZE+1;
+  for(int i=0; i<W*H; i++){
+    int x = i % W * TILE_SIZE;
+    int y = i / W * TILE_SIZE;
+    bi_node_add_node(layer->root,create_tile(x,y,texture));
+  }
+
 
   // fps layer
-  BiFontAtlas *font = load_font();
-  add_fps_layer(context,font);
+  add_fps_layer(context,load_font());
 
   bi_start_run_loop(context);
   return 0;

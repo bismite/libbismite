@@ -1,5 +1,7 @@
 #include "common.h"
 
+#define SIZE 8
+
 int main(int argc, char* argv[])
 {
   BiContext* context = bi_init_context(malloc(sizeof(BiContext)), 480, 320, 0, true, __FILE__);
@@ -13,7 +15,6 @@ int main(int argc, char* argv[])
 
   //
   struct Blend{ GLuint src; GLuint dst; GLuint asrc; GLuint adst; };
-  const int SIZE = 8;
   struct Blend b[SIZE] = {
     { GL_SRC_ALPHA,           GL_ONE_MINUS_SRC_ALPHA }, // Normal
     { GL_SRC_ALPHA,           GL_ONE },                 // Additive

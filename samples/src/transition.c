@@ -57,7 +57,6 @@ static BiLayer* scene_a(BiContext* context)
 {
   BiNode* bg = make_sprite("assets/check.png");
   bi_node_set_position(bg,context->w/2,context->h/2);
-  bi_set_color(bg->color,0x80,0x80,0,0xff);
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_add_node(bg,face);
   onupdate(face,on_update_rotate_face);
@@ -72,7 +71,7 @@ static BiLayer* scene_a(BiContext* context)
 
 static BiLayer* scene_b(BiContext* context)
 {
-  BiNode* bg = make_sprite("assets/check.png");
+  BiNode* bg = make_sprite("assets/map.png");
   bi_node_set_position(bg,context->w/2,context->h/2);
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_add_node(bg,face);

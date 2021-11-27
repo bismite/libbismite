@@ -1,6 +1,7 @@
 
 varying vec3 uv;
-varying vec4 color;
+varying vec4 _tint_color;
+varying float _opacity;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
@@ -33,7 +34,8 @@ void main()
 {
   vec2 xy = gl_FragCoord.xy;
   if( mod(xy.x,GRID) <= SIZE && mod(xy.y,GRID) <= SIZE ) {
-    gl_FragColor = getTextureColor(int(uv.z), uv.xy) * color;
+    vec4 c = getTextureColor(int(uv.z), uv.xy);
+    gl_FragColor = vec4(_tint_color.rgb + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
   }else{
     gl_FragColor = vec4(0.0);
   }

@@ -35,6 +35,8 @@ extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
 extern PFNGLCREATESHADERPROC glCreateShader;
 extern PFNGLSHADERSOURCEPROC glShaderSource;
 extern PFNGLCOMPILESHADERPROC glCompileShader;
+extern PFNGLGETSHADERIVPROC glGetShaderiv;
+extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 extern PFNGLATTACHSHADERPROC  glAttachShader;
 extern PFNGLDELETESHADERPROC  glDeleteShader;
 extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;

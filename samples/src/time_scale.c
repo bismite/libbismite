@@ -2,7 +2,7 @@
 
 static void rotate_face(BiContext* context,BiTimer* timer,double dt)
 {
-  BiNode *node = timer->userdata;
+  BiNode *node = (BiNode*)timer->node;
   bi_node_set_angle(node, node->angle + dt * M_PI/180);
 }
 
@@ -18,15 +18,15 @@ int main(int argc,char* argv[])
   bi_node_set_anchor(root,0,0);
 
   // sprites
-  float TIMESCALES[3] = {2.0, 1.0, 0.5};
+  float TIMESCALES[4] = {2.0, 1.0, 0.5, 0};
   BiTextureMapping* m = make_texture_mapping("assets/face01.png");
-  for(int i=0;i<3;i++){
+  for(int i=0;i<4;i++){
     BiNode* face = make_sprite_from_mapping(m);
     bi_node_add_node(root,face);
-    bi_node_set_position(face,i*120+120,160);
+    bi_node_set_position(face,i*480/5+480/5,160);
     BiTimer *timer_rotate_face = malloc(sizeof(BiTimer));
-    bi_timer_init(timer_rotate_face, rotate_face, 0, -1, face);
-    bi_timer_manager_add_timer(&face->timers,timer_rotate_face);
+    bi_timer_init(timer_rotate_face, rotate_face, 0, -1, NULL);
+    bi_node_add_timer(face,timer_rotate_face);
     face->time_scale = TIMESCALES[i];
   }
 

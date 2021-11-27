@@ -44,7 +44,7 @@ extern void bi_action_base_init(BiAction* action);
 
 // Fade In / Fade Out
 typedef struct {
-  int from;
+  float from;
 } BiActionFade;
 extern void bi_action_fade_in_init(BiAction* action,int duration);
 extern void bi_action_fade_out_init(BiAction* action,int duration);

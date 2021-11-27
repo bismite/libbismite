@@ -1,6 +1,7 @@
 
 varying vec3 uv;
-varying vec4 color;
+varying vec4 _tint_color;
+varying float _opacity;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
@@ -28,6 +29,7 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 
 void main()
 {
-  vec4 c = color * getTextureColor(int(uv.z), uv.xy);
+  vec4 c = getTextureColor(int(uv.z), uv.xy);
+  c = vec4(_tint_color.rgb + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
   gl_FragColor = vec4(c.r, c.g, c.b*0.2, c.a );
 }

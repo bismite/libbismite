@@ -45,7 +45,7 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
   node->scale_y = node->scale_x = 0.1 + rand()%200 / 100.0;
 
   // color
-  bi_set_color(node->color, rand()%0xFF, rand()%0xFF, rand()%0xFF, 1+rand()%0xFE);
+  bi_set_color(node->color, rand()%0xff, rand()%0xff, rand()%0xff, 0xff);
 
   // on update callback
   onupdate(node,random_move);
@@ -68,27 +68,23 @@ int main(int argc, char* argv[])
   bi_init_context(context, 480, 320, 0, true, __FILE__);
   print_info(context);
 
-  // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
-
-  // particles
-  BiTexture *ball_tex = malloc(sizeof(BiTexture));
-  bi_texture_init_with_filename(ball_tex,"assets/ball.png",false);
-  for(uint64_t i=0; i< 2048 ; i++){
-    bi_node_add_node(root, create_particle(context,ball_tex) );
-  }
-
   // layer
   BiLayer *layer = malloc(sizeof(BiLayer));
   bi_layer_init(layer);
-  layer->root = root;
+  layer->root = make_sprite_with_anchor("assets/map.png",0,0);;
   bi_add_layer(context,layer);
-  // addtive blending
+  layer->textures[0] = layer->root->texture_mapping->texture;
+  layer->textures[1] = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),"assets/ball.png",false);
+  // additive blending
   layer->blend_factor.src = GL_SRC_ALPHA;
   layer->blend_factor.dst = GL_ONE;
-  // texture image
-  layer->textures[0] = ball_tex;
+
+  bi_set_blend_factor(&layer->blend_factor,GL_SRC_ALPHA,GL_ONE,GL_SRC_ALPHA,GL_ONE);
+
+  // particles
+  for(uint64_t i=0; i< 1024 ; i++){
+    bi_node_add_node(layer->root, create_particle(context,layer->textures[1]) );
+  }
 
   //
   // fps layer

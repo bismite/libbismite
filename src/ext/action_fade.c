@@ -7,13 +7,13 @@
 static void bi_action_fade_in_update(BiAction* action, double rate,int delta_time)
 {
   BiActionFade* fade = action->action_data;
-  action->node->color[3] = rate >= 1.0 ? 0xff : fade->from + (0xff - fade->from) * rate;
+  action->node->opacity = rate >= 1.0 ? 1.0 : fade->from + (1.0 - fade->from) * rate;
 }
 
 static void bi_action_fade_in_start(BiAction* action)
 {
   BiActionFade* fade = action->action_data;
-  fade->from = action->node->color[3];
+  fade->from = action->node->opacity;
 }
 
 void bi_action_fade_in_init(BiAction* action,int duration)
@@ -29,13 +29,13 @@ void bi_action_fade_in_init(BiAction* action,int duration)
 static void bi_action_fade_out_update(BiAction* action, double rate,int delta_time)
 {
   BiActionFade* fade = action->action_data;
-  action->node->color[3] = rate >= 1.0 ? 0 : fade->from - fade->from * rate;
+  action->node->opacity = rate >= 1.0 ? 0 : fade->from - fade->from * rate;
 }
 
 static void bi_action_fade_out_start(BiAction* action)
 {
   BiActionFade* fade = action->action_data;
-  fade->from = action->node->color[3];
+  fade->from = action->node->opacity;
 }
 
 void bi_action_fade_out_init(BiAction* action,int duration)

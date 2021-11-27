@@ -16,8 +16,7 @@ typedef enum {
   int _index; \
   bool interaction_enabled; \
   BiTimerManager timers; \
-  double time_scale; \
-  uint8_t color[4];
+  double time_scale;
 
 struct _BiRawNode{
   BI_NODE_HEADER
@@ -32,11 +31,6 @@ inline static void bi_raw_node_init(BiRawNode* n,BiNodeType type)
   // timers
   bi_timer_manager_init(&n->timers);
   n->time_scale = 1.0;
-  // color
-  n->color[0] = 0;
-  n->color[1] = 0;
-  n->color[2] = 0;
-  n->color[3] = 0;
 }
 
 inline static void bi_node_add_timer(void* n, BiTimer* t)

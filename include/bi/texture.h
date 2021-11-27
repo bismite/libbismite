@@ -25,13 +25,13 @@ struct _BiTextureMapping {
   bool flip_vertical;
 };
 
-extern bool bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias);
-extern bool bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool antialiase);
-extern bool bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool antialiase);
+extern BiTexture* bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias);
+extern BiTexture* bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool antialiase);
+extern BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool antialiase);
 
 extern void bi_texture_delete(BiTexture* texture);
 
-extern void bi_texture_mapping_init(BiTextureMapping* texture_mapping,BiTexture* texture);
+extern BiTextureMapping* bi_texture_mapping_init(BiTextureMapping* texture_mapping,BiTexture* texture);
 extern void bi_texture_mapping_set_bound(BiTextureMapping* texture_mapping, uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 
 #endif

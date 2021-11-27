@@ -1,7 +1,8 @@
 #include "common.h"
 #include <bi/ext/action.h>
 
-BiLayerGroup* main_layer_group;
+BiLayerGroup* layer_group_a;
+BiLayerGroup* layer_group_b;
 
 static BiAction* alloc_action(size_t size, void* payload)
 {
@@ -13,11 +14,6 @@ static BiAction* alloc_action(size_t size, void* payload)
   return action;
 }
 
-static void rotate_on_update(BiContext* context, BiNode *node, double dt)
-{
-  bi_node_set_angle(node,node->angle + 2.0*M_PI/180.0);
-}
-
 static void rotate_on_timer(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
@@ -27,49 +23,34 @@ static void rotate_on_timer(BiContext* context,BiTimer* timer,double dt)
 static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, bool pressed)
 {
   if(pressed){
-    main_layer_group->time_scale = main_layer_group->time_scale == 0 ? 1.0 : 0;
-    context->timers.scale = context->timers.scale == 0 ? 1.0 : 0;
+    layer_group_a->time_scale = layer_group_a->time_scale == 0 ? 1.0 : 0;
   }
-  return true;
+  return true; // swallow
 }
 
-int main(int argc, char* argv[])
+static void init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 60, false, __FILE__);
-  print_info(context);
-
-  // Layer Group
-  main_layer_group = malloc(sizeof(BiLayerGroup));
-  bi_layer_group_init(main_layer_group);
-  bi_layer_group_add_layer_group(&context->layers, main_layer_group);
+  bi_layer_group_init(lg);
+  bi_layer_group_add_layer_group(&context->layers, lg);
 
   // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
+  BiNode* root = bi_node_init(malloc(sizeof(BiNode)));
 
-  BiNode* bg = make_sprite("assets/check.png");
-  bi_node_set_position(bg,context->w/2,context->h/2);
-  bi_node_add_node(root,bg);
-
-  // texture node
+  // sprite
   BiTextureMapping* tm = make_texture_mapping("assets/face01.png");
-
-  BiNode* faces[4];
-  for(int i=0;i<4;i++){
+  BiNode* faces[2];
+  for(int i=0;i<2;i++){
     BiNode* face = make_sprite_from_mapping(tm);
-    bi_node_set_position(face,480/3*(1+i%2),320/3*(1+i/2));
+    bi_node_set_position(face,480/3*(1+i%2),offset_y);
     bi_node_add_node(root,face);
     faces[i] = face;
   }
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
+  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   layer->root = root;
-  bi_layer_group_add_layer(main_layer_group,layer);
-  layer->textures[0] = bg->texture_mapping->texture;
-  layer->textures[1] = tm->texture;
+  bi_layer_group_add_layer(lg,layer);
+  layer->textures[0] = tm->texture;
 
   // pause
   bi_node_set_on_click(root, on_click);
@@ -82,18 +63,38 @@ int main(int argc, char* argv[])
   bi_action_repeat_init(repeat,rot);
   bi_add_action(faces[0],repeat);
   bi_action_start(repeat);
-  // rotate by on_update
-  bi_set_color(faces[1]->color,0,0xFF,0,0xFF);
-  bi_node_set_on_update(faces[1],rotate_on_update);
   // rotate by timer
-  bi_set_color(faces[2]->color,0,0,0xFF,0xFF);
+  bi_set_color(faces[1]->color,0,0,0xFF,0xFF);
   BiTimer *t = malloc(sizeof(BiTimer));
-  bi_timer_init(t, rotate_on_timer, 0, -1, faces[2]);
-  bi_timer_manager_add_timer(&faces[2]->timers,t);
-  // rotate by global timer
-  t = malloc(sizeof(BiTimer));
-  bi_timer_init(t, rotate_on_timer, 0, -1, faces[3]);
-  bi_timer_manager_add_timer(&context->timers,t);
+  bi_timer_init(t, rotate_on_timer, 0, -1, faces[1]);
+  bi_timer_manager_add_timer(&faces[1]->timers,t);
+}
+
+int main(int argc, char* argv[])
+{
+  BiContext* context = malloc(sizeof(BiContext));
+  bi_init_context(context, 480, 320, 60, false, __FILE__);
+  print_info(context);
+
+  // bg
+  BiNode* bg = make_sprite("assets/check.png");
+  bi_node_set_position(bg,context->w/2,context->h/2);
+  // layer
+  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  layer->root = bg;
+  bi_layer_group_add_layer(&context->layers,layer);
+  layer->textures[0] = bg->texture_mapping->texture;
+
+  layer_group_a = malloc(sizeof(BiLayerGroup));
+  init_layer_group(context, layer_group_a, 320/3*2);
+  layer_group_b = malloc(sizeof(BiLayerGroup));
+  init_layer_group(context, layer_group_b, 320/3*1);
+
+  //
+  // fps layer
+  //
+  BiFontAtlas *font = load_font();
+  add_fps_layer(context,font);
 
   // start
   bi_start_run_loop(context);

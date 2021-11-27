@@ -190,7 +190,7 @@ static void draw(BiContext* context, BiNode* n, RenderingContext render_context)
     }
 
     // skip: invisible, zero-size node, transparent node
-    if( visible==true && n->visible==true && n->w!=0 && n->h!=0 && n->color[3]!=0) {
+    if( visible==true && n->visible==true && n->w!=0 && n->h!=0 && n->opacity>0 ) {
       array_add_object(&context->_rendering_queue,n);
     }
 
@@ -276,14 +276,12 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     //
     GLfloat uv[4*len]; // [ left, top, right, bottom ]
     GLfloat texture_z[len];
+    GLfloat opacity[len];
     GLfloat transforms[len][16];
-    GLfloat mod_color[len][4];
+    GLfloat tint[len][4];
     for(int i=0;i<len;i++){
-
       BiNode* node = context->_rendering_queue.objects[i];
-
-      // texture_uv
-      texture_z[i] = -1; // no-texture
+      opacity[i] = node->opacity;
       if(node->texture_mapping != NULL) {
         // Left-Top is 0-0, Right-Bottom is 1-1.
         BiTextureMapping *t = node->texture_mapping;
@@ -300,22 +298,29 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
           uv[i*4+3] = t->boundary[1];
         }
         texture_z[i] = t->texture->_texture_unit; // texture
+      }else{
+        texture_z[i] = -1; // no-texture
       }
 
       //
       bi_mat4_copy(transforms[i], node->draw);
 
       // color
-      mod_color[i][0] = node->color[0] / 255.0;
-      mod_color[i][1] = node->color[1] / 255.0;
-      mod_color[i][2] = node->color[2] / 255.0;
-      mod_color[i][3] = node->color[3] / 255.0;
+      tint[i][0] = node->color[0] / 255.0;
+      tint[i][1] = node->color[1] / 255.0;
+      tint[i][2] = node->color[2] / 255.0;
+      tint[i][3] = node->color[3] / 255.0;
     }
 
     //
     // update vbo
     // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
     //
+    // opacity
+    glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, opacity);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     // texture_z (texture index send as float. not integer.)
     glBindBuffer(GL_ARRAY_BUFFER, shader->texture_z_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
@@ -331,10 +336,10 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, transforms);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // color
-    glBindBuffer(GL_ARRAY_BUFFER, shader->mod_color_buffer);
+    // tint color
+    glBindBuffer(GL_ARRAY_BUFFER, shader->tint_color_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, mod_color);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, tint);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // set camera, projection, blend function
@@ -373,7 +378,6 @@ static void render_texture(BiContext* context, GLuint texture, BiRawNode* target
   bi_node_init(&n);
   bi_node_set_size(&n,t.w,t.h);
   n.texture_mapping = &m;
-  bi_set_color(n.color,0xff,0xff,0xff,0xff);
 
   BiLayer l;
   bi_layer_init(&l);

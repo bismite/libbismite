@@ -33,6 +33,9 @@ struct _BiNode {
   bool visible;
   bool _final_visibility;
 
+  uint8_t color[4];
+  float opacity;
+
   BiTextureMapping *texture_mapping;
 
   // matrix

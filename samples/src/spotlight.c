@@ -20,7 +20,6 @@ static BiNode* create_spotlight(BiTexture* texture,float x, float y)
   sprite->anchor_x = 0.5;
   sprite->anchor_y = 0.5;
   sprite->texture_mapping = mapping;
-  bi_set_color( sprite->color, 0xFF, 0xFF, 0xFF, 0xFF);
   bi_node_set_position(sprite,x,y);
   // spin spotlight
   onupdate(sprite,spin);

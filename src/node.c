@@ -20,6 +20,10 @@ BiNode* bi_node_init(BiNode* n)
   n->visible = true;
   n->_final_visibility = true;
 
+  // color
+  bi_set_color(n->color,0,0,0,0);
+  n->opacity = 1.0;
+
   bi_mat4_identity(n->transform);
   bi_mat4_identity(n->draw);
 

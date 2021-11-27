@@ -26,6 +26,8 @@ PFNGLBUFFERSUBDATAPROC glBufferSubData;
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLCOMPILESHADERPROC glCompileShader;
+PFNGLGETSHADERIVPROC glGetShaderiv;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLATTACHSHADERPROC  glAttachShader;
 PFNGLDELETESHADERPROC  glDeleteShader;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
@@ -61,6 +63,8 @@ static void enable_gl_extensions(BiContext* context)
     GLP(glCreateShader);
     GLP(glShaderSource);
     GLP(glCompileShader);
+    GLP(glGetShaderiv);
+    GLP(glGetShaderInfoLog);
     GLP(glAttachShader);
     GLP(glDeleteShader);
     GLP(glBindFramebuffer);

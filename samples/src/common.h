@@ -9,6 +9,14 @@
 #define SHADER_HEADER "#version 120\n"
 #endif
 
+__attribute__((unused)) static BiFontAtlas* load_font_atlas(const char* name, BiTexture *font_texture)
+{
+    BiFontAtlas *font = malloc(sizeof(BiFontAtlas));
+    bi_load_font_layout_from_file(name,font);
+    font->texture = font_texture;
+    return font;
+}
+
 __attribute__((unused)) static BiTimer* onupdate(BiNode* n,timer_callback func)
 {
   BiTimer *t = bi_timer_init(malloc(sizeof(BiTimer)),func,0,-1,NULL);
@@ -44,16 +52,12 @@ __attribute__((unused)) static BiShader* create_shader(const char* vert, const c
 
 static BiTextureMapping* make_texture_mapping(const char* name)
 {
-  // load texture
-  BiTextureMapping *mapping = malloc(sizeof(BiTextureMapping));
-  BiTexture *texture = malloc(sizeof(BiTexture));
-  if( bi_texture_init_with_filename(texture,name,false) ) {
-    bi_texture_mapping_init(mapping,texture);
-  }else{
+  BiTexture *texture = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),name,false);
+  if( ! texture ) {
     LOG("load error\n");
     return NULL;
   }
-  return mapping;
+  return bi_texture_mapping_init(malloc(sizeof(BiTextureMapping)),texture);
 }
 
 static BiNode* make_sprite_from_mapping(BiTextureMapping *mapping)
@@ -62,7 +66,6 @@ static BiNode* make_sprite_from_mapping(BiTextureMapping *mapping)
   bi_node_set_size(sprite, mapping->texture->w, mapping->texture->h);
   bi_node_set_anchor(sprite,0.5,0.5);
   sprite->texture_mapping = mapping;
-  bi_set_color( sprite->color, 0xFF, 0xFF, 0xFF, 0xFF);
   return sprite;
 }
 
@@ -71,6 +74,15 @@ __attribute__((unused)) static BiNode* make_sprite(const char* name)
   // load texture
   BiTextureMapping *mapping = make_texture_mapping(name);
   return make_sprite_from_mapping(mapping);
+}
+
+__attribute__((unused)) static BiNode* make_sprite_with_anchor(const char* name,float x, float y)
+{
+  // load texture
+  BiTextureMapping *mapping = make_texture_mapping(name);
+  BiNode *n = make_sprite_from_mapping(mapping);
+  bi_node_set_anchor(n,x,y);
+  return n;
 }
 
 __attribute__((unused)) static void print_info(BiContext *context)

@@ -1,13 +1,5 @@
 #include "common.h"
 
-static BiFontAtlas* load_font_atlas(const char* name, BiTexture *font_texture)
-{
-    BiFontAtlas *font = malloc(sizeof(BiFontAtlas));
-    bi_load_font_layout_from_file(name,font);
-    font->texture = font_texture;
-    return font;
-}
-
 int main(int argc, char* argv[])
 {
   BiContext* context = malloc(sizeof(BiContext));
@@ -40,15 +32,14 @@ int main(int argc, char* argv[])
   for(int i=0; i<4; i++){
     BiNode* label = malloc(sizeof(BiNode));
     bi_node_init(label);
-    bi_set_color(label->color,32,32,32,0xff);
+    bi_set_color(label->color,0xff,0xff,0xff,0xff);
     bi_node_set_position( label, offset_x, offset_y+i*20 );
-    bi_update_label(label, "The quick brown fox jumps over the lazy dog", fonts[i], 0xFF,0xFF,0xFF,0xFF);
+    bi_update_label(label, "The quick brown fox jumps over the lazy dog", fonts[i], 0,0,0,0xFF);
     bi_node_add_node(root,label);
   }
   for(int i=0; i<4; i++){
     BiNode* label = malloc(sizeof(BiNode));
     bi_node_init(label);
-    bi_set_color(label->color,32,32,32,0xff);
     bi_node_set_position( label, offset_x, offset_y+(4+i)*20 );
     bi_update_label(label, "いろはにほへと　ちりぬるを　わかよたれそ　つねならむ", fonts[i], 0xFF,0xFF,0xFF,0xFF);
     bi_node_add_node(root,label);

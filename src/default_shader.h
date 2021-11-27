@@ -22,9 +22,11 @@ attribute vec4 transform_c;
 attribute vec4 transform_d;
 attribute float vertex_index;
 attribute float texture_z;
-attribute vec4 mod_color;
+attribute float opacity;
+attribute vec4 tint_color;
 varying vec3 uv;
-varying vec4 color;
+varying vec4 _tint_color;
+varying float _opacity;
 void main()
 {
   gl_Position = projection * view * mat4(transform_a,transform_b,transform_c,transform_d) * vec4(vertex,0.0,1.0);
@@ -43,13 +45,15 @@ void main()
   }
 
   //
-  color = mod_color;
+  _tint_color = tint_color;
+  _opacity = opacity;
 }
 );
 
 static const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 varying vec3 uv;
-varying vec4 color;
+varying vec4 _tint_color;
+varying float _opacity;
 uniform float time;
 uniform vec2 resolution;
 uniform vec4 optional_attributes;
@@ -79,9 +83,10 @@ void main()
 {
   int samplerID = int(uv.z);
   if( 0 <= samplerID && samplerID < 16 ) {
-    gl_FragColor = getTextureColor(samplerID, uv.xy) * color;
+    vec4 c = getTextureColor(samplerID, uv.xy);
+    gl_FragColor = vec4(_tint_color.rgb + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
   }else{
-    gl_FragColor = color;
+    gl_FragColor = _tint_color * _opacity;
   }
 }
 );

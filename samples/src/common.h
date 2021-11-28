@@ -9,6 +9,8 @@
 #define SHADER_HEADER "#version 120\n"
 #endif
 
+#define ALLOC(x) malloc(sizeof(x))
+
 __attribute__((unused)) static BiFontAtlas* load_font_atlas(const char* name, BiTexture *font_texture)
 {
     BiFontAtlas *font = malloc(sizeof(BiFontAtlas));

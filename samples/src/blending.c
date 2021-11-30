@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define SIZE 8
+#define SIZE 9
 
 int main(int argc, char* argv[])
 {
@@ -17,15 +17,16 @@ int main(int argc, char* argv[])
   struct Blend{ GLuint src; GLuint dst; GLuint asrc; GLuint adst; };
   struct Blend b[SIZE] = {
     { GL_SRC_ALPHA,           GL_ONE_MINUS_SRC_ALPHA }, // Normal
-    { GL_SRC_ALPHA,           GL_ONE },                 // Additive
-    { GL_ONE,                 GL_ONE },                 // Additive2
-    { GL_ONE_MINUS_DST_COLOR, GL_ONE },                 // Additive3 Screen
+    { GL_ONE,                 GL_ONE_MINUS_SRC_ALPHA }, // Premultiplied Alpha
     { GL_ZERO,                GL_SRC_COLOR },           // Multiply
     { GL_ONE_MINUS_DST_COLOR, GL_ZERO },                // Negative
+    { GL_SRC_ALPHA,           GL_ONE },                 // Additive
+    { GL_ONE,                 GL_ONE },                 // Additive2
+    { GL_ONE_MINUS_DST_COLOR, GL_ONE },                 // Additive3
     { GL_DST_COLOR,           GL_ONE },                 // spotlight
     { GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR}   // xor
   };
-  const int W=4, H=2, IW=108,IH=108;
+  const int W=4, H=3, IW=96,IH=96;
   for(int i=0;i<SIZE;i++) {
     BiLayer *a = bi_layer_init(malloc(sizeof(BiLayer)));
     bi_add_layer(context,a);

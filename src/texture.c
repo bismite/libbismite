@@ -4,15 +4,14 @@
 #include <bi/logger.h>
 #include <bi/layer.h>
 
-static GLuint create_texture_from_pixels(int w, int h, void*pixels, bool antialiase)
+static GLuint create_texture_from_pixels(int w, int h, void*pixels, GLint internal_format, GLenum format, bool antialiase)
 {
   GLuint texture_id;
   glGenTextures(1, &texture_id);
 
   //
   glBindTexture(GL_TEXTURE_2D, texture_id);
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format, GL_UNSIGNED_BYTE, pixels);
 
   //
   if(antialiase) {
@@ -33,45 +32,58 @@ static GLuint create_texture_from_pixels(int w, int h, void*pixels, bool antiali
   return texture_id;
 }
 
-BiTexture* bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias)
+static bool get_format(SDL_PixelFormatEnum sdl_format, GLint* internal_format, GLenum* format)
 {
-  texture->texture_id = create_texture_from_pixels(w,h,pixels,antialias);
-  texture->w = w;
-  texture->h = h;
-  texture->_texture_unit = 0;
-  return texture;
+  switch(sdl_format) {
+    case SDL_PIXELFORMAT_ABGR8888:
+    case SDL_PIXELFORMAT_BGR888:
+      *internal_format = GL_RGBA;
+      *format = GL_RGBA;
+      break;
+    case SDL_PIXELFORMAT_ARGB8888:
+    case SDL_PIXELFORMAT_RGB888:
+      *internal_format = GL_RGBA;
+      *format = GL_BGRA_EXT;
+      break;
+    case SDL_PIXELFORMAT_RGB24:
+      *internal_format = GL_RGB;
+      *format = GL_RGB;
+      break;
+    default:
+      return false;
+  }
+  return true;
 }
 
 static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, bool antialias)
 {
-  // XXX: ARGB? ABGR?
-  // Desktop OpenGL: SDL_PIXELFORMAT_ARGB8888, invert R<->B
-  // WebGL:          SDL_PIXELFORMAT_ABGR8888, correct.
-  SDL_Surface *orig = IMG_Load_RW( rwops, 1 );
-  if(orig == NULL) {
-    LOG("Error IMG_Load\n");
+  SDL_Surface *img = IMG_Load_RW( rwops, 1 );
+  if(img == NULL) {
+    LOG("IMG_Load_RW failed. Error:%s\n", IMG_GetError());
     return NULL;
   }
 
-  SDL_Surface* img = orig;
-
-  // force change Format to SDL_PIXELFORMAT_ABGR8888
-  if(orig->format->format != SDL_PIXELFORMAT_ABGR8888) {
-    img = SDL_CreateRGBSurfaceWithFormat(0, orig->w, orig->h, 32, SDL_PIXELFORMAT_ABGR8888);
-    if (img == NULL) {
-      LOG("SDL_CreateRGBSurfaceWithFormat() failed: %s", SDL_GetError());
-      return NULL;
+  GLint internal_format;
+  GLenum format;
+  if( get_format(img->format->format,&internal_format,&format) ) {
+    texture->texture_id = create_texture_from_pixels(img->w,img->h,img->pixels,internal_format,format,antialias);
+    texture->w = img->w;
+    texture->h = img->h;
+    texture->_texture_unit = 0;
+  }else{
+    SDL_Surface* tmp = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_ABGR8888, 0);
+    if (tmp ) {
+      texture->texture_id = create_texture_from_pixels(tmp->w,tmp->h,tmp->pixels,GL_RGBA,GL_RGBA,antialias);
+      texture->w = tmp->w;
+      texture->h = tmp->h;
+      texture->_texture_unit = 0;
+      SDL_FreeSurface(tmp);
+    }else{
+      LOG("ConvertSurfaceFormat failed. Format:%s Error:%s", SDL_GetPixelFormatName(img->format->format), SDL_GetError() );
     }
-    SDL_BlitSurface(orig,NULL,img,NULL);
   }
 
-  bi_texture_init_with_pixels(texture,img->w,img->h,img->pixels,antialias);
-
-  if(orig->format->format != SDL_PIXELFORMAT_ABGR8888) {
-    SDL_FreeSurface(img);
-  }
-
-  SDL_FreeSurface(orig);
+  SDL_FreeSurface(img);
   return texture;
 }
 

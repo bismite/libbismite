@@ -25,7 +25,7 @@ struct _BiTextureMapping {
   bool flip_vertical;
 };
 
-extern BiTexture* bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, bool antialias);
+extern BiTexture* bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, GLint internal_format, GLenum format, bool antialias);
 extern BiTexture* bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool antialiase);
 extern BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool antialiase);
 

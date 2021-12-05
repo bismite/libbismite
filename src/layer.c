@@ -13,7 +13,6 @@ BiLayer* bi_layer_init(BiLayer* layer)
   layer->root = NULL;
   layer->camera_x = 0;
   layer->camera_y = 0;
-  layer->projection_centering = false;
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     layer->textures[i] = NULL;
   }
@@ -47,7 +46,10 @@ BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
   layer_group->blend_factor.alpha_dst = GL_ONE_MINUS_SRC_ALPHA;
 
   array_init(&layer_group->layers);
-  bi_framebuffer_init(&layer_group->framebuffer);
+
+  GLint dims[4] = {0};
+  glGetIntegerv(GL_VIEWPORT, dims);
+  bi_framebuffer_init(&layer_group->framebuffer,dims[2],dims[3]);
   return layer_group;
 }
 

@@ -1,5 +1,5 @@
 #include <bi/shader.h>
-
+#include <bi/matrix.h>
 #include <bi/util.h>
 #include <bi/bi_sdl.h>
 #include <stdbool.h>
@@ -55,8 +55,7 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->transform_locations[3] = glGetAttribLocation(program_id, "transform_d");
 
   // Uniform locations
-  shader->projection_location = glGetUniformLocation(program_id, "projection");
-  shader->view_location = glGetUniformLocation(program_id, "view");
+  shader->camera_location = glGetUniformLocation(program_id, "camera");
   shader->texture_locations[0] = glGetUniformLocation(program_id, "sampler[0]");
   shader->time_location = glGetUniformLocation(program_id, "time");
   shader->resolution_location = glGetUniformLocation(program_id, "resolution");
@@ -149,4 +148,45 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   int texture_location_indexes[BI_LAYER_MAX_TEXTURES];
   for(int i=0; i<BI_LAYER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
   glUniform1iv(shader->texture_locations[0], BI_LAYER_MAX_TEXTURES, texture_location_indexes);
+}
+
+void bi_shader_set_camera(BiShader* shader,float w,float h,float x,float y,bool flip_vertical)
+{
+  // Projection
+  GLfloat camera[16] = {
+    2.0/w,   0.0, 0.0, 0.0,
+      0.0, 2.0/h, 0.0, 0.0,
+      0.0,   0.0, 1.0, 0.0,
+     -1.0,  -1.0, 0.0, 1.0
+  };
+
+  // upside-down for framebuffer
+  if(flip_vertical){
+    GLfloat flip_scale[16] = {
+      1.0, 0.0, 0.0, 0.0,
+      0.0,-1.0, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+      0.0, 0.0, 0.0, 1.0
+    };
+    GLfloat flip_trans[16] = {
+      1.0, 0.0, 0.0, 0.0,
+      0.0, 1.0, 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+      0.0,  -h, 0.0, 1.0
+    };
+    bi_mat4_multiply(flip_scale,camera,camera);
+    bi_mat4_multiply(flip_trans,camera,camera);
+  }
+
+  // Trans
+  GLfloat trans[16] = {
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+     -x,  -y, 0.0, 1.0
+  };
+
+  bi_mat4_multiply(trans,camera,camera);
+
+  glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
 }

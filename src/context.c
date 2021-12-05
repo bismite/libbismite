@@ -179,6 +179,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 
   context->w = w;
   context->h = h;
+  context->highdpi = highdpi;
 
   context->color[0] = 0;
   context->color[1] = 0;
@@ -192,7 +193,6 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   uint8_t pixels[4] = {0,0,0,0};
   glGenTextures(1, &context->default_texture);
   glBindTexture(GL_TEXTURE_2D, context->default_texture);
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -200,8 +200,10 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  bi_framebuffer_init(&context->_layer_framebuffer);
-  bi_framebuffer_init(&context->_post_process_framebuffer);
+  GLint dims[4] = {0};
+  glGetIntegerv(GL_VIEWPORT, dims);
+  bi_framebuffer_init(&context->_layer_framebuffer,dims[2],dims[3]);
+  bi_framebuffer_init(&context->_post_process_framebuffer,dims[2],dims[3]);
 
   return context;
 }
@@ -209,6 +211,17 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 void bi_set_title(BiContext* context, const char* title)
 {
   SDL_SetWindowTitle( context->window, title );
+}
+
+//
+const char* bi_default_vertex_shader()
+{
+  return DEFAULT_VERTEX_SHADER;
+}
+
+const char* bi_default_fragment_shader()
+{
+  return DEFAULT_FRAGMENT_SHADER;
 }
 
 //

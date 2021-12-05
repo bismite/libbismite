@@ -7,11 +7,11 @@ int main(int argc, char* argv[])
   print_info(context);
 
   // Shaders
-  BiShader *bg_shader = create_shader("assets/shaders/default.vert","assets/shaders/shader-yellow.frag");
-  BiShader *bg_pp_shader = create_shader("assets/shaders/default.vert","assets/shaders/postprocess-ball-distortion.frag");
-  BiShader *fg_shader = create_shader("assets/shaders/default.vert","assets/shaders/shader-chop.frag");
-  BiShader *fg_pp_shader = create_shader("assets/shaders/default.vert","assets/shaders/postprocess-ball-negative.frag");
-  BiShader *final_pp_shader = create_shader("assets/shaders/default.vert","assets/shaders/postprocess-blur.frag");
+  BiShader *bg_shader = create_shader_with_default_vertex_shader("assets/shaders/shader-yellow.frag");
+  BiShader *bg_pp_shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-ball-distortion.frag");
+  BiShader *fg_shader = create_shader_with_default_vertex_shader("assets/shaders/shader-chop.frag");
+  BiShader *fg_pp_shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-ball-negative.frag");
+  BiShader *final_pp_shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-blur.frag");
 
   // Middle Layer Group
   BiLayerGroup* layer_group = malloc(sizeof(BiLayerGroup));

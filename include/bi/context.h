@@ -19,6 +19,7 @@ struct _BiContext {
   // geometry
   int w;
   int h;
+  bool highdpi;
 
   // background color
   uint8_t color[4];
@@ -71,5 +72,9 @@ extern void bi_set_title(BiContext* context,const char* title);
 extern void bi_add_layer(BiContext* context, BiLayer* layer);
 extern void bi_update_layer_order(BiContext* context);
 extern void bi_remove_layer(BiContext* context, BiLayer* layer);
+
+//
+extern const char* bi_default_vertex_shader();
+extern const char* bi_default_fragment_shader();
 
 #endif

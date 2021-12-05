@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   pp->root = make_sprite("assets/noise.png");
   bi_node_set_position(pp->root,context->w/2, context->h/2);
   pp->textures[0] = pp->root->texture_mapping->texture;
-  pp->post_process.shader = create_shader("assets/shaders/default.vert","assets/shaders/postprocess-dissolve.frag");
+  pp->post_process.shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-dissolve.frag");
   pp->post_process.framebuffer_enabled = true;
   bi_set_blend_factor(&pp->post_process.blend_factor, GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
 

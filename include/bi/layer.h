@@ -6,6 +6,7 @@
 #include <bi/array.h>
 #include <bi/framebuffer.h>
 #include <bi/node_base.h>
+#include <bi/blend_factor.h>
 
 #define BI_LAYER_MAX_TEXTURES 16
 
@@ -13,24 +14,15 @@ typedef struct _BiNode BiNode;
 typedef struct _BiTexture BiTexture;
 typedef struct _BiShader BiShader;
 
-typedef struct _BiLayerBlendFactor BiLayerBlendFactor;
 typedef struct _BiLayer BiLayer;
 typedef struct _BiLayerGroup BiLayerGroup;
 typedef struct _BiPostProcess BiPostProcess;
-
-struct _BiLayerBlendFactor {
-  GLenum src;
-  GLenum dst;
-  GLenum alpha_src;
-  GLenum alpha_dst;
-};
 
 struct _BiLayer {
   BI_NODE_HEADER;
   BiLayerBlendFactor blend_factor;
   GLfloat camera_x;
   GLfloat camera_y;
-  bool projection_centering;
   BiNode* root;
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
   BiShader *shader;
@@ -71,13 +63,5 @@ extern void bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj)
 extern void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_update_order(BiLayerGroup* layer_group);
-
-//
-static inline void bi_set_blend_factor(BiLayerBlendFactor* b, GLenum src, GLenum dst, GLenum alpha_src, GLenum alpha_dst ) {
-  b->src = src;
-  b->dst = dst;
-  b->alpha_src = alpha_src;
-  b->alpha_dst = alpha_dst;
-}
 
 #endif

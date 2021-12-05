@@ -12,6 +12,6 @@ struct _BiFramebuffer {
   int h;
 };
 
-extern void bi_framebuffer_init(BiFramebuffer *fb);
+extern BiFramebuffer* bi_framebuffer_init(BiFramebuffer *fb,int w,int h);
 
 #endif

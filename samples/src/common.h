@@ -52,6 +52,16 @@ __attribute__((unused)) static BiShader* create_shader(const char* vert, const c
   return shader;
 }
 
+__attribute__((unused)) static BiShader* create_shader_with_default_vertex_shader(const char* frag)
+{
+  const char* vartex_shader = bi_default_vertex_shader();
+  char* fragment_shader = read_shader(frag);
+  BiShader *shader = malloc(sizeof(BiShader));
+  bi_shader_init(shader, vartex_shader, fragment_shader);
+  free(fragment_shader);
+  return shader;
+}
+
 static BiTextureMapping* make_texture_mapping(const char* name)
 {
   BiTexture *texture = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),name,false);

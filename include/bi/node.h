@@ -85,6 +85,8 @@ extern void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_i
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);
 
+extern bool bi_node_update_matrix(BiNode* n);
+
 // event handler
 static inline void bi_node_set_on_click(BiNode* node, on_click_callback callback){node->_on_click = callback;}
 static inline void bi_node_set_on_move_cursor(BiNode* node, on_move_cursor_callback callback){node->_on_move_cursor = callback;}

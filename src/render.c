@@ -6,13 +6,6 @@
 #include <bi/bi_gl.h>
 #include <math.h>
 
-// context
-typedef struct _RenderingContext{
-  bool visible;
-  bool interaction_enabled;
-  double time_scale;
-} RenderingContext;
-
 static int node_order_compare(const void *_a, const void *_b )
 {
   const BiNode *a = *(BiNode**)_a;
@@ -43,79 +36,6 @@ static void layer_sort(BiLayerGroup* layer_group)
   qsort( a->objects, a->size, sizeof(BiRawNode*), layer_order_compare);
 }
 
-void bi_render_update_matrix(BiNode* n)
-{
-  GLfloat tx = n->x;
-  GLfloat ty = n->y;
-  GLfloat sx = n->scale_x ;
-  GLfloat sy = n->scale_y ;
-  // XXX: non-zero angle calculation is super slow!
-  GLfloat cos_v = cos(n->angle);
-  GLfloat sin_v = sin(n->angle);
-  // local
-  GLfloat lx = - n->anchor_x * n->w;
-  GLfloat ly = - n->anchor_y * n->h;
-  GLfloat lsx = n->w;
-  GLfloat lsy = n->h;
-
-  // matrix chain
-  if(n->parent == NULL){
-    bi_mat4_identity( n->transform );
-  }else{
-    bi_mat4_copy( n->transform, n->parent->transform );
-  }
-
-  GLfloat trans[16] = {
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0,
-     tx,  ty, 0.0, 1.0
-  };
-
-  // cos -sin  0  0      cos  sin  0  0
-  // sin  cos  0  0     -sin  cos  0  0
-  //   0    0  1  0  =>    0    0  1  0
-  //   0    0  0  1        0    0  0  1
-  GLfloat rotation[16] = {
-     cos_v, sin_v, 0.0, 0.0,
-    -sin_v, cos_v, 0.0, 0.0,
-       0.0,   0.0, 1.0, 0.0,
-       0.0,   0.0, 0.0, 1.0
-  };
-
-  GLfloat scale[16] = {
-   sx,  0,  0,  0,
-    0, sy,  0,  0,
-    0,  0,  1,  0,
-    0,  0,  0,  1
-  };
-
-  GLfloat local_trans[16] = {
-    1,  0,  0,  0,
-    0,  1,  0,  0,
-    0,  0,  1,  0,
-   lx, ly,  0,  1
-  };
-
-  GLfloat local_scale[16] = {
-   lsx,   0,  0,  0,
-     0, lsy,  0,  0,
-     0,   0,  1,  0,
-     0,   0,  0,  1
-  };
-
-  bi_mat4_multiply(trans,n->transform,n->transform);
-  bi_mat4_multiply(rotation,n->transform,n->transform);
-  bi_mat4_multiply(scale,n->transform,n->transform);
-  if( n->matrix_include_anchor_translate ) {
-    bi_mat4_multiply(local_trans,n->transform,n->transform); // include local transform
-    bi_mat4_multiply(local_scale,n->transform,n->draw);
-  } else {
-    bi_mat4_multiply(local_trans,n->transform,n->draw); // exclude local transform
-    bi_mat4_multiply(local_scale,n->draw,n->draw);
-  }
-}
-
 static bool node_has_event_handler(BiNode* n)
 {
   if(n->_on_move_cursor != NULL ||
@@ -130,49 +50,57 @@ static bool node_has_event_handler(BiNode* n)
   return false;
 }
 
-static void draw(BiContext* context, BiNode* n, RenderingContext render_context)
+void bi_render_queuing(BiRenderingContext context, BiNode* n)
 {
-  bool visible = render_context.visible;
-  bool interaction_enabled = render_context.interaction_enabled && n->interaction_enabled;
+  bool visible = context.visible;
+  bool interaction_enabled = context.interaction_enabled && n->interaction_enabled;
 
-  render_context.interaction_enabled = interaction_enabled;
-  n->timers.scale = render_context.time_scale * n->time_scale;
+  context.interaction_enabled = interaction_enabled;
+  n->timers.scale = context.time_scale * n->time_scale;
   n->_final_visibility = n->visible && visible;
 
   // event handler and timer
-  if( interaction_enabled && node_has_event_handler(n) ) {
-    array_add_object(&context->_interaction_queue, n);
+  if( context.interaction_queue && interaction_enabled && node_has_event_handler(n) ) {
+    array_add_object(context.interaction_queue, n);
   }
-  if( n->timers.size > 0 ) {
-    array_add_object(&context->_timer_queue, n);
+  if( context.timer_queue && n->timers.size > 0 ) {
+    array_add_object(context.timer_queue, n);
   }
 
   // skip: invisible, zero-size node, transparent node
   if( visible==true && n->visible==true && n->w!=0 && n->h!=0 && n->opacity>0 ) {
-    array_add_object(&context->_rendering_queue,n);
+    array_add_object(context.rendering_queue,n);
   }
 
   //
-  bool matrix_update_require = false;
-  if( n->matrix_cached == false ) {
-      bi_render_update_matrix(n);
-      n->matrix_cached = true;
-      matrix_update_require = true;
-      context->profile.matrix_updated += 1;
-  }
+  bool matrix_update_require = bi_node_update_matrix(n);
 
   //
-  render_context.visible = visible && n->visible;
+  context.visible = visible && n->visible;
   bi_render_node_sort(n);
   for( int i=0; i<n->children.size; i++ ){
     if( bi_node_child_at(n,i)->matrix_cached == true && matrix_update_require ) {
         bi_node_child_at(n,i)->matrix_cached = false;
     }
-    draw(context, bi_node_child_at(n,i), render_context);
+    bi_render_queuing(context, bi_node_child_at(n,i));
   }
 }
 
-static void render_layer(BiContext* context,BiLayer* layer, RenderingContext render_context)
+void bi_render_activate_textures(GLuint default_texture,BiTexture** textures)
+{
+  // Textures
+  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
+    glActiveTexture(GL_TEXTURE0+i);
+    if( textures[i] == NULL ) {
+      glBindTexture(GL_TEXTURE_2D, default_texture);
+    }else{
+      textures[i]->_texture_unit = i;
+      glBindTexture(GL_TEXTURE_2D, textures[i]->texture_id);
+    }
+  }
+}
+
+static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext render_context)
 {
   if( layer->root == NULL ) {
     return;
@@ -181,22 +109,19 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
   render_context.time_scale *= layer->time_scale;
 
   // timer
-  if( layer->timers.size > 0 ) {
-    array_add_object(&context->_timer_queue, layer);
+  if( render_context.timer_queue && layer->timers.size > 0 ) {
+    array_add_object(render_context.timer_queue, layer);
   }
 
   // reset rendering queue
-  array_clear(&context->_rendering_queue);
+  array_clear(render_context.rendering_queue);
 
-  //
   // recursive visit nodes
-  //
-  draw(context, layer->root, render_context);
+  bi_render_queuing(render_context, layer->root);
 
-  const size_t len = context->_rendering_queue.size;
-  if(len==0) return;
+  if(render_context.rendering_queue->size==0) return;
 
-  context->profile.rendering_nodes_queue_size += len;
+  // context->profile.rendering_nodes_queue_size += len;
 
   // shader select
   BiShader* shader = &context->default_shader;
@@ -205,99 +130,15 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
   }
   glUseProgram(shader->program_id);
 
-  // time
-  glUniform1f(shader->time_location, (context->program_start_at - context->_frame_start_at)/1000.0 );
-  // resolution
-  glUniform2f(shader->resolution_location, context->w, context->h );
-  // scale
+  // uniforms
+  double time = (context->program_start_at - context->_frame_start_at)/1000.0;
   int drawable_w,drawable_h;
   SDL_GL_GetDrawableSize(context->window, &drawable_w, &drawable_h);
-  glUniform1f(shader->scale_location, (float)drawable_h / context->h );
-  // optional attributes
-  glUniform4fv(shader->optional_attributes_location, 1, layer->shader_attributes );
+  float scale = (float)drawable_h / context->h;
+  bi_shader_set_uniforms(shader,time,context->w,context->h,scale,layer->shader_attributes);
 
-  // Textures
-  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
-    // texture bind
-    glActiveTexture(GL_TEXTURE0+i);
-    if( layer->textures[i] == NULL ) {
-      glBindTexture(GL_TEXTURE_2D, context->default_texture);
-    }else{
-      layer->textures[i]->_texture_unit = i;
-      glBindTexture(GL_TEXTURE_2D, layer->textures[i]->texture_id);
-    }
-  }
-
-  //
-  // copy to buffer
-  //
-  GLfloat uv[4*len]; // [ left, top, right, bottom ]
-  GLfloat texture_z[len];
-  GLfloat opacity[len];
-  GLfloat transforms[len][16];
-  GLfloat tint[len][4];
-  for(int i=0;i<len;i++){
-    BiNode* node = context->_rendering_queue.objects[i];
-    opacity[i] = node->opacity;
-    if(node->texture_mapping != NULL) {
-      // Left-Top is 0-0, Right-Bottom is 1-1.
-      BiTextureMapping *t = node->texture_mapping;
-      uv[i*4+0] = t->boundary[0]; // Left
-      uv[i*4+1] = t->boundary[1]; // Top
-      uv[i*4+2] = t->boundary[2]; // Right
-      uv[i*4+3] = t->boundary[3]; // Bottom
-      if(t->flip_horizontal) {
-        uv[i*4+0] = t->boundary[2];
-        uv[i*4+2] = t->boundary[0];
-      }
-      if(t->flip_vertical) {
-        uv[i*4+1] = t->boundary[3];
-        uv[i*4+3] = t->boundary[1];
-      }
-      texture_z[i] = t->texture->_texture_unit; // texture
-    }else{
-      texture_z[i] = -1; // no-texture
-    }
-
-    //
-    bi_mat4_copy(transforms[i], node->draw);
-
-    // color
-    tint[i][0] = node->color[0] / 255.0;
-    tint[i][1] = node->color[1] / 255.0;
-    tint[i][2] = node->color[2] / 255.0;
-    tint[i][3] = node->color[3] / 255.0;
-  }
-
-  //
-  // update vbo
-  // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
-  //
-  // opacity
-  glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, opacity);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // texture_z (texture index send as float. not integer.)
-  glBindBuffer(GL_ARRAY_BUFFER, shader->texture_z_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, texture_z);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // uv
-  glBindBuffer(GL_ARRAY_BUFFER, shader->uv_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, uv);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // transform
-  glBindBuffer(GL_ARRAY_BUFFER, shader->transform_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, transforms);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // tint color
-  glBindBuffer(GL_ARRAY_BUFFER, shader->tint_color_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, tint);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // textures
+  bi_render_activate_textures(context->default_texture,layer->textures);
 
   // set projection and view
   bi_shader_set_camera(shader, context->w, context->h, layer->camera_x, layer->camera_y, false);
@@ -310,12 +151,7 @@ static void render_layer(BiContext* context,BiLayer* layer, RenderingContext ren
     layer->blend_factor.alpha_dst
   );
 
-  //
-  // Draw instances
-  //
-  glBindVertexArray(shader->vao);
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, len);
-  glBindVertexArray(0);
+  bi_shader_draw(shader,render_context.rendering_queue);
 }
 
 static void render_texture(BiContext* context, GLuint texture, BiRawNode* target)
@@ -360,10 +196,13 @@ static void render_texture(BiContext* context, GLuint texture, BiRawNode* target
     }
   }
 
-  RenderingContext rcontext = {true,false};
+  BiRenderingContext rcontext;
+  bi_rendering_context_init(&rcontext,true,false,0,
+                            NULL,
+                            NULL,
+                            &context->_rendering_queue);
   render_layer(context,&l,rcontext);
 }
-
 
 static void target_and_clear_framebuffer(GLuint framebuffer_id)
 {
@@ -375,7 +214,7 @@ static void target_and_clear_framebuffer(GLuint framebuffer_id)
 static void render_layer_group(BiContext* context,
                                BiLayerGroup *lg,
                                GLuint parent_framebuffer_id,
-                               RenderingContext rcontext
+                               BiRenderingContext rcontext
                               )
 {
   rcontext.interaction_enabled = rcontext.interaction_enabled && lg->interaction_enabled;
@@ -437,9 +276,30 @@ void bi_render(BiContext* context)
   context->profile.rendering_nodes_queue_size = 0;
 
   // rendering
-  RenderingContext rc = {true,true,1.0};
-  render_layer_group(context,&context->layers,0,rc);
+  BiRenderingContext rendering_context;
+  bi_rendering_context_init(&rendering_context,true,true,1.0,
+                            &context->_interaction_queue,
+                            &context->_timer_queue,
+                            &context->_rendering_queue);
+  render_layer_group(context,&context->layers,0,rendering_context);
 
   //
   SDL_GL_SwapWindow(context->window);
+}
+
+BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context,
+                                              bool visible,
+                                              bool interaction_enabled,
+                                              double time_scale,
+                                              Array* interaction_queue,
+                                              Array* timer_queue,
+                                              Array* rendering_queue)
+{
+  context->visible = visible;
+  context->interaction_enabled = interaction_enabled;
+  context->time_scale = time_scale;
+  context->interaction_queue = interaction_queue;
+  context->timer_queue = timer_queue;
+  context->rendering_queue = rendering_queue;
+  return context;
 }

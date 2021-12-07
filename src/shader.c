@@ -2,6 +2,8 @@
 #include <bi/matrix.h>
 #include <bi/util.h>
 #include <bi/bi_sdl.h>
+#include <bi/texture.h>
+#include <bi/node.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -89,45 +91,47 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4, vertex_index, GL_DYNAMIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // create vao
+  // generate vao
   glGenVertexArrays(1, &shader->vao);
   glBindVertexArray(shader->vao);
 
     // vertex
-    glBindBuffer(GL_ARRAY_BUFFER, shader->vertex_buffer);
-    glEnableVertexAttribArray ( shader->vertex_location );
-    glVertexAttribPointer ( shader->vertex_location, 2, GL_FLOAT, GL_FALSE, 0, NULL );
+    glBindBuffer(GL_ARRAY_BUFFER,shader->vertex_buffer);
+    glEnableVertexAttribArray(shader->vertex_location);
+    glVertexAttribPointer(shader->vertex_location,2,GL_FLOAT,GL_FALSE,0,NULL);
 
     // texture_uv
-    glBindBuffer(GL_ARRAY_BUFFER, shader->uv_buffer);
-    glEnableVertexAttribArray ( shader->texture_uv_location );
-    glVertexAttribPointer ( shader->texture_uv_location, 4, GL_FLOAT, GL_FALSE, 0, NULL );
+    glBindBuffer(GL_ARRAY_BUFFER,shader->uv_buffer);
+    glEnableVertexAttribArray(shader->texture_uv_location);
+    glVertexAttribPointer(shader->texture_uv_location, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
     // vertex_index (XXX: glVertexAttribIPointer is not available in WebGL 1.0)
-    glBindBuffer(GL_ARRAY_BUFFER, shader->vertex_index_buffer);
-    glEnableVertexAttribArray ( shader->vertex_index_location );
-    glVertexAttribPointer ( shader->vertex_index_location, 1, GL_FLOAT, GL_FALSE, 0, NULL );
+    glBindBuffer(GL_ARRAY_BUFFER,shader->vertex_index_buffer);
+    glEnableVertexAttribArray(shader->vertex_index_location);
+    glVertexAttribPointer(shader->vertex_index_location,1,GL_FLOAT,GL_FALSE,0,NULL);
 
     // opacity
-    glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
-    glEnableVertexAttribArray ( shader->opacity_location );
-    glVertexAttribPointer ( shader->opacity_location, 1, GL_FLOAT, GL_FALSE, 0, NULL );
+    glBindBuffer(GL_ARRAY_BUFFER,shader->opacity_buffer);
+    glEnableVertexAttribArray(shader->opacity_location );
+    glVertexAttribPointer(shader->opacity_location,1,GL_FLOAT,GL_FALSE,0,NULL);
 
     // texture_z (XXX: glVertexAttribIPointer is not available in WebGL 1.0)
-    glBindBuffer(GL_ARRAY_BUFFER, shader->texture_z_buffer);
-    glEnableVertexAttribArray ( shader->texture_z_location );
-    glVertexAttribPointer ( shader->texture_z_location, 1, GL_FLOAT, GL_FALSE, 0, NULL );
+    glBindBuffer(GL_ARRAY_BUFFER,shader->texture_z_buffer);
+    glEnableVertexAttribArray(shader->texture_z_location );
+    glVertexAttribPointer(shader->texture_z_location,1,GL_FLOAT,GL_FALSE,0,NULL);
 
     // tint color
-    glBindBuffer(GL_ARRAY_BUFFER, shader->tint_color_buffer);
-    glEnableVertexAttribArray ( shader->tint_color_location );
-    glVertexAttribPointer ( shader->tint_color_location, 4, GL_FLOAT, GL_FALSE, 0, NULL );
+    glBindBuffer(GL_ARRAY_BUFFER,shader->tint_color_buffer);
+    glEnableVertexAttribArray(shader->tint_color_location);
+    glVertexAttribPointer(shader->tint_color_location,4,GL_FLOAT,GL_FALSE,0,NULL);
 
     // transform
     for(int i=0;i<4;i++){
-      glBindBuffer(GL_ARRAY_BUFFER, shader->transform_buffer);
-      glEnableVertexAttribArray ( shader->transform_locations[i] );
-      glVertexAttribPointer ( shader->transform_locations[i], 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*4*4, NULL+sizeof(GLfloat)*4*i );
+      glBindBuffer(GL_ARRAY_BUFFER,shader->transform_buffer);
+      glEnableVertexAttribArray(shader->transform_locations[i] );
+      GLsizei stride = sizeof(GLfloat)*4*4;
+      void* position = NULL+sizeof(GLfloat)*4*i;
+      glVertexAttribPointer(shader->transform_locations[i],4,GL_FLOAT,GL_FALSE,stride,position);
     }
 
     // for instancing
@@ -141,6 +145,7 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
       glVertexAttribDivisor(shader->transform_locations[i], 1);
     }
 
+  // unbind vao
   glBindVertexArray(0);
 
   // set sampler2D
@@ -189,4 +194,92 @@ void bi_shader_set_camera(BiShader* shader,float w,float h,float x,float y,bool 
   bi_mat4_multiply(trans,camera,camera);
 
   glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
+}
+
+void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float* attributes)
+{
+  glUniform1f(shader->time_location, time);
+  glUniform2f(shader->resolution_location, w, h );
+  glUniform1f(shader->scale_location, scale );
+  glUniform4fv(shader->optional_attributes_location, 1, attributes );
+}
+
+void bi_shader_draw(BiShader* shader,Array* queue)
+{
+  const size_t len = queue->size;
+
+  GLfloat uv[4*len]; // [ left, top, right, bottom ]
+  GLfloat texture_z[len];
+  GLfloat opacity[len];
+  GLfloat transforms[len][16];
+  GLfloat tint[len][4];
+  for(int i=0;i<len;i++){
+    BiNode* node = queue->objects[i];
+    opacity[i] = node->opacity;
+    if(node->texture_mapping != NULL) {
+      // Left-Top is 0-0, Right-Bottom is 1-1.
+      BiTextureMapping *t = node->texture_mapping;
+      uv[i*4+0] = t->boundary[0]; // Left
+      uv[i*4+1] = t->boundary[1]; // Top
+      uv[i*4+2] = t->boundary[2]; // Right
+      uv[i*4+3] = t->boundary[3]; // Bottom
+      if(t->flip_horizontal) {
+        uv[i*4+0] = t->boundary[2];
+        uv[i*4+2] = t->boundary[0];
+      }
+      if(t->flip_vertical) {
+        uv[i*4+1] = t->boundary[3];
+        uv[i*4+3] = t->boundary[1];
+      }
+      texture_z[i] = t->texture->_texture_unit; // texture
+    }else{
+      texture_z[i] = -1; // no-texture
+    }
+
+    //
+    bi_mat4_copy(transforms[i], node->draw);
+
+    // color
+    tint[i][0] = node->color[0] / 255.0;
+    tint[i][1] = node->color[1] / 255.0;
+    tint[i][2] = node->color[2] / 255.0;
+    tint[i][3] = node->color[3] / 255.0;
+  }
+
+  //
+  // update vbo
+  // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
+  //
+  // opacity
+  glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, opacity);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // texture_z (texture index send as float. not integer.)
+  glBindBuffer(GL_ARRAY_BUFFER, shader->texture_z_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, texture_z);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // uv
+  glBindBuffer(GL_ARRAY_BUFFER, shader->uv_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, uv);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // transform
+  glBindBuffer(GL_ARRAY_BUFFER, shader->transform_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, transforms);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // tint color
+  glBindBuffer(GL_ARRAY_BUFFER, shader->tint_color_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, tint);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  //
+  // Draw instances
+  //
+  glBindVertexArray(shader->vao);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, len);
+  glBindVertexArray(0);
 }

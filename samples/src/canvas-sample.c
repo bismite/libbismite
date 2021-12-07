@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   // Canvas
   BiNode* face = make_sprite_with_anchor("assets/face01.png",0,0);
   BiNode* tile = make_sprite_with_anchor("assets/tile.png",0,0);
-  BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256);
+  BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256,context->default_texture);
   canvas->shader = &context->default_shader;
   canvas->textures[0] = face->texture_mapping->texture;
   canvas->textures[1] = tile->texture_mapping->texture;

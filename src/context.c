@@ -213,6 +213,16 @@ void bi_set_title(BiContext* context, const char* title)
   SDL_SetWindowTitle( context->window, title );
 }
 
+
+//
+// Layer
+//
+void bi_add_layer(BiContext* context, BiLayer* layer) { bi_layer_group_add_layer(&context->layers,layer); }
+void bi_update_layer_order(BiContext* context) { bi_layer_group_update_order(&context->layers); }
+void bi_remove_layer(BiContext* context, BiLayer* layer) { bi_layer_group_remove_layer(&context->layers,layer); }
+
+//
+// Shader
 //
 const char* bi_default_vertex_shader()
 {
@@ -223,10 +233,3 @@ const char* bi_default_fragment_shader()
 {
   return DEFAULT_FRAGMENT_SHADER;
 }
-
-//
-// Layer
-//
-void bi_add_layer(BiContext* context, BiLayer* layer) { bi_layer_group_add_layer(&context->layers,layer); }
-void bi_update_layer_order(BiContext* context) { bi_layer_group_update_order(&context->layers); }
-void bi_remove_layer(BiContext* context, BiLayer* layer) { bi_layer_group_remove_layer(&context->layers,layer); }

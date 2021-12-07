@@ -1,6 +1,5 @@
 #include <bi/node.h>
 #include <bi/matrix.h>
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -165,4 +164,86 @@ bool bi_node_inside(BiNode* node, int x, int y)
       return true;
     }
     return false;
+}
+
+//
+
+bool bi_node_update_matrix(BiNode* n)
+{
+  if( n->matrix_cached ) {
+    return false;
+  }
+  n->matrix_cached = true;
+
+  GLfloat tx = n->x;
+  GLfloat ty = n->y;
+  GLfloat sx = n->scale_x ;
+  GLfloat sy = n->scale_y ;
+  // XXX: non-zero angle calculation is super slow!
+  GLfloat cos_v = cos(n->angle);
+  GLfloat sin_v = sin(n->angle);
+  // local
+  GLfloat lx = - n->anchor_x * n->w;
+  GLfloat ly = - n->anchor_y * n->h;
+  GLfloat lsx = n->w;
+  GLfloat lsy = n->h;
+
+  // matrix chain
+  if(n->parent == NULL){
+    bi_mat4_identity( n->transform );
+  }else{
+    bi_mat4_copy( n->transform, n->parent->transform );
+  }
+
+  GLfloat trans[16] = {
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+     tx,  ty, 0.0, 1.0
+  };
+
+  // cos -sin  0  0      cos  sin  0  0
+  // sin  cos  0  0     -sin  cos  0  0
+  //   0    0  1  0  =>    0    0  1  0
+  //   0    0  0  1        0    0  0  1
+  GLfloat rotation[16] = {
+     cos_v, sin_v, 0.0, 0.0,
+    -sin_v, cos_v, 0.0, 0.0,
+       0.0,   0.0, 1.0, 0.0,
+       0.0,   0.0, 0.0, 1.0
+  };
+
+  GLfloat scale[16] = {
+   sx,  0,  0,  0,
+    0, sy,  0,  0,
+    0,  0,  1,  0,
+    0,  0,  0,  1
+  };
+
+  GLfloat local_trans[16] = {
+    1,  0,  0,  0,
+    0,  1,  0,  0,
+    0,  0,  1,  0,
+   lx, ly,  0,  1
+  };
+
+  GLfloat local_scale[16] = {
+   lsx,   0,  0,  0,
+     0, lsy,  0,  0,
+     0,   0,  1,  0,
+     0,   0,  0,  1
+  };
+
+  bi_mat4_multiply(trans,n->transform,n->transform);
+  bi_mat4_multiply(rotation,n->transform,n->transform);
+  bi_mat4_multiply(scale,n->transform,n->transform);
+  if( n->matrix_include_anchor_translate ) {
+    bi_mat4_multiply(local_trans,n->transform,n->transform); // include local transform
+    bi_mat4_multiply(local_scale,n->transform,n->draw);
+  } else {
+    bi_mat4_multiply(local_trans,n->transform,n->draw); // exclude local transform
+    bi_mat4_multiply(local_scale,n->draw,n->draw);
+  }
+
+  return true;
 }

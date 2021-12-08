@@ -26,7 +26,7 @@ static void bi_action_sequence_update(BiAction* action, double rate,int delta_ti
 {
   BiActionSequence* seq = action->action_data;
   //    t1                      t2
-  //    |-----------------------|
+  //    |----------delta--------|
   // x     yx         yx     yx   y
   // |--a--||----a----||--a--||-a-|
   int t1 = seq->progress;
@@ -39,7 +39,10 @@ static void bi_action_sequence_update(BiAction* action, double rate,int delta_ti
     y += a->duration;
     if( t1 <= y && x <= t2 ){
       double local_rate = a->duration==0 ? 1.0 : (double)(t2-x)/a->duration;
-      run(seq->actions[i], local_rate, delta_time);
+      int local_delta_start = t1 > x ? t1 : x;
+      int local_delta_end = y < t2 ? y : t2;
+      int local_delta = local_delta_end - local_delta_start;
+      run(seq->actions[i], local_rate, local_delta);
     }
     x = y;
   }

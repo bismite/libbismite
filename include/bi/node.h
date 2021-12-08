@@ -65,6 +65,7 @@ static inline BiNode* bi_node_child_at(BiNode* node,int index){ return (BiNode*)
 extern void bi_node_add_node(BiNode* node,BiNode* child);
 extern BiNode* bi_node_remove_at(BiNode* node,int index);
 extern BiNode* bi_node_remove_node(BiNode* node,BiNode* child);
+extern BiNode* bi_node_remove_from_parent(BiNode* node);
 
 // geometry
 extern void bi_node_set_position(BiNode* n, int x, int y);

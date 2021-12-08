@@ -69,6 +69,12 @@ BiNode* bi_node_remove_node(BiNode* node,BiNode* child)
   return array_remove_object(&node->children,child);
 }
 
+BiNode* bi_node_remove_from_parent(BiNode* node)
+{
+  if(node && node->parent) return bi_node_remove_node(node->parent,node);
+  return NULL;
+}
+
 //
 // geometry
 //

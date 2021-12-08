@@ -25,18 +25,17 @@ BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h,GLuint default_texture)
 
 void bi_canvas_draw(BiCanvas* canvas,BiNode* node)
 {
+  //
+  if(node==NULL) return;
+  bi_node_remove_from_parent(node);
+
+  // queue
   Array queue;
   array_init(&queue);
   BiRenderingContext context;
-  bi_rendering_context_init(&context,true,false,0,
-                            NULL,
-                            NULL,
-                            &queue);
+  bi_rendering_context_init(&context,true,false,0,NULL,NULL,&queue);
   bi_render_queuing(context, node);
-
-
-  const size_t len = queue.size;
-  if(len==0) return;
+  if(queue.size==0) return;
 
   // viewport setting
   GLint original_viewport[4];

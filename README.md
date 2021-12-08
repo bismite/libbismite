@@ -1,6 +1,14 @@
 # libbismite
 
 # Change Log
+## 1.0.9 - wip
+- add canvas system
+- timer system overhaul (delta time,saturation,etc)
+  - on_update removed from node
+  - global timer removed from context
+  - add timers to layer and layer group
+- update and add some actions
+- sprite tinting method changed
 ## 1.0.8 - 2021/09/23
 - ext and samples have been merged.
 - renamed to libbismite

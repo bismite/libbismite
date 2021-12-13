@@ -5,7 +5,7 @@ BiLayer* bi_layer_init(BiLayer* layer)
 {
   bi_raw_node_init((BiRawNode*)layer,BI_NODE_TYPE_LAYER);
 
-  layer->blend_factor.src = GL_SRC_ALPHA;
+  layer->blend_factor.src = GL_ONE;
   layer->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
   layer->blend_factor.alpha_src = GL_ONE;
   layer->blend_factor.alpha_dst = GL_ONE_MINUS_SRC_ALPHA;

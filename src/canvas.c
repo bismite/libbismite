@@ -1,5 +1,6 @@
 #include <bi/canvas.h>
 #include <bi/matrix.h>
+#include <bi/camera.h>
 #include <bi/bi_gl.h>
 #include <bi/render.h>
 #include <bi/node.h>
@@ -12,7 +13,7 @@ BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h,GLuint default_texture)
   canvas->h = h;
   canvas->default_texture = default_texture;
   bi_framebuffer_init(&canvas->framebuffer,w,h);
-  bi_set_blend_factor(&canvas->blend_factor,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+  bi_set_blend_factor(&canvas->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
   canvas->shader = NULL;
   for(int i=0;i<4;i++) {
     canvas->shader_attributes[i] = 0;
@@ -56,7 +57,9 @@ void bi_canvas_draw(BiCanvas* canvas,BiNode* node)
   bi_render_activate_textures(canvas->default_texture,canvas->textures);
 
   // set projection and view
-  bi_shader_set_camera(shader, canvas->w, canvas->h, 0,0, true);
+  GLfloat camera[16];
+  bi_camera_matrix(camera,0,0,canvas->w,canvas->h,true);
+  glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
 
   // blend function
   glBlendFuncSeparate(

@@ -99,8 +99,12 @@ __attribute__((unused)) static BiNode* make_sprite_with_anchor(const char* name,
 
 __attribute__((unused)) static void print_info(BiContext *context)
 {
-  printf("Window Size: %d,%d\n",context->w,context->h);
   printf("bismite version: %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);
+  printf("Window Size: %d,%d\n",context->w,context->h);
+  //
+  GLint viewport[4] = {0};
+  glGetIntegerv(GL_VIEWPORT, viewport);
+  printf("OpenGL ViewPort Size: %d,%d\n",viewport[2],viewport[3]);
 
 #ifdef EMSCRIPTEN
   printf("emscripten version: %d.%d.%d\n", __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__ );

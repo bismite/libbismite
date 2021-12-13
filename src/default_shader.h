@@ -83,7 +83,7 @@ void main()
   int samplerID = int(uv.z);
   if( 0 <= samplerID && samplerID < 16 ) {
     vec4 c = getTextureColor(samplerID, uv.xy);
-    gl_FragColor = vec4(_tint_color.rgb*_tint_color.a + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
+    gl_FragColor = vec4(_tint_color.rgb*_tint_color.a*c.a+c.rgb*(1.0-_tint_color.a),c.a) * _opacity;
   }else{
     gl_FragColor = _tint_color * _opacity;
   }

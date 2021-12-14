@@ -127,7 +127,7 @@ BiTextureMapping* bi_texture_mapping_init(BiTextureMapping* texture_mapping,BiTe
   texture_mapping->y = 0;
   texture_mapping->w = 0;
   texture_mapping->h = 0;
-  for(int i=0;i<4;i++) texture_mapping->boundary[i] = 0;
+  memset(texture_mapping->_uv,0,sizeof(texture_mapping->_uv));
   if(texture){
     bi_texture_mapping_set_bound(texture_mapping,0,0,texture->w,texture->h);
   }
@@ -143,10 +143,10 @@ void bi_texture_mapping_set_bound(BiTextureMapping* t, uint16_t x, uint16_t y, u
   t->w = w;
   t->h = h;
   // left, top, right, bottom
-  double tw = t->texture->w;
-  double th = t->texture->h;
-  t->boundary[0] = x / tw;
-  t->boundary[1] = y / th;
-  t->boundary[2] = (x+w) / tw;
-  t->boundary[3] = (y+h) / th;
+  GLfloat tw = t->texture->w;
+  GLfloat th = t->texture->h;
+  t->_uv[0] = x / tw;
+  t->_uv[1] = (y+h) / th;
+  t->_uv[2] = (x+w) / tw;
+  t->_uv[3] = y / th;
 }

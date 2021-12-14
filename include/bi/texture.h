@@ -20,9 +20,9 @@ struct _BiTexture {
 struct _BiTextureMapping {
   BiTexture *texture;
   uint16_t x,y,w,h;
-  double boundary[4]; // left,top,right,bottom
   bool flip_horizontal;
   bool flip_vertical;
+  GLfloat _uv[4]; // left,top,right,bottom
 };
 
 extern BiTexture* bi_texture_init_with_pixels(BiTexture* texture, int w, int h, void* pixels, GLint internal_format, GLenum format, bool antialias);

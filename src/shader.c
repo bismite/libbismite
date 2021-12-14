@@ -178,21 +178,22 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     BiNode* node = queue->objects[i];
     opacity[i] = node->opacity;
     if(node->texture_mapping != NULL) {
-      // Left-Top is 0-0, Right-Bottom is 1-1.
       BiTextureMapping *t = node->texture_mapping;
-      uv[i*4+0] = t->boundary[0]; // Left
-      uv[i*4+1] = t->boundary[1]; // Top
-      uv[i*4+2] = t->boundary[2]; // Right
-      uv[i*4+3] = t->boundary[3]; // Bottom
       if(t->flip_horizontal) {
-        uv[i*4+0] = t->boundary[2];
-        uv[i*4+2] = t->boundary[0];
+        uv[i*4+0] = t->_uv[2]; // Left <-> Right
+        uv[i*4+2] = t->_uv[0];
+      }else{
+        uv[i*4+0] = t->_uv[0];
+        uv[i*4+2] = t->_uv[2];
       }
-      if(t->flip_vertical) {
-        uv[i*4+1] = t->boundary[3];
-        uv[i*4+3] = t->boundary[1];
+      if(!t->flip_vertical) { // XXX: DEFAULT flipped
+        uv[i*4+1] = t->_uv[3]; // Top <-> Bottom
+        uv[i*4+3] = t->_uv[1];
+      }else{
+        uv[i*4+1] = t->_uv[1];
+        uv[i*4+3] = t->_uv[3];
       }
-      texture_z[i] = t->texture->_texture_unit; // texture
+      texture_z[i] = t->texture->_texture_unit;
     }else{
       texture_z[i] = -1; // no-texture
     }

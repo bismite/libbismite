@@ -17,9 +17,12 @@ void (*glVertexAttribDivisor)(GLuint,GLuint);
 PFNGLACTIVETEXTUREPROC glActiveTexture;
 #endif
 PFNGLUSEPROGRAMPROC glUseProgram;
+PFNGLUNIFORM1IVPROC glUniform1iv;
+PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM2FPROC glUniform2f;
 PFNGLUNIFORM4FVPROC glUniform4fv;
+PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
@@ -35,12 +38,11 @@ PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLLINKPROGRAMPROC  glLinkProgram;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-PFNGLUNIFORM1IVPROC glUniform1iv;
-PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLGENBUFFERSPROC glGenBuffers;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
 #define GLP(name) do{ name = SDL_GL_GetProcAddress( #name ); }while(0)
@@ -54,9 +56,12 @@ static void enable_gl_extensions(BiContext* context)
     GLP(glActiveTexture);
 #endif
     GLP(glUseProgram);
+    GLP(glUniform1i);
+    GLP(glUniform1iv);
     GLP(glUniform1f);
     GLP(glUniform2f);
     GLP(glUniform4fv);
+    GLP(glUniformMatrix4fv);
     GLP(glBindBuffer);
     GLP(glBufferData);
     GLP(glBufferSubData);
@@ -72,12 +77,11 @@ static void enable_gl_extensions(BiContext* context)
     GLP(glLinkProgram);
     GLP(glGetUniformLocation);
     GLP(glGetAttribLocation);
-    GLP(glUniform1iv);
-    GLP(glUniformMatrix4fv);
     GLP(glGenBuffers);
     GLP(glEnableVertexAttribArray);
     GLP(glVertexAttribPointer);
     GLP(glGenFramebuffers);
+    GLP(glDeleteFramebuffers);
     GLP(glFramebufferTexture2D);
     GLP(glBlendFuncSeparate);
 #endif

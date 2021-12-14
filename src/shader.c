@@ -1,5 +1,6 @@
 #include <bi/shader.h>
 #include <bi/matrix.h>
+#include <bi/camera.h>
 #include <bi/util.h>
 #include <bi/bi_sdl.h>
 #include <bi/texture.h>
@@ -68,6 +69,13 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
 void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source)
 {
   load_shader(shader,vertex_shader_source,fragment_shader_source);
+
+  // set unit to sampler2D
+  glUseProgram(shader->program_id);
+  int texture_location_indexes[BI_LAYER_MAX_TEXTURES];
+  for(int i=0; i<BI_LAYER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
+  glUniform1iv(shader->texture_locations[0], BI_LAYER_MAX_TEXTURES, texture_location_indexes);
+  glUseProgram(0);
 
   // create vbo
   glGenBuffers(1, &shader->uv_buffer);
@@ -147,53 +155,6 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
 
   // unbind vao
   glBindVertexArray(0);
-
-  // set sampler2D
-  glUseProgram(shader->program_id);
-  int texture_location_indexes[BI_LAYER_MAX_TEXTURES];
-  for(int i=0; i<BI_LAYER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
-  glUniform1iv(shader->texture_locations[0], BI_LAYER_MAX_TEXTURES, texture_location_indexes);
-}
-
-void bi_shader_set_camera(BiShader* shader,float w,float h,float x,float y,bool flip_vertical)
-{
-  // Projection
-  GLfloat camera[16] = {
-    2.0/w,   0.0, 0.0, 0.0,
-      0.0, 2.0/h, 0.0, 0.0,
-      0.0,   0.0, 1.0, 0.0,
-     -1.0,  -1.0, 0.0, 1.0
-  };
-
-  // upside-down for framebuffer
-  if(flip_vertical){
-    GLfloat flip_scale[16] = {
-      1.0, 0.0, 0.0, 0.0,
-      0.0,-1.0, 0.0, 0.0,
-      0.0, 0.0, 1.0, 0.0,
-      0.0, 0.0, 0.0, 1.0
-    };
-    GLfloat flip_trans[16] = {
-      1.0, 0.0, 0.0, 0.0,
-      0.0, 1.0, 0.0, 0.0,
-      0.0, 0.0, 1.0, 0.0,
-      0.0,  -h, 0.0, 1.0
-    };
-    bi_mat4_multiply(flip_scale,camera,camera);
-    bi_mat4_multiply(flip_trans,camera,camera);
-  }
-
-  // Trans
-  GLfloat trans[16] = {
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0,
-     -x,  -y, 0.0, 1.0
-  };
-
-  bi_mat4_multiply(trans,camera,camera);
-
-  glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
 }
 
 void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float* attributes)

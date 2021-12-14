@@ -26,9 +26,12 @@ extern void (*glVertexAttribDivisor)(GLuint,GLuint);
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
 #endif
 extern PFNGLUSEPROGRAMPROC glUseProgram;
+extern PFNGLUNIFORM1IVPROC glUniform1iv;
+extern PFNGLUNIFORM1IPROC glUniform1i;
 extern PFNGLUNIFORM1FPROC glUniform1f;
 extern PFNGLUNIFORM2FPROC glUniform2f;
 extern PFNGLUNIFORM4FVPROC glUniform4fv;
+extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 extern PFNGLBINDBUFFERPROC glBindBuffer;
 extern PFNGLBUFFERDATAPROC glBufferData;
 extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
@@ -44,12 +47,11 @@ extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLLINKPROGRAMPROC  glLinkProgram;
 extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-extern PFNGLUNIFORM1IVPROC glUniform1iv;
-extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 extern PFNGLGENBUFFERSPROC glGenBuffers;
 extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 extern PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 extern PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
 #endif

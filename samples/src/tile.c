@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define TILE_SIZE 64
+#define TILE_SIZE 32
 
 static BiNode* create_tile(int x, int y,BiTexture *tex)
 {
@@ -37,7 +37,6 @@ int main(int argc,char* argv[])
     int y = i / W * TILE_SIZE;
     bi_node_add_node(layer->root,create_tile(x,y,texture));
   }
-
 
   // fps layer
   add_fps_layer(context,load_font());

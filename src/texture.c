@@ -4,14 +4,17 @@
 #include <bi/logger.h>
 #include <bi/layer.h>
 
-static GLuint create_texture_from_pixels(int w, int h, void*pixels, GLint internal_format, GLenum format, bool antialiase)
+extern GLuint bi_texture_convert_to_premultiplied_alpha(GLuint texture_id,GLint tex_format,int w,int h);
+
+static GLuint create_texture_from_pixels(int w, int h, void*pixels,
+                                         GLint tex_format, GLenum img_format, bool antialiase)
 {
   GLuint texture_id;
   glGenTextures(1, &texture_id);
 
   //
   glBindTexture(GL_TEXTURE_2D, texture_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format, GL_UNSIGNED_BYTE, pixels);
+  glTexImage2D(GL_TEXTURE_2D, 0, tex_format, w, h, 0, img_format, GL_UNSIGNED_BYTE, pixels);
 
   //
   if(antialiase) {
@@ -32,22 +35,22 @@ static GLuint create_texture_from_pixels(int w, int h, void*pixels, GLint intern
   return texture_id;
 }
 
-static bool get_format(SDL_PixelFormatEnum sdl_format, GLint* internal_format, GLenum* format)
+static bool get_format(SDL_PixelFormatEnum sdl_format, GLint* tex_format, GLenum* img_format)
 {
   switch(sdl_format) {
     case SDL_PIXELFORMAT_ABGR8888:
     case SDL_PIXELFORMAT_BGR888:
-      *internal_format = GL_RGBA;
-      *format = GL_RGBA;
+      *tex_format = GL_RGBA;
+      *img_format = GL_RGBA;
       break;
     case SDL_PIXELFORMAT_ARGB8888:
     case SDL_PIXELFORMAT_RGB888:
-      *internal_format = GL_RGBA;
-      *format = GL_BGRA_EXT;
+      *tex_format = GL_RGBA;
+      *img_format = GL_BGRA_EXT;
       break;
     case SDL_PIXELFORMAT_RGB24:
-      *internal_format = GL_RGB;
-      *format = GL_RGB;
+      *tex_format = GL_RGB;
+      *img_format = GL_RGB;
       break;
     default:
       return false;
@@ -63,24 +66,35 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
     return NULL;
   }
 
-  GLint internal_format;
-  GLenum format;
-  if( get_format(img->format->format,&internal_format,&format) ) {
-    texture->texture_id = create_texture_from_pixels(img->w,img->h,img->pixels,internal_format,format,antialias);
+  GLuint texture_id = 0;
+  GLint tex_format;
+  GLenum img_format;
+  if( get_format(img->format->format,&tex_format,&img_format) ) {
+    texture_id = create_texture_from_pixels(img->w,img->h,img->pixels,tex_format,img_format,antialias);
+  }else{
+    SDL_Surface* tmp = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_ABGR8888, 0);
+    if(tmp) {
+      tex_format = GL_RGBA;
+      img_format = GL_RGBA;
+      texture_id = create_texture_from_pixels(tmp->w,tmp->h,tmp->pixels,tex_format,img_format,antialias);
+      SDL_FreeSurface(tmp);
+    }else{
+      LOG("ConvertSurfaceFormat failed. Format:%s Error:%s",
+          SDL_GetPixelFormatName(img->format->format), SDL_GetError() );
+    }
+  }
+
+  // convert to Premulitiplied Alpha Texture
+  if(tex_format==GL_RGBA){
+    texture->texture_id = bi_texture_convert_to_premultiplied_alpha(texture_id,tex_format,img->w,img->h);
     texture->w = img->w;
     texture->h = img->h;
     texture->_texture_unit = 0;
   }else{
-    SDL_Surface* tmp = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_ABGR8888, 0);
-    if (tmp ) {
-      texture->texture_id = create_texture_from_pixels(tmp->w,tmp->h,tmp->pixels,GL_RGBA,GL_RGBA,antialias);
-      texture->w = tmp->w;
-      texture->h = tmp->h;
-      texture->_texture_unit = 0;
-      SDL_FreeSurface(tmp);
-    }else{
-      LOG("ConvertSurfaceFormat failed. Format:%s Error:%s", SDL_GetPixelFormatName(img->format->format), SDL_GetError() );
-    }
+    texture->texture_id = texture_id;
+    texture->w = img->w;
+    texture->h = img->h;
+    texture->_texture_unit = 0;
   }
 
   SDL_FreeSurface(img);

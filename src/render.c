@@ -2,6 +2,7 @@
 #include <bi/node.h>
 #include <bi/context.h>
 #include <bi/matrix.h>
+#include <bi/camera.h>
 #include <bi/layer.h>
 #include <bi/bi_gl.h>
 #include <math.h>
@@ -141,7 +142,9 @@ static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext r
   bi_render_activate_textures(context->default_texture,layer->textures);
 
   // set projection and view
-  bi_shader_set_camera(shader, context->w, context->h, layer->camera_x, layer->camera_y, false);
+  GLfloat camera[16];
+  bi_camera_matrix(camera,layer->camera_x,layer->camera_y,context->w,context->h,false);
+  glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
 
   // blend function
   glBlendFuncSeparate(

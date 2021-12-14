@@ -1,7 +1,8 @@
 # libbismite
 
 # Change Log
-## 1.0.9 - wip
+## 1.1.0 - 2021/12/15
+- textures convert to premultiplied alpha in loading.
 - add canvas system
 - timer system overhaul (delta time,saturation,etc)
   - on_update removed from node

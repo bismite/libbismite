@@ -44,7 +44,8 @@ void bi_load_font_layout_from_file(const char *filename, BiFontAtlas* font)
   SDL_RWclose(rwops);
 }
 
-void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font, uint8_t r, uint8_t g, uint8_t b, uint8_t a  )
+void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font,
+                     uint8_t r, uint8_t g, uint8_t b, uint8_t a  )
 {
   // text
   size_t textlen = strlen(text);

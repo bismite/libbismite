@@ -98,13 +98,9 @@ BiTexture* bi_canvas_to_texture(BiCanvas* canvas,BiTexture* texture)
 void bi_canvas_save_png_image(BiCanvas* canvas,const char *filename)
 {
   uint8_t* pixels = malloc(8*canvas->w*canvas->h);
-  glBindTexture(GL_TEXTURE_2D,canvas->framebuffer.texture_id);
-#ifdef __EMSCRIPTEN__
+  glBindFramebuffer(GL_FRAMEBUFFER,canvas->framebuffer.framebuffer_id);
   glReadPixels(0,0,canvas->w,canvas->h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
-#else
-  glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
-#endif
-  glBindTexture(GL_TEXTURE_2D,0);
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
   const int w = canvas->w;
   const int h = canvas->h;
   const int pitch = 4*w;

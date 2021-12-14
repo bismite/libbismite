@@ -20,6 +20,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(face,context->w/2,context->h/2);
   bi_node_set_scale_x(face,2.0);
   bi_node_set_scale_y(face,2.0);
+  bi_node_set_degree(face,45);
   bi_node_add_node(root,face);
 
   // layer

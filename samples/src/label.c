@@ -2,18 +2,15 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, true, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
   print_info(context);
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
 
   // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
+  BiNode* root = bi_node_init(ALLOC(BiNode));
   layer->root = root;
 
   // font

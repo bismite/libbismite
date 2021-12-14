@@ -28,8 +28,7 @@ __attribute__((unused)) static BiFontAtlas* load_font()
 static BiNode* create_fps_label(BiContext* context, BiFontAtlas *font)
 {
     // label
-    BiNode* label = malloc(sizeof(BiNode));
-    bi_node_init(label);
+    BiNode* label = bi_node_init(malloc(sizeof(BiNode)));
     label->userdata = font;
     bi_set_color(label->color, 0,0,0,0xFF);
     bi_update_label(label, "FPS:00.00", font, 0xff,0xff,0xff,0xff);

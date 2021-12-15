@@ -18,7 +18,8 @@ typedef enum {
   int _index; \
   bool interaction_enabled; \
   BiTimerManager timers; \
-  double time_scale;
+  double time_scale; \
+  void* userdata;
 
 struct _BiRawNode{
   BI_NODE_HEADER

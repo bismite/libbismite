@@ -53,8 +53,6 @@ struct _BiNode {
   on_touch_callback _on_touch;
   on_keyinput_callback _on_keyinput;
   on_textinput_callback _on_textinput;
-
-  void* userdata;
 };
 
 

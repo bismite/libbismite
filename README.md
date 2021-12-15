@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 1.1.3 - 2021/12/15
+- all Node type structures(Node,Layer,LayerGroup) has `void* userdata`
+- include/bi/node_base.h : add stdbool.h
 ## 1.1.1 - 2021/12/15
 - small updates for actions.
 ## 1.1.0 - 2021/12/15

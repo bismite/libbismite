@@ -1,5 +1,5 @@
-#ifndef __BI_BISMITE_H__
-#define __BI_BISMITE_H__
+#ifndef __BISMITE_H__
+#define __BISMITE_H__
 
 #include <bi/array.h>
 #include <bi/bi_gl.h>
@@ -18,7 +18,7 @@
 #include <bi/util.h>
 
 #define BISMITE_MAJOR_VERSION 1
-#define BISMITE_MINOR_VERSION 0
-#define BISMITE_PATCHLEVEL 0
+#define BISMITE_MINOR_VERSION 1
+#define BISMITE_PATCHLEVEL 4
 
 #endif

@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
   BiContext* context = malloc(sizeof(BiContext));
   bi_init_context(context, 480, 320, 0, true, __FILE__);
 
-  transition_shader = create_shader("assets/shaders/default.vert","assets/shaders/transition.frag");
+  transition_shader = create_shader_with_default_vertex_shader("assets/shaders/transition.frag");
 
   layer_a = scene_a(context);
   layer_b = scene_b(context);

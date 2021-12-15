@@ -1,7 +1,7 @@
 # libbismite
 
 # Change Log
-## 1.1.5 - 2021/12/16
+## 1.1.6 - 2021/12/16
 - all Node type structures(Node,Layer,LayerGroup) has `void* userdata`
 - include/bi/node_base.h : add stdbool.h
 - reorganize timer handler.

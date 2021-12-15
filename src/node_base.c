@@ -19,12 +19,12 @@ void bi_raw_node_add_timer(BiRawNode* node, BiTimer* timer)
 {
   if(timer==NULL) return;
   if(timer->node) return;
-  timer->node = node;
   for(int i=0;i<node->timers.size;i++){
     if(node->timers.timers[i] == timer){
       return; // already
     }
   }
+  timer->node = node;
   node->timers.size += 1;
   node->timers.timers = realloc(node->timers.timers, sizeof(BiTimer*)*node->timers.size);
   node->timers.timers[node->timers.size-1] = timer;
@@ -33,10 +33,10 @@ void bi_raw_node_add_timer(BiRawNode* node, BiTimer* timer)
 void bi_raw_node_remove_timer(BiRawNode* node, BiTimer* timer)
 {
   if(timer==NULL) return;
-  timer->node = NULL;
   for(int i=0;i<node->timers.size;i++){
     if(node->timers.timers[i] == timer){
       node->timers.timers[i] = NULL;
+      timer->node = NULL;
       return;
     }
   }

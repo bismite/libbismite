@@ -67,7 +67,7 @@ static void init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
   bi_set_color(faces[1]->color,0,0,0xFF,0xFF);
   BiTimer *t = malloc(sizeof(BiTimer));
   bi_timer_init(t, rotate_on_timer, 0, -1, faces[1]);
-  bi_timer_manager_add_timer(&faces[1]->timers,t);
+  bi_node_add_timer(faces[1],t);
 }
 
 int main(int argc, char* argv[])

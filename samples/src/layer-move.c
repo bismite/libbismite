@@ -56,7 +56,7 @@ int main(int argc,char* argv[])
 
   // look around
   layer_camera_position(layer,0);
-  bi_node_add_timer(layer,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,NULL));
+  bi_layer_add_timer(layer,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,NULL));
 
   // fps layer
   add_fps_layer(context,load_font());

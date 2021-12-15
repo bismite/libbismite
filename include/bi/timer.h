@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 typedef struct _BiTimer BiTimer;
-typedef struct _BiTimerManager BiTimerManager;
 typedef struct _BiContext BiContext;
 typedef struct _BiRawNode BiRawNode;
 
@@ -22,7 +21,6 @@ struct _BiTimer {
   timer_callback callback;
   void* userdata;
   BiTimerState state;
-  BiTimerManager* manager;
   BiRawNode *node;
 };
 
@@ -33,16 +31,5 @@ extern BiTimer* bi_timer_init(BiTimer* timer,
                               void* userdata);
 extern void bi_timer_pause(BiTimer* timer);
 extern void bi_timer_resume(BiTimer* timer);
-
-struct _BiTimerManager {
-  int size;
-  BiTimer **timers;
-  double scale;
-};
-
-extern void bi_timer_manager_init(BiTimerManager* timers);
-extern void bi_timer_manager_run(BiContext* context, BiTimerManager* timers,double delta_time);
-extern void bi_timer_manager_add_timer(BiTimerManager* timers, BiTimer* timer);
-extern void bi_timer_manager_remove_timer(BiTimerManager* timers, BiTimer* timer);
 
 #endif

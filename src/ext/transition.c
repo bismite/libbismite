@@ -38,7 +38,7 @@ static void transition_update(BiContext* context,BiTimer* timer,double delta_tim
 
   if(transition->_done){
     // finish
-    bi_node_remove_timer(transition->layer_group,&transition->timer);
+    bi_layer_group_remove_timer(transition->layer_group,&transition->timer);
     bi_layer_group_remove_layer(transition->layer_group,&transition->layer);
     transition->layer_group->interaction_enabled = true;
     if(transition->callback){
@@ -63,5 +63,5 @@ void bi_transition_start(BiContext* context, BiTransition* transition)
   transition->delay_count = 1;
   transition->progress = 0.0;
   bi_timer_init(&transition->timer,transition_update,0,-1,transition);
-  bi_node_add_timer(transition->layer_group,&transition->timer);
+  bi_layer_group_add_timer(transition->layer_group,&transition->timer);
 }

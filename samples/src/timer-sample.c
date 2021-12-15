@@ -13,7 +13,7 @@ static void pause_rotate(BiContext* context,BiTimer* timer,double dt)
   printf("pause_rotate : %lld\n", (long long)bi_get_now());
   if(timer->count==0){
     printf("remove timer pause_rotate\n");
-    bi_timer_manager_remove_timer(timer->manager,timer);
+    bi_raw_node_remove_timer(timer->node,timer);
     free(timer);
   }
 }
@@ -24,7 +24,7 @@ static void resume_rotate(BiContext* context,BiTimer* timer,double dt)
   printf("resume_rotate : %lld\n", (long long)bi_get_now());
   if(timer->count==0){
     printf("remove timer resume_rotate\n");
-    bi_timer_manager_remove_timer(timer->manager,timer);
+    bi_raw_node_remove_timer(timer->node,timer);
     free(timer);
   }
 }
@@ -38,7 +38,7 @@ static void enlarge(BiContext *context,BiTimer* timer,double dt)
   counter++;
   if(counter>2){
     printf("enlarge timer sucide\n");
-    bi_timer_manager_remove_timer(timer->manager,timer);
+    bi_raw_node_remove_timer(timer->node,timer);
     free(timer);
   }
 }
@@ -52,30 +52,23 @@ static void change_color(BiContext* context,BiTimer* timer,double dt)
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, false, __FILE__);
+  BiContext* context = bi_init_context(malloc(sizeof(BiContext)),480,320,0,false,__FILE__);
   print_info(context);
 
-  // root node
-  BiNode* root = make_sprite("assets/check.png");
-  bi_node_set_position(root,context->w/2,context->h/2);
-
-  // sprite node
-  BiNode* face = make_sprite("assets/face01.png");
-  bi_node_add_node(root,face);
-
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
-  layer->textures[0] = root->texture_mapping->texture;
-  layer->textures[1] = face->texture_mapping->texture;
+  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   bi_add_layer(context,layer);
-  layer->root = root;
+  layer->root = make_sprite_with_anchor("assets/check.png",0,0);;
+  BiNode* face = make_sprite("assets/face01.png");
+  bi_node_set_position(face,context->w/2,context->h/2);
+  bi_node_add_node(layer->root,face);
+  layer->textures[0] = layer->root->texture_mapping->texture;
+  layer->textures[1] = face->texture_mapping->texture;
 
   // timer on layer group
-  bi_node_add_timer(&context->layers,bi_timer_init(malloc(sizeof(BiTimer)),enlarge,1000,-1,face));
+  bi_layer_group_add_timer(&context->layers,bi_timer_init(malloc(sizeof(BiTimer)),enlarge,1000,-1,face));
   // timer on layer
-  bi_node_add_timer(layer,bi_timer_init(malloc(sizeof(BiTimer)),change_color,500,3,face));
+  bi_layer_add_timer(layer,bi_timer_init(malloc(sizeof(BiTimer)),change_color,500,3,face));
 
   // rotate
   BiTimer *rotate_timer = bi_timer_init(malloc(sizeof(BiTimer)),rotate,10,-1,NULL);

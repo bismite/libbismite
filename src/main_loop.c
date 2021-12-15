@@ -89,7 +89,7 @@ static void main_loop( void* arg )
     BiRawNode *n = context->_timer_queue.objects[i];
     if( n == NULL ) continue;
     // Timer
-    bi_timer_manager_run(context,&n->timers,delta_time);
+    bi_node_run_timers(context,n,delta_time);
   }
   // callback
   for(int i=context->_interaction_queue.size-1;i>=0;i--){

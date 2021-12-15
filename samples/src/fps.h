@@ -36,7 +36,7 @@ static BiNode* create_fps_label(BiContext* context, BiFontAtlas *font)
     // timer
     BiTimer *timer = malloc(sizeof(BiTimer));
     bi_timer_init(timer, label_fps_indicate, 100, -1, label);
-    bi_timer_manager_add_timer(&label->timers,timer);
+    bi_node_add_timer(label,timer);
 
     return label;
 }

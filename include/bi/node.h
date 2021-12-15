@@ -10,6 +10,7 @@
 
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
+typedef struct _BiTimer BiTimer;
 
 typedef bool (*on_click_callback)(BiContext*, BiNode*, int, int, int, bool); // x,y,button,pressed
 typedef bool (*on_move_cursor_callback)(BiContext*, BiNode*, int, int); // x, y
@@ -84,7 +85,9 @@ extern void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_i
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);
 
-extern bool bi_node_update_matrix(BiNode* n);
+// Timer
+static inline void bi_node_add_timer(BiNode* node,BiTimer* timer){ bi_raw_node_add_timer((BiRawNode*)node,timer); }
+static inline void bi_node_remove_timer(BiNode* node,BiTimer* timer){ bi_raw_node_remove_timer((BiRawNode*)node,timer); }
 
 // event handler
 static inline void bi_node_set_on_click(BiNode* node, on_click_callback callback){node->_on_click = callback;}
@@ -93,5 +96,8 @@ static inline void bi_node_set_on_move_finger(BiNode* node, on_move_finger_callb
 static inline void bi_node_set_on_touch(BiNode* node, on_touch_callback callback){node->_on_touch = callback;}
 static inline void bi_node_set_on_keyinput(BiNode* node, on_keyinput_callback callback){node->_on_keyinput = callback;}
 static inline void bi_node_set_on_textinput(BiNode* node, on_textinput_callback callback){node->_on_textinput = callback;}
+
+//
+extern bool bi_node_update_matrix(BiNode* n);
 
 #endif

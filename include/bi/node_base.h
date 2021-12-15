@@ -1,7 +1,8 @@
-#ifndef __BI_CORE_NODE_BASE_H__
-#define __BI_CORE_NODE_BASE_H__
+#ifndef __BISMITE_NODE_BASE_H__
+#define __BISMITE_NODE_BASE_H__
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <bi/timer.h>
 
 typedef struct _BiRawNode BiRawNode;

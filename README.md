@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 1.1.1 - 2021/12/15
+- small updates for actions.
 ## 1.1.0 - 2021/12/15
 - textures convert to premultiplied alpha in loading.
 - add canvas system

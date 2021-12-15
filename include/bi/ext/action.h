@@ -29,7 +29,7 @@ struct _BiAction {
   void* on_finish_callback_context;
 };
 
-extern void bi_action_init(BiAction *action);
+extern BiAction* bi_action_init(BiAction *action);
 extern void bi_action_start(BiAction *action);
 extern void bi_add_action(BiNode* node, BiAction* action);
 extern void bi_remove_action(BiNode* node, BiAction* action);

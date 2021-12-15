@@ -14,8 +14,7 @@ static void callback_change_color(BiAction* action, void* payload)
 
 static BiAction* alloc_action(size_t size, void* func, void* payload)
 {
-  BiAction* action = malloc(sizeof(BiAction));
-  bi_action_init(action);
+  BiAction* action = bi_action_init(malloc(sizeof(BiAction)));
   action->action_data = malloc(size);
   action->on_finish = func;
   action->on_finish_callback_context = payload;
@@ -97,28 +96,19 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, false, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
   print_info(context);
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  layer->root = make_sprite_with_anchor("assets/check.png",0,0);
+  bi_add_layer(context,layer);
 
-  // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
-  layer->root = root;
-
-  BiNode* bg = make_sprite("assets/check.png");
-  bi_node_set_position(bg,context->w/2,context->h/2);
-  bi_node_add_node(root,bg);
-
-  // texture node
+  // sprite
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_set_position(face,240,160);
-  bi_node_add_node(root,face);
-  layer->textures[0] = bg->texture_mapping->texture;
+  bi_node_add_node(layer->root,face);
+  layer->textures[0] = layer->root->texture_mapping->texture;
   layer->textures[1] = face->texture_mapping->texture;
 
   // callback
@@ -126,8 +116,6 @@ int main(int argc, char* argv[])
 
   // action
   add_action(face);
-
-  bi_add_layer(context,layer);
 
   bi_start_run_loop(context);
   return 0;

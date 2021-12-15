@@ -7,7 +7,7 @@ typedef struct {
   BiAction* action;
 } ActionDoer;
 
-void bi_action_init(BiAction *action)
+BiAction* bi_action_init(BiAction *action)
 {
   action->start = NULL;
   action->update = NULL;
@@ -18,6 +18,7 @@ void bi_action_init(BiAction *action)
   action->action_data = NULL;
   action->node = NULL;
   action->on_finish_callback_context = NULL;
+  return action;
 }
 
 void bi_action_start(BiAction *action)

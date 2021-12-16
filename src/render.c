@@ -87,13 +87,13 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   }
 }
 
-void bi_render_activate_textures(GLuint default_texture,BiTexture** textures)
+void bi_render_activate_textures(BiTexture** textures)
 {
   // Textures
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);
     if( textures[i] == NULL ) {
-      glBindTexture(GL_TEXTURE_2D, default_texture);
+      glBindTexture(GL_TEXTURE_2D, 0);
     }else{
       textures[i]->_texture_unit = i;
       glBindTexture(GL_TEXTURE_2D, textures[i]->texture_id);
@@ -139,7 +139,7 @@ static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext r
   bi_shader_set_uniforms(shader,time,context->w,context->h,scale,layer->shader_attributes);
 
   // textures
-  bi_render_activate_textures(context->default_texture,layer->textures);
+  bi_render_activate_textures(layer->textures);
 
   // set projection and view
   GLfloat camera[16];

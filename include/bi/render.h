@@ -29,6 +29,6 @@ extern BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context
                                                      Array* timer_queue,
                                                      Array* rendering_queue);
 extern void bi_render_queuing(BiRenderingContext context, BiNode* n);
-extern void bi_render_activate_textures(GLuint default_texture,BiTexture** textures);
+extern void bi_render_activate_textures(BiTexture** textures);
 
 #endif

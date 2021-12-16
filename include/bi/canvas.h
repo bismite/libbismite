@@ -19,11 +19,9 @@ typedef struct _BiCanvas {
   BiShader *shader;
   GLfloat shader_attributes[4];
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
-  // default texture
-  GLuint default_texture;
 } BiCanvas;
 
-extern BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h,GLuint default_texture);
+extern BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h);
 extern void bi_canvas_draw(BiCanvas* canvas,BiNode* node);
 extern void bi_canvas_clear(BiCanvas* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a);
 extern BiTexture* bi_canvas_to_texture(BiCanvas* canvas,BiTexture* texture);

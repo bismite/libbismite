@@ -52,9 +52,6 @@ struct _BiContext {
   //
   SDL_Window *window;
 
-  // default texture
-  GLuint default_texture;
-
   //
   BiFramebuffer _layer_framebuffer;
   BiFramebuffer _post_process_framebuffer;

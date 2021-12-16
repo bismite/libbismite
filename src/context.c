@@ -194,16 +194,14 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   bi_shader_init(&context->default_shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
 
   // default texture
+#ifdef __APPLE__
   uint8_t pixels[4] = {0,0,0,0};
-  glGenTextures(1, &context->default_texture);
-  glBindTexture(GL_TEXTURE_2D, context->default_texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glBindTexture(GL_TEXTURE_2D, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 
+  // framebuffer
   GLint dims[4] = {0};
   glGetIntegerv(GL_VIEWPORT, dims);
   bi_framebuffer_init(&context->_layer_framebuffer,dims[2],dims[3]);

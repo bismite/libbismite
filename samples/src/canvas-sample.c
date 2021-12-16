@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
   // Canvas
   BiNode* sprite = make_sprite_with_anchor("assets/tester.png",0,0);
   BiNode* face = make_sprite("assets/face01.png");
-  BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256,context->default_texture);
+  BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256);
   canvas->shader = &context->default_shader;
   canvas->textures[0] = sprite->texture_mapping->texture;
   canvas->textures[1] = face->texture_mapping->texture;
@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
   bi_set_color(face->color,0,0xff,0,0x99);
 
   // draw
-  bi_canvas_clear(canvas,0xff,0,0,64);
   bi_canvas_clear(canvas,0,0,0,0);
   bi_canvas_draw(canvas,sprite);
 

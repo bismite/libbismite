@@ -1,6 +1,6 @@
 CC=clang
 AR=ar
-CFLAGS=-Wall -O3 `sdl2-config --cflags`
+CFLAGS=-Wall -O3 -fPIC `sdl2-config --cflags`
 INCLUDE_PATHS=-Iinclude
 
 LIB_DIR=build/linux/lib

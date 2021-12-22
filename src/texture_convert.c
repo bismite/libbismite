@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <bi/texture.h>
 #include <bi/camera.h>
 #include <bi/bi_gl.h>

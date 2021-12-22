@@ -2,6 +2,7 @@
 #include <bi/ext/simple_unicode.h>
 #include <bi/node.h>
 #include <bi/util.h>
+#include <bi/bi_sdl.h>
 #include <stdlib.h>
 #include <string.h>
 

@@ -32,9 +32,6 @@ int main(int argc, char* argv[])
   bi_canvas_clear(canvas,0,0,0,0);
   bi_canvas_draw(canvas,sprite);
 
-  // save image
-  bi_canvas_save_png_image(canvas,"canvas.png");
-
   // Sprite from Canvas
   BiNode *canvas_sprite = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(canvas_sprite, canvas->w,canvas->h);

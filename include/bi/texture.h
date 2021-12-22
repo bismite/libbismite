@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <bi/bi_gl.h>
 
 typedef struct _BiTexture {

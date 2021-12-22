@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 1.2.0 - 2021/12/22
+- BiTexture: add straight alpha loading. add antialias setter function.
 ## 1.1.9 - 2021/12/18
 - all Node type structures(Node,Layer,LayerGroup) has `void* userdata`
 - include/bi/node_base.h : add stdbool.h

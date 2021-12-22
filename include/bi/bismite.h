@@ -18,7 +18,7 @@
 #include <bi/util.h>
 
 #define BISMITE_MAJOR_VERSION 1
-#define BISMITE_MINOR_VERSION 1
-#define BISMITE_PATCHLEVEL 9
+#define BISMITE_MINOR_VERSION 2
+#define BISMITE_PATCHLEVEL 0
 
 #endif

@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 1.2.3 - 2021/12/31
+- src/ext/font.c : fix empty white space
+- Makefile.macos.mk : update SDL-macOS-UniversalBinaries 1.2
 ## 1.2.1 - 2021/12/22
 - BiTexture: add straight alpha loading. add antialias setter function.
 ## 1.1.9 - 2021/12/18

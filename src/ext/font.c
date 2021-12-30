@@ -62,9 +62,8 @@ void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font,
 
       const BiGlyphLayout *glyph = &(font->table[ucs2]);
 
-      if(glyph->utf8==0 || glyph->w==0 || glyph->h==0) {
-        continue;
-      }
+      if(glyph->utf8==0) continue;
+      if(glyph->w==0 && glyph->h==0 && glyph->advance_x==0 && glyph->advance_y==0 ) continue;
 
       BiNode* n = NULL;
       if( i < node->children.size ){

@@ -10,7 +10,7 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 SDL_TGZ=build/SDL-macOS-UniversalBinaries.tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-macOS-UniversalBinaries/releases/download/1.1/SDL-macOS-UniversalBinaries.tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-macOS-UniversalBinaries/releases/download/1.2/SDL-macOS-UniversalBinaries.tgz
 SDL_DIR=build/macos/SDL
 
 SAMPLE_DIR=build/macos/samples

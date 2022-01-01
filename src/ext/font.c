@@ -13,10 +13,11 @@ static BiGlyphNode* make_glyph_node()
   return n;
 }
 
-static void bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
+static bool bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
 {
   BiFontHeader header;
   SDL_RWread(rwops,&header,sizeof(BiFontHeader),1);
+  if(header.version!=2) return false;
   font->font_size = header.font_size;
   font->base_line = header.descent;
   font->_pool = malloc(sizeof(BiGlyphLayout)*header.glyph_count);
@@ -34,21 +35,23 @@ static void bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
     if( font->table[c]->nodes[b] == NULL ) font->table[c]->nodes[b] = make_glyph_node();
     if( font->table[c]->nodes[b]->layouts[a] == NULL ) font->table[c]->nodes[b]->layouts[a] = l;
   }
+  return true;
 }
 
-
-void bi_load_font_layout(const char *buffer, int size, BiFontAtlas* font)
+bool bi_load_font_layout(const char *buffer, int size, BiFontAtlas* font)
 {
   SDL_RWops *rwops = SDL_RWFromConstMem(buffer,size);
-  bi_load_font_layout_from_rwops(rwops,font);
+  bool result = bi_load_font_layout_from_rwops(rwops,font);
   SDL_RWclose(rwops);
+  return result;
 }
 
-void bi_load_font_layout_from_file(const char *filename, BiFontAtlas* font)
+bool bi_load_font_layout_from_file(const char *filename, BiFontAtlas* font)
 {
   SDL_RWops *rwops = SDL_RWFromFile(filename,"rb");
-  bi_load_font_layout_from_rwops(rwops,font);
+  bool result = bi_load_font_layout_from_rwops(rwops,font);
   SDL_RWclose(rwops);
+  return result;
 }
 
 static BiGlyphLayout* get_glyph(const BiFontAtlas* font,uint32_t cp)

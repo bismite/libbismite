@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 2.0.0 - 2022/1/1
+- update font data format, support 32bit unicode.
+  - update font and label sample
 ## 1.2.3 - 2021/12/31
 - src/ext/font.c : fix empty white space
 - Makefile.macos.mk : update SDL-macOS-UniversalBinaries 1.2
@@ -36,6 +39,6 @@
 
 # License
 
-Copyright 2018-2021 kbys <work4kbys@gmail.com>
+Copyright 2018-2022 kbys <work4kbys@gmail.com>
 
 Apache License Version 2.0

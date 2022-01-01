@@ -6,27 +6,33 @@
 #include <stdlib.h>
 #include <string.h>
 
+static BiGlyphNode* make_glyph_node()
+{
+  BiGlyphNode* n = malloc(sizeof(BiGlyphNode));
+  for(int i=0;i<0xFF;i++) n->nodes[i] = NULL;
+  return n;
+}
+
 static void bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
 {
   BiFontHeader header;
-
   SDL_RWread(rwops,&header,sizeof(BiFontHeader),1);
-
   font->font_size = header.font_size;
   font->base_line = header.descent;
-
-  for(int i=0;i<0xFFFF;i++) {
-    font->table[i].utf8 = 0; // XXX: no-font
-  }
-
+  font->_pool = malloc(sizeof(BiGlyphLayout)*header.glyph_count);
+  for(int i=0;i<0xFF;i++) { font->table[i] = NULL; }
   for(int i=0; i<header.glyph_count; i++){
-    BiGlyphLayout l;
-    size_t count = SDL_RWread(rwops,&l,sizeof(BiGlyphLayout),1);
-    if(count < 1) {
-      break;
-    }
-    uint16_t ucs2 = utf8_to_ucs2( l.utf8 );
-    font->table[ucs2] = l;
+    BiGlyphLayout *l = &font->_pool[i];
+    size_t count = SDL_RWread(rwops,l,sizeof(BiGlyphLayout),1);
+    if(count < 1) break;
+    uint32_t cp = l->codepoint;
+    // uint8_t d = cp>>24 & 0xff;
+    uint8_t c = cp>>16 & 0xff;
+    uint8_t b = cp>>8  & 0xff;
+    uint8_t a = cp     & 0xff;
+    if( font->table[c] == NULL ) font->table[c] = make_glyph_node();
+    if( font->table[c]->nodes[b] == NULL ) font->table[c]->nodes[b] = make_glyph_node();
+    if( font->table[c]->nodes[b]->layouts[a] == NULL ) font->table[c]->nodes[b]->layouts[a] = l;
   }
 }
 
@@ -45,6 +51,17 @@ void bi_load_font_layout_from_file(const char *filename, BiFontAtlas* font)
   SDL_RWclose(rwops);
 }
 
+static BiGlyphLayout* get_glyph(const BiFontAtlas* font,uint32_t cp)
+{
+  // uint8_t d = cp>>24 & 0xff;
+  uint8_t c = cp>>16 & 0xff;
+  uint8_t b = cp>>8  & 0xff;
+  uint8_t a = cp     & 0xff;
+  if( font->table[c] == NULL ) return NULL;
+  if( font->table[c]->nodes[b] == NULL ) return NULL;
+  return font->table[c]->nodes[b]->layouts[a];
+}
+
 void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font,
                      uint8_t r, uint8_t g, uint8_t b, uint8_t a  )
 {
@@ -58,11 +75,10 @@ void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font,
     bi_node_child_at(node,i)->visible = false;
   }
   while (textlen > 0) {
-      uint32_t ucs2 = utf8_getch_as_ucs2(&text, &textlen);
-
-      const BiGlyphLayout *glyph = &(font->table[ucs2]);
-
-      if(glyph->utf8==0) continue;
+      uint32_t cp = utf8_getch_as_codepoint(&text, &textlen);
+      BiGlyphLayout *glyph = get_glyph(font,cp);
+      if(glyph==NULL) continue;
+      if(glyph->codepoint==0) continue;
       if(glyph->w==0 && glyph->h==0 && glyph->advance_x==0 && glyph->advance_y==0 ) continue;
 
       BiNode* n = NULL;

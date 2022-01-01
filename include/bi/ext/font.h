@@ -1,5 +1,5 @@
-#ifndef __BI_EXT_FONT_H__
-#define __BI_EXT_FONT_H__
+#ifndef __BISMITE_EXT_FONT_H__
+#define __BISMITE_EXT_FONT_H__
 
 #include <stdint.h>
 
@@ -33,15 +33,24 @@ struct _BiGlyphLayout {
     int16_t base_y;
     int16_t advance_x;
     int16_t advance_y;
-    uint32_t utf8;
+    uint32_t codepoint;
     uint32_t reserved;
 };
 
+union _BiGlyphNode;
+typedef union _BiGlyphNode BiGlyphNode;
+
+union _BiGlyphNode {
+  BiGlyphLayout* layouts[0xFF];
+  BiGlyphNode* nodes[0xFF];
+};
+
 struct _BiFontAtlas {
-  BiGlyphLayout table[0xFFFF];
+  BiGlyphNode* table[0xFF];
   BiTexture* texture;
   int font_size;
   int base_line;
+  BiGlyphLayout *_pool;
 };
 
 extern void bi_load_font_layout(const char *buffer, int size, BiFontAtlas* font);

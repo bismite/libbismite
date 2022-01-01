@@ -16,10 +16,10 @@ __attribute__((unused)) static BiFontAtlas* load_font()
 {
   // texture
   BiTexture *font_texture = malloc(sizeof(BiTexture));
-  bi_texture_init_with_filename(font_texture,"assets/mixed.png",false);
+  bi_texture_init_with_filename(font_texture,"assets/font.png",false);
   // layout
   BiFontAtlas *font = malloc(sizeof(BiFontAtlas));
-  const char* layout_file_name = "assets/large-bold.dat";
+  const char* layout_file_name = "assets/font12.dat";
   bi_load_font_layout_from_file(layout_file_name,font);
   font->texture = font_texture;
   return font;

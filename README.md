@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 2.0.1 - 2022/1/4
+- fix font table range
 ## 2.0.0 - 2022/1/1
 - update font data format, support 32bit unicode.
   - update font and label sample

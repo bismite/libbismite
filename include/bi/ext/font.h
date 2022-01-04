@@ -42,12 +42,12 @@ union _BiGlyphNode;
 typedef union _BiGlyphNode BiGlyphNode;
 
 union _BiGlyphNode {
-  BiGlyphLayout* layouts[0xFF];
-  BiGlyphNode* nodes[0xFF];
+  BiGlyphLayout* layouts[0x100];
+  BiGlyphNode* nodes[0x100];
 };
 
 struct _BiFontAtlas {
-  BiGlyphNode* table[0xFF];
+  BiGlyphNode* table[0x100];
   BiTexture* texture;
   int font_size;
   int base_line;

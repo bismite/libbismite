@@ -1,5 +1,6 @@
 #include <bi/ext/font.h>
 #include <bi/ext/simple_unicode.h>
+#include <bi/logger.h>
 #include <bi/node.h>
 #include <bi/util.h>
 #include <bi/bi_sdl.h>
@@ -9,23 +10,36 @@
 static BiGlyphNode* make_glyph_node()
 {
   BiGlyphNode* n = malloc(sizeof(BiGlyphNode));
-  for(int i=0;i<0xFF;i++) n->nodes[i] = NULL;
+  for(int i=0;i<0x100;i++) n->nodes[i] = NULL;
   return n;
 }
 
 static bool bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
 {
+  font->_pool = NULL;
+  for(int i=0;i<0x100;i++) { font->table[i] = NULL; }
+  int64_t fsize = SDL_RWsize(rwops);
   BiFontHeader header;
   SDL_RWread(rwops,&header,sizeof(BiFontHeader),1);
   if(header.version!=2) return false;
   font->font_size = header.font_size;
   font->base_line = header.descent;
+  if( (fsize - sizeof(BiFontHeader)) % sizeof(BiGlyphLayout) != 0 ) {
+    LOG("wrong file size\n");
+    return false;
+  }
+  if( header.glyph_count != (fsize - sizeof(BiFontHeader)) / sizeof(BiGlyphLayout) ) {
+    LOG("wrong file size\n");
+    return false;
+  }
   font->_pool = malloc(sizeof(BiGlyphLayout)*header.glyph_count);
-  for(int i=0;i<0xFF;i++) { font->table[i] = NULL; }
+  size_t glyph_count = SDL_RWread(rwops,font->_pool,sizeof(BiGlyphLayout),header.glyph_count);
+  if(glyph_count!=header.glyph_count){
+    LOG("wrong glyph count %d (require %d)\n",glyph_count,header.glyph_count);
+    return false;
+  }
   for(int i=0; i<header.glyph_count; i++){
     BiGlyphLayout *l = &font->_pool[i];
-    size_t count = SDL_RWread(rwops,l,sizeof(BiGlyphLayout),1);
-    if(count < 1) break;
     uint32_t cp = l->codepoint;
     // uint8_t d = cp>>24 & 0xff;
     uint8_t c = cp>>16 & 0xff;

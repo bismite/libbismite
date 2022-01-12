@@ -6,6 +6,10 @@
 #include <bi/util.h>
 #include <bi/logger.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 {
   bool swallow = false;

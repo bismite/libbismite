@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 2.0.2 - 2022/1/13
+- update bi_get_now()
 ## 2.0.1 - 2022/1/4
 - fix font table range
 ## 2.0.0 - 2022/1/1

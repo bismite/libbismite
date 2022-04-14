@@ -14,7 +14,7 @@ static BiGlyphNode* make_glyph_node()
   return n;
 }
 
-static bool bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
+static bool __bi_font_init__(SDL_RWops* rwops, BiFontAtlas* font)
 {
   font->_pool = NULL;
   for(int i=0;i<0x100;i++) { font->table[i] = NULL; }
@@ -35,7 +35,7 @@ static bool bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
   font->_pool = malloc(sizeof(BiGlyphLayout)*header.glyph_count);
   size_t glyph_count = SDL_RWread(rwops,font->_pool,sizeof(BiGlyphLayout),header.glyph_count);
   if(glyph_count!=header.glyph_count){
-    LOG("wrong glyph count %d (require %d)\n",glyph_count,header.glyph_count);
+    LOG("wrong glyph count %zu (require %d)\n",glyph_count,header.glyph_count);
     return false;
   }
   for(int i=0; i<header.glyph_count; i++){
@@ -52,20 +52,20 @@ static bool bi_load_font_layout_from_rwops(SDL_RWops* rwops, BiFontAtlas* font)
   return true;
 }
 
-bool bi_load_font_layout(const char *buffer, int size, BiFontAtlas* font)
+BiFontAtlas* bi_font_init(BiFontAtlas* font, const char *buffer, int size)
 {
   SDL_RWops *rwops = SDL_RWFromConstMem(buffer,size);
-  bool result = bi_load_font_layout_from_rwops(rwops,font);
+  __bi_font_init__(rwops,font);
   SDL_RWclose(rwops);
-  return result;
+  return font;
 }
 
-bool bi_load_font_layout_from_file(const char *filename, BiFontAtlas* font)
+BiFontAtlas* bi_font_init_with_file(BiFontAtlas* font, const char *filename)
 {
   SDL_RWops *rwops = SDL_RWFromFile(filename,"rb");
-  bool result = bi_load_font_layout_from_rwops(rwops,font);
+  __bi_font_init__(rwops,font);
   SDL_RWclose(rwops);
-  return result;
+  return font;
 }
 
 static BiGlyphLayout* get_glyph(const BiFontAtlas* font,uint32_t cp)
@@ -79,55 +79,112 @@ static BiGlyphLayout* get_glyph(const BiFontAtlas* font,uint32_t cp)
   return font->table[c]->nodes[b]->layouts[a];
 }
 
-void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font,
-                     uint8_t r, uint8_t g, uint8_t b, uint8_t a  )
+int bi_font_line_x_to_index(const BiFontAtlas* font, const char* text, int x)
+{
+  size_t textlen = strlen(text);
+  int cursor = 0;
+  int count = 0;
+  BiGlyphLayout *glyph = NULL;
+  if(x<0) return -1;
+  while (textlen > 0) {
+    glyph = get_glyph(font,utf8_getch_as_codepoint(&text, &textlen));
+    count++;
+    if(glyph==NULL) continue;
+    if(glyph->codepoint==0) continue;
+    if(glyph->w==0 && glyph->h==0 && glyph->advance_x==0 && glyph->advance_y==0 ) continue;
+    if( cursor+glyph->advance_x >= x ) return count-1;
+    cursor += glyph->advance_x;
+  }
+  return count;
+}
+
+void bi_font_get_label_size(const BiFontAtlas* font, const char* text, int *w, int *h)
+{
+  size_t textlen = strlen(text);
+  int x = 0;
+  BiGlyphLayout *glyph = NULL;
+  while (textlen > 0) {
+    glyph = get_glyph(font,utf8_getch_as_codepoint(&text, &textlen));
+    if(glyph==NULL) continue;
+    if(glyph->codepoint==0) continue;
+    if(glyph->w==0 && glyph->h==0 && glyph->advance_x==0 && glyph->advance_y==0 ) continue;
+    x += glyph->advance_x;
+  }
+  *w = x;
+  *h = font->font_size;
+}
+
+void bi_label_set_text_with_color(BiNode* label, const BiFontAtlas* font, const char* text,
+                                  uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity)
 {
   // text
   size_t textlen = strlen(text);
   int x = 0;
   int y = font->base_line;
   int line_height = font->font_size;
-  int i = 0;
-  for(int i=0;i<node->children.size;i++) {
-    bi_node_child_at(node,i)->visible = false;
+  int child_index = 0;
+  for(int i=0;i<label->children.size;i++) {
+    bi_node_child_at(label,i)->visible = false;
   }
   while (textlen > 0) {
-      uint32_t cp = utf8_getch_as_codepoint(&text, &textlen);
-      BiGlyphLayout *glyph = get_glyph(font,cp);
-      if(glyph==NULL) continue;
-      if(glyph->codepoint==0) continue;
-      if(glyph->w==0 && glyph->h==0 && glyph->advance_x==0 && glyph->advance_y==0 ) continue;
+    uint32_t cp = utf8_getch_as_codepoint(&text, &textlen);
+    BiGlyphLayout *glyph = get_glyph(font,cp);
+    if(glyph==NULL) continue;
+    if(glyph->codepoint==0) continue;
+    if(glyph->w==0 && glyph->h==0 && glyph->advance_x==0 && glyph->advance_y==0 ) continue;
 
-      BiNode* n = NULL;
-      if( i < node->children.size ){
-        n = bi_node_child_at(node,i);
-      }else{
-        n = malloc(sizeof(BiNode));
-        bi_node_init(n);
-        bi_node_add_node(node,n);
-        n->texture_mapping = malloc(sizeof(BiTextureMapping));
-        bi_texture_mapping_init(n->texture_mapping,NULL);
-      }
-      // node
-      bi_node_set_position(n, x + glyph->base_x, y + glyph->base_y );
-      bi_node_set_size(n,glyph->w,glyph->h);
-      n->visible = true;
-      //texture
-      n->texture_mapping->texture = font->texture;
-      bi_texture_mapping_set_bound(n->texture_mapping, glyph->x,glyph->y,glyph->w,glyph->h);
-      // color
-      bi_set_color( n->color, r,g,b,a );
+    BiNode* n = NULL;
+    if( child_index < label->children.size ){
+      n = bi_node_child_at(label,child_index);
+    }else{
+      n = malloc(sizeof(BiNode));
+      bi_node_init(n);
+      bi_node_add_node(label,n);
+      n->texture_mapping = malloc(sizeof(BiTextureMapping));
+      bi_texture_mapping_init(n->texture_mapping,NULL);
+    }
+    // node
+    bi_node_set_position(n, x + glyph->base_x, y + glyph->base_y );
+    bi_node_set_size(n,glyph->w,glyph->h);
+    n->visible = true;
+    //texture
+    n->texture_mapping->texture = font->texture;
+    bi_texture_mapping_set_bound(n->texture_mapping, glyph->x,glyph->y,glyph->w,glyph->h);
+    // color
+    bi_set_color( n->color, r,g,b,a );
+    n->opacity = opacity;
 
-      x += glyph->advance_x;
-      i++;
+    x += glyph->advance_x;
+    child_index++;
   }
-  bi_node_set_size(node,x,line_height);
-  bi_node_set_matrix_include_anchor_translate(node,true);
+  bi_node_set_size(label,x,line_height);
+  bi_node_set_matrix_include_anchor_translate(label,true);
 }
 
-void bi_update_color(BiNode* node, uint8_t r, uint8_t g, uint8_t b, uint8_t a )
+void bi_label_set_text(BiNode* label, const BiFontAtlas* font, const char* text)
 {
-  for(int i=0;i<node->children.size;i++) {
-    bi_set_color( bi_node_child_at(node,i)->color, r,g,b,a );
+  bi_label_set_text_with_color(label,font,text,0,0,0,0,1.0);
+}
+
+void bi_label_set_color(BiNode* label, uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity )
+{
+  BiNode* n = NULL;
+  for(int i=0;i<label->children.size;i++) {
+    n = bi_node_child_at(label,i);
+    bi_set_color( n->color, r,g,b,a );
+    n->opacity = opacity;
+  }
+}
+
+void bi_label_set_color_with_range(BiNode* label, int start, int end, uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity )
+{
+  BiNode* n = NULL;
+  if(start<0) start = 0;
+  if(end>label->children.size) end = label->children.size;
+  if(start>end) return;
+  for(int i=start;i<end;i++) {
+    n = bi_node_child_at(label,i);
+    bi_set_color( n->color, r,g,b,a );
+    n->opacity = opacity;
   }
 }

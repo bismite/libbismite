@@ -3,17 +3,11 @@
 static bool on_textinput(BiContext* context,BiNode* n, char* text)
 {
   BiNode* labels = n->userdata;
-  BiNode* label;
   char buf[256];
-
   snprintf(buf, 256, "Text: %s", text);
-  label = &labels[1];
-  bi_update_label(label, buf, label->userdata,0xFF,0xFF,0xFF,0xFF);
-
+  bi_label_set_text(&labels[1],labels[1].userdata,buf);
   snprintf(buf, 256, "Text Length: %ld", (long)strlen(text) );
-  label = &labels[2];
-  bi_update_label(label, buf, label->userdata,0xFF,0xFF,0xFF,0xFF);
-
+  bi_label_set_text(&labels[2],labels[2].userdata,buf);
   return true;
 }
 
@@ -42,9 +36,9 @@ int main(int argc,char* argv[])
   }
   root->userdata = labels;
 
-  bi_update_label(&labels[0], "PRESS ANY KEY", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[1], "Text:", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[2], "Text Length:", font,0xFF,0xFF,0xFF,0xFF);
+  bi_label_set_text(&labels[0],font, "PRESS ANY KEY");
+  bi_label_set_text(&labels[1],font, "Text:");
+  bi_label_set_text(&labels[2],font, "Text Length:");
 
   // set callbacks
   bi_node_set_on_textinput(root, on_textinput);

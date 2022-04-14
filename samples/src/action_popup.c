@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     BiNode* label = bi_node_init(malloc(sizeof(BiNode)));
     bi_node_set_anchor(label,0,0);
     bi_node_set_position( label, -popup->w/2+20, 10+i*14 );
-    bi_update_label(label, "The quick brown fox jumps over the lazy dog", fonts[i], 0xFF,0xFF,0xFF,0xFF);
+    bi_label_set_text(label,fonts[i], "The quick brown fox jumps over the lazy dog");
     bi_node_add_node(popup,label);
   }
 

@@ -4,29 +4,18 @@
 static bool on_keyinput(BiContext* context,BiNode* node, uint16_t scancode, uint32_t keycode, uint16_t mod, bool pressed)
 {
   BiNode* labels = node->userdata;
-  BiNode* label;
   char buf[256];
-
   snprintf(buf, 256, "Keycode: %s (%d)", SDL_GetKeyName(keycode), keycode);
-  label = &labels[1];
-  bi_update_label(label, buf, label->userdata, 0xFF,0xFF,0xFF,0xFF);
-
-  snprintf(buf, 256, "KeycodeFromScancode: %s (%d)", SDL_GetKeyName(SDL_GetKeyFromScancode(scancode)), SDL_GetKeyFromScancode(scancode) );
-  label = &labels[2];
-  bi_update_label(label, buf, label->userdata, 0xFF,0xFF,0xFF,0xFF);
-
+  bi_label_set_text(&labels[1],labels[1].userdata,buf);
+  snprintf(buf, 256, "KeycodeFromScancode: %s (%d)", SDL_GetKeyName(SDL_GetKeyFromScancode(scancode)),
+                                                     SDL_GetKeyFromScancode(scancode) );
+  bi_label_set_text(&labels[2],labels[2].userdata, buf);
   snprintf(buf, 256, "Scancode: %s (%d)", SDL_GetScancodeName(scancode), scancode );
-  label = &labels[3];
-  bi_update_label(label, buf, label->userdata, 0xFF,0xFF,0xFF,0xFF);
-
+  bi_label_set_text(&labels[3],labels[3].userdata, buf);
   snprintf(buf, 256, "MOD: %d", mod );
-  label = &labels[4];
-  bi_update_label(label, buf, label->userdata, 0xFF,0xFF,0xFF,0xFF);
-
+  bi_label_set_text(&labels[4],labels[4].userdata, buf);
   snprintf(buf, 256, "Pressed: %s", pressed?"DOWN":"UP" );
-  label = &labels[5];
-  bi_update_label(label, buf, label->userdata, 0xFF,0xFF,0xFF,0xFF);
-
+  bi_label_set_text(&labels[5],labels[5].userdata, buf);
   return false;
 }
 
@@ -55,13 +44,17 @@ int main(int argc,char* argv[])
   }
   root->userdata = labels;
 
-  bi_update_label(&labels[0], "PRESS ANY KEY", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[1], "Keycode:", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[2], "KeycodeFromScancode:", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[3], "Scancode:", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[4], "MOD:", font,0xFF,0xFF,0xFF,0xFF);
-  bi_update_label(&labels[5], "Pressed:", font,0xFF,0xFF,0xFF,0xFF);
-
+  const char* texts[] = {
+    "PRESS ANY KEY",
+    "Keycode:",
+    "KeycodeFromScancode:",
+    "Scancode:",
+    "MOD:",
+    "Pressed:"
+  };
+  for(int i=0;i<6;i++){
+    bi_label_set_text(&labels[i],font, texts[i]);
+  }
   // set callback
   bi_node_set_on_keyinput(root, on_keyinput);
 

@@ -54,10 +54,12 @@ struct _BiFontAtlas {
   BiGlyphLayout *_pool;
 };
 
-extern bool bi_load_font_layout(const char *buffer, int size, BiFontAtlas* font);
-extern bool bi_load_font_layout_from_file(const char *filename, BiFontAtlas* font);
-
-extern void bi_update_label(BiNode* node, const char* text, const BiFontAtlas* font, uint8_t r, uint8_t g, uint8_t b, uint8_t a );
-extern void bi_update_color(BiNode* node, uint8_t r, uint8_t g, uint8_t b, uint8_t a );
+extern BiFontAtlas* bi_font_init(BiFontAtlas* font, const char *buffer, int size);
+extern BiFontAtlas* bi_font_init_with_file(BiFontAtlas* font, const char *filename);
+extern int bi_font_line_x_to_index(const BiFontAtlas* font, const char* text, int x);
+extern void bi_label_set_text(BiNode* label, const BiFontAtlas* font, const char* text);
+extern void bi_label_set_text_with_color(BiNode* label, const BiFontAtlas* font, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity );
+extern void bi_label_set_color(BiNode* label, uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity );
+extern void bi_label_set_color_with_range(BiNode* label, int start, int end, uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity );
 
 #endif

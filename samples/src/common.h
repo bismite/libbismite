@@ -13,10 +13,9 @@
 
 __attribute__((unused)) static BiFontAtlas* load_font_atlas(const char* name, BiTexture *font_texture)
 {
-    BiFontAtlas *font = malloc(sizeof(BiFontAtlas));
-    bi_load_font_layout_from_file(name,font);
-    font->texture = font_texture;
-    return font;
+  BiFontAtlas *font = bi_font_init_with_file(ALLOC(BiFontAtlas),name);
+  font->texture = font_texture;
+  return font;
 }
 
 __attribute__((unused)) static BiTimer* onupdate(BiNode* n,timer_callback func)

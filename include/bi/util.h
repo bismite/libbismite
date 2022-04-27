@@ -24,4 +24,12 @@ static inline void bi_set_color(uint8_t *color,uint8_t r,uint8_t g,uint8_t b,uin
   color[3] = a;
 }
 
+static inline void bi_set_rgb(uint8_t *color,uint8_t r,uint8_t g,uint8_t b)
+{
+  color[0] = r;
+  color[1] = g;
+  color[2] = b;
+  color[3] = 0xff;
+}
+
 #endif

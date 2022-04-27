@@ -30,7 +30,7 @@ struct _BiNode {
   float scale_y;
   float anchor_x;
   float anchor_y;
-  bool matrix_include_anchor_translate;
+  bool _matrix_include_anchor_translate;
   bool visible;
   bool _final_visibility;
 

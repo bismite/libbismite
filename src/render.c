@@ -81,7 +81,7 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   bi_render_node_sort(n);
   for( int i=0; i<n->children.size; i++ ){
     if( bi_node_child_at(n,i)->matrix_cached == true && matrix_update_require ) {
-        bi_node_child_at(n,i)->matrix_cached = false;
+      bi_node_child_at(n,i)->matrix_cached = false;
     }
     bi_render_queuing(context, bi_node_child_at(n,i));
   }

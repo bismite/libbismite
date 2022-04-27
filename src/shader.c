@@ -165,6 +165,30 @@ void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale
   glUniform4fv(shader->optional_attributes_location, 1, attributes );
 }
 
+static void calc_clipped_texture_mapping_matrix(BiNode* n, GLfloat mat[16])
+{
+  // offset
+  GLfloat ox = n->texture_mapping->offset_x;
+  GLfloat oy = n->texture_mapping->offset_y;
+  if( n->_matrix_include_anchor_translate == false ) {
+    // anchor
+    GLfloat ax = - n->anchor_x * n->w;
+    GLfloat ay = - n->anchor_y * n->h;
+    ox += ax;
+    oy += ay;
+  }
+  GLfloat ow = (GLfloat)n->texture_mapping->w * n->w / n->texture_mapping->outer_w;
+  GLfloat oh = (GLfloat)n->texture_mapping->h * n->h / n->texture_mapping->outer_h;
+  // trans -> scale
+  GLfloat texture_size[16] = {
+   ow,  0,  0,  0,
+    0, oh,  0,  0,
+    0,  0,  1,  0,
+   ox, oy,  0,  1
+  };
+  bi_mat4_multiply(texture_size,n->transform,mat);
+}
+
 void bi_shader_draw(BiShader* shader,Array* queue)
 {
   const size_t len = queue->size;
@@ -198,8 +222,14 @@ void bi_shader_draw(BiShader* shader,Array* queue)
       texture_z[i] = -1; // no-texture
     }
 
-    //
-    bi_mat4_copy(transforms[i], node->draw);
+    // Matrix
+    if(node->texture_mapping && node->texture_mapping->clipped){
+      GLfloat tmp[16];
+      calc_clipped_texture_mapping_matrix(node,tmp);
+      bi_mat4_copy(transforms[i], tmp);
+    }else{
+      bi_mat4_copy(transforms[i], node->draw);
+    }
 
     // color
     tint[i][0] = node->color[0] / 255.0;

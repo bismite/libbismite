@@ -15,7 +15,7 @@ BiNode* bi_node_init(BiNode* n)
   n->scale_y = 1;
   n->anchor_x = 0;
   n->anchor_y = 0;
-  n->matrix_include_anchor_translate = false;
+  n->_matrix_include_anchor_translate = false;
   n->visible = true;
   n->_final_visibility = true;
 
@@ -124,10 +124,10 @@ void bi_node_set_angle(BiNode* n, float angle)
 
 void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_include_anchor_translate)
 {
-    if(n->matrix_include_anchor_translate != matrix_include_anchor_translate) {
+    if(n->_matrix_include_anchor_translate != matrix_include_anchor_translate) {
       n->matrix_cached = false;
     }
-    n->matrix_include_anchor_translate = matrix_include_anchor_translate;
+    n->_matrix_include_anchor_translate = matrix_include_anchor_translate;
 }
 
 void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly)
@@ -159,7 +159,7 @@ bool bi_node_inside(BiNode* node, int x, int y)
     GLfloat b = - node->anchor_y * node->h;
     GLfloat t = b + node->h;
 
-    if(node->matrix_include_anchor_translate){
+    if(node->_matrix_include_anchor_translate){
       l = 0;
       r = node->w;
       b = 0;
@@ -244,7 +244,7 @@ bool bi_node_update_matrix(BiNode* n)
   bi_mat4_multiply(trans,n->transform,n->transform);
   bi_mat4_multiply(rotation,n->transform,n->transform);
   bi_mat4_multiply(scale,n->transform,n->transform);
-  if( n->matrix_include_anchor_translate ) {
+  if( n->_matrix_include_anchor_translate ) {
     bi_mat4_multiply(local_trans,n->transform,n->transform); // include local transform
     bi_mat4_multiply(local_scale,n->transform,n->draw);
   } else {

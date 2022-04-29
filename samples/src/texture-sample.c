@@ -8,20 +8,44 @@ int main(int argc, char* argv[])
   // Background
   BiNode* background = make_sprite_with_anchor("assets/check.png",0,0);
 
-  // Face
-  BiNode* face = make_sprite("assets/face01.png");
-  bi_node_set_position(face,context->w/2,context->h/2);
-  bi_node_set_size(face,64,64);
-  bi_node_set_scale(face,2.0,2.0);
-  bi_node_set_degree(face,45);
-  bi_node_add_node(background,face);
+  //
+  BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
+  BiNode* n = NULL;
+
+  // Angle and Scale
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,120,240);
+  bi_node_set_degree(n,45);
+  bi_node_set_scale(n, 0.8,0.8);
+  bi_node_add_node(background,n);
+
+  // Flip Horizontal and Anchor
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,360,240);
+  n->_texture_flip_horizontal = true;
+  bi_node_set_anchor(n,1,1);
+  bi_node_add_node(background,n);
+
+  // Flip Vertical and Resize
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,120,80);
+  n->_texture_flip_vertical = true;
+  bi_node_set_size(n, 64,64);
+  bi_node_add_node(background,n);
+
+  // Crop and Anchor
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,360,80);
+  bi_node_set_cropped_texture(n,tex, 32,0,64,128, 32,0,128,128 );
+  bi_node_set_matrix_include_anchor_translate(n,true);
+  bi_node_add_node(background,n);
 
   // layer
   BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   bi_add_layer(context,layer);
   layer->root = background;
   layer->textures[0] = background->_texture;
-  layer->textures[1] = face->_texture;
+  layer->textures[1] = tex;
 
   bi_start_run_loop(context);
   return 0;

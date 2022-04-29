@@ -37,7 +37,7 @@ int main(int argc,char* argv[])
   for(int i=0;i<6;i++){
     BiNode *label = &labels[i];
     bi_node_init(label);
-    label->scale_x = label->scale_y = 1.0;
+    bi_node_set_scale(label,1.0,1.0);
     bi_node_set_position( label, 10, context->h - 100 - i * 32 );
     label->userdata = font;
     bi_node_add_node(root,label);

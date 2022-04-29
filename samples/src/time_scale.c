@@ -3,7 +3,7 @@
 static void rotate_face(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = (BiNode*)timer->node;
-  bi_node_set_angle(node, node->angle + dt * M_PI/180);
+  bi_node_set_angle(node, node->_angle + dt * M_PI/180);
 }
 
 int main(int argc,char* argv[])
@@ -18,20 +18,20 @@ int main(int argc,char* argv[])
 
   // sprites
   float TIMESCALES[4] = {2.0, 1.0, 0.5, 0};
-  BiTextureMapping* m = make_texture_mapping("assets/face01.png");
+  BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   for(int i=0;i<4;i++){
-    BiNode* face = make_sprite_from_mapping(m);
+    BiNode* face = make_sprite_from_texture(tex);
     bi_node_add_node(layer->root,face);
     bi_node_set_position(face,i*480/5+480/5,160);
-    BiTimer *timer_rotate_face = malloc(sizeof(BiTimer));
+    BiTimer *timer_rotate_face = ALLOC(BiTimer);
     bi_timer_init(timer_rotate_face, rotate_face, 0, -1, NULL);
     bi_node_add_timer(face,timer_rotate_face);
     face->time_scale = TIMESCALES[i];
   }
 
   // textures
-  layer->textures[0] = layer->root->texture_mapping->texture;
-  layer->textures[1] = m->texture;
+  layer->textures[0] = layer->root->_texture;
+  layer->textures[1] = tex;
 
   // fps layer
   add_fps_layer(context,load_font());

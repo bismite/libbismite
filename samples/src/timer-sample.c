@@ -3,7 +3,7 @@
 static void rotate(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = (BiNode*)timer->node;
-  bi_node_set_angle(node, node->angle + dt*0.01);
+  bi_node_set_angle(node, node->_angle + dt*0.01);
 }
 
 static void pause_rotate(BiContext* context,BiTimer* timer,double dt)
@@ -33,8 +33,8 @@ static void enlarge(BiContext *context,BiTimer* timer,double dt)
 {
   static int counter = 0;
   BiNode *node = timer->userdata;
-  bi_node_set_scale(node,node->scale_x*1.2,node->scale_y*1.2);
-  printf("%d: scale:%f\n", counter, node->scale_x);
+  bi_node_set_scale(node,node->_scale_x*1.2,node->_scale_y*1.2);
+  printf("%d: scale:%f\n", counter, node->_scale_x);
   counter++;
   if(counter>2){
     printf("enlarge timer sucide\n");
@@ -62,8 +62,8 @@ int main(int argc,char* argv[])
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_set_position(face,context->w/2,context->h/2);
   bi_node_add_node(layer->root,face);
-  layer->textures[0] = layer->root->texture_mapping->texture;
-  layer->textures[1] = face->texture_mapping->texture;
+  layer->textures[0] = layer->root->_texture;
+  layer->textures[1] = face->_texture;
 
   // timer on layer group
   bi_layer_group_add_timer(&context->layers,bi_timer_init(malloc(sizeof(BiTimer)),enlarge,1000,-1,face));

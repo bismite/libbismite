@@ -61,37 +61,26 @@ __attribute__((unused)) static BiShader* create_shader_with_default_vertex_shade
   return shader;
 }
 
-static BiTextureMapping* make_texture_mapping(const char* name)
-{
-  BiTexture *texture = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),name,false);
-  if( ! texture ) {
-    LOG("load error\n");
-    return NULL;
-  }
-  return bi_texture_mapping_init(malloc(sizeof(BiTextureMapping)),texture);
-}
-
-static BiNode* make_sprite_from_mapping(BiTextureMapping *mapping)
+__attribute__((unused)) static BiNode* make_sprite_from_texture(BiTexture* t)
 {
   BiNode* sprite = bi_node_init(malloc(sizeof(BiNode)));
-  bi_node_set_size(sprite, mapping->texture->w, mapping->texture->h);
+  bi_node_set_size(sprite, t->w, t->h);
   bi_node_set_anchor(sprite,0.5,0.5);
-  sprite->texture_mapping = mapping;
+  bi_node_set_texture(sprite,t,0,0,t->w,t->h);
   return sprite;
 }
 
+#define MAKE_TEXTURE(name) bi_texture_init_with_filename(ALLOC(BiTexture),name,false)
+
 __attribute__((unused)) static BiNode* make_sprite(const char* name)
 {
-  // load texture
-  BiTextureMapping *mapping = make_texture_mapping(name);
-  return make_sprite_from_mapping(mapping);
+  BiTexture *texture = MAKE_TEXTURE(name);
+  return make_sprite_from_texture(texture);
 }
 
 __attribute__((unused)) static BiNode* make_sprite_with_anchor(const char* name,float x, float y)
 {
-  // load texture
-  BiTextureMapping *mapping = make_texture_mapping(name);
-  BiNode *n = make_sprite_from_mapping(mapping);
+  BiNode *n = make_sprite(name);
   bi_node_set_anchor(n,x,y);
   return n;
 }

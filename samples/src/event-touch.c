@@ -3,7 +3,7 @@
 static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, bool pressed)
 {
   if(pressed) {
-    bi_node_set_angle(n,n->angle + 30*3.1415/180.0);
+    bi_node_set_angle(n,n->_angle + 30*3.1415/180.0);
     bi_node_set_position(n,x,y);
   }
   return true;
@@ -20,7 +20,7 @@ static bool on_touch(BiContext* context,BiNode* n, float x, float y, int64_t fin
 {
   if(pressed) {
     bi_node_set_position(n,x*480,y*320);
-    bi_node_set_angle(n,n->angle + 30*3.1415/180.0);
+    bi_node_set_angle(n,n->_angle + 30*3.1415/180.0);
   }
   return true;
 }
@@ -60,7 +60,7 @@ int main(int argc,char* argv[])
     bi_layer_init(layer);
     bi_add_layer(context,layer);
     layer->root = root;
-    layer->textures[0] = face->texture_mapping->texture;
+    layer->textures[0] = face->_texture;
 
     // fps layer
     add_fps_layer(context,load_font());

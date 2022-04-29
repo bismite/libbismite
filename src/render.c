@@ -69,7 +69,7 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   }
 
   // skip: invisible, zero-size node, transparent node
-  if( visible==true && n->visible==true && n->w!=0 && n->h!=0 && n->opacity>0 ) {
+  if( visible==true && n->visible==true && n->_w!=0 && n->_h!=0 && n->opacity>0 ) {
     array_add_object(context.rendering_queue,n);
   }
 
@@ -165,14 +165,11 @@ static void render_texture(BiContext* context, GLuint texture, BiRawNode* target
   t.h = context->h;
   t._texture_unit = 0;
 
-  BiTextureMapping m;
-  bi_texture_mapping_init(&m,&t);
-  m.flip_vertical = true;
-
   BiNode n;
   bi_node_init(&n);
   bi_node_set_size(&n,t.w,t.h);
-  n.texture_mapping = &m;
+  bi_node_set_texture(&n,&t,0,0,t.w,t.h);
+  n._texture_flip_vertical = true;
 
   BiLayer l;
   bi_layer_init(&l);

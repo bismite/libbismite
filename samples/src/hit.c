@@ -19,7 +19,7 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
       int lx,ly;
       bi_node_transform_local(n,x,y,&lx,&ly);
       printf("(%d,%d) -> (%d,%d)\n",x,y,lx,ly);
-      bi_node_set_angle(n,n->angle + 30 * M_PI / 180.0);
+      bi_node_set_angle(n,n->_angle + 30 * M_PI / 180.0);
       return true; // swallow event
     }
   }

@@ -17,7 +17,7 @@ static BiAction* alloc_action(size_t size, void* payload)
 static void rotate_on_timer(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
-  bi_node_set_angle(node, node->angle + 2.0*M_PI/180.0);
+  bi_node_set_angle(node, node->_angle + 2.0*M_PI/180.0);
 }
 
 static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, bool pressed)
@@ -34,23 +34,23 @@ static void init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
   bi_layer_group_add_layer_group(&context->layers, lg);
 
   // root node
-  BiNode* root = bi_node_init(malloc(sizeof(BiNode)));
+  BiNode* root = bi_node_init(ALLOC(BiNode));
 
   // sprite
-  BiTextureMapping* tm = make_texture_mapping("assets/face01.png");
+  BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   BiNode* faces[2];
   for(int i=0;i<2;i++){
-    BiNode* face = make_sprite_from_mapping(tm);
+    BiNode* face = make_sprite_from_texture(tex);
     bi_node_set_position(face,480/3*(1+i%2),offset_y);
     bi_node_add_node(root,face);
     faces[i] = face;
   }
 
   // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = root;
   bi_layer_group_add_layer(lg,layer);
-  layer->textures[0] = tm->texture;
+  layer->textures[0] = tex;
 
   // pause
   bi_node_set_on_click(root, on_click);
@@ -72,18 +72,17 @@ static void init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 60, false, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 60, false, __FILE__);
   print_info(context);
 
   // bg
   BiNode* bg = make_sprite("assets/check.png");
   bi_node_set_position(bg,context->w/2,context->h/2);
   // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = bg;
   bi_layer_group_add_layer(&context->layers,layer);
-  layer->textures[0] = bg->texture_mapping->texture;
+  layer->textures[0] = bg->_texture;
 
   layer_group_a = malloc(sizeof(BiLayerGroup));
   init_layer_group(context, layer_group_a, 320/3*2);

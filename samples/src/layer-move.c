@@ -21,10 +21,9 @@ static void lookaround(BiContext* context,BiTimer* timer,double dt)
 static BiNode* create_tile(int x, int y,BiTexture *tex)
 {
   BiNode* node = bi_node_init(ALLOC(BiNode));
-  node->texture_mapping = bi_texture_mapping_init(ALLOC(BiTextureMapping),tex);
   int tx = rand()%(tex->w/TILE_SIZE) * TILE_SIZE;
   int ty = rand()%(tex->h/TILE_SIZE) * TILE_SIZE;
-  bi_texture_mapping_set_bound(node->texture_mapping,tx,ty,TILE_SIZE,TILE_SIZE);
+  bi_node_set_texture(node,tex,tx,ty,TILE_SIZE,TILE_SIZE);
   bi_node_set_position(node,x,y);
   bi_node_set_size(node,TILE_SIZE,TILE_SIZE);
   return node;

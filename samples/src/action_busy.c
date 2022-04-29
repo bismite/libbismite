@@ -112,16 +112,16 @@ int main(int argc, char* argv[])
   bi_node_add_node(root,bg);
 
   // texture node
-  BiTextureMapping* tm = make_texture_mapping("assets/face01.png");
-  BiNode* face = make_sprite_from_mapping(tm);
+  BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
+  BiNode* face = make_sprite_from_texture(tex);
   bi_node_set_position(face,0,320/3*1);
   bi_node_add_node(root,face);
-  BiNode* face2 = make_sprite_from_mapping(tm);
+  BiNode* face2 = make_sprite_from_texture(tex);
   bi_node_set_position(face2,0,320/3*2);
   bi_node_add_node(root,face2);
 
-  layer->textures[0] = bg->texture_mapping->texture;
-  layer->textures[1] = tm->texture;
+  layer->textures[0] = bg->_texture;
+  layer->textures[1] = tex;
 
   // action
   add_action(face);

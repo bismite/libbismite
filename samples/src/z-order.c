@@ -2,15 +2,13 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, true, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
   print_info(context);
 
   bi_set_color(context->color,0x33,0x33,0x33,0xff);
 
   // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
+  BiNode* root = bi_node_init(ALLOC(BiNode));
 
   // texture node
   BiNode* face_a = make_sprite("assets/face01.png");
@@ -30,7 +28,7 @@ int main(int argc, char* argv[])
   bi_layer_init(layer);
   bi_add_layer(context,layer);
   layer->root = root;
-  layer->textures[0] = face_a->texture_mapping->texture;
+  layer->textures[0] = face_a->_texture;
 
   bi_start_run_loop(context);
   return 0;

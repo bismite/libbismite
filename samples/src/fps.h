@@ -55,8 +55,7 @@ __attribute__((unused)) static void add_fps_layer(BiContext* context,BiFontAtlas
     BiNode* label = create_fps_label(context,font);
     label->anchor_x = 0;
     label->anchor_y = 1;
-    label->x = 0;
-    label->y = context->h;
+    bi_node_set_position(label,0,context->h);
     layer->root = label;
     bi_layer_group_add_layer(layer_group,layer);
     bi_layer_group_add_layer_group(&context->layers,layer_group);

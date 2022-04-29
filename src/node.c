@@ -6,13 +6,10 @@
 BiNode* bi_node_init(BiNode* n)
 {
   bi_raw_node_init((BiRawNode*)n,BI_NODE_TYPE_NODE);
-  n->x = 0;
-  n->y = 0;
-  n->w = 0;
-  n->h = 0;
-  n->angle = 0;
-  n->scale_x = 1;
-  n->scale_y = 1;
+  n->_x = n->_y = n->_w = n->_h = 0;
+  n->_angle = 0;
+  n->_scale_x = 1;
+  n->_scale_y = 1;
   n->anchor_x = 0;
   n->anchor_y = 0;
   n->_matrix_include_anchor_translate = false;
@@ -28,8 +25,19 @@ BiNode* bi_node_init(BiNode* n)
 
   n->matrix_cached = false;
 
-  n->texture_mapping = NULL;
+  // Texture
+  n->_texture = NULL;
+  n->_tx = n->_ty = n->_tw = n->_th = 0;
+  n->_texture_uv_left = 0;
+  n->_texture_uv_top = 0;
+  n->_texture_uv_right = 0;
+  n->_texture_uv_bottom = 0;
+  n->_texture_cropped = false;
+  n->_cx = n->_cy = n->_ow = n->_oh = 0;
+  n->_texture_flip_horizontal = false;
+  n->_texture_flip_vertical = false;
 
+  //
   array_init(&n->children);
   n->parent = NULL;
   n->children_order_cached = true;
@@ -81,11 +89,11 @@ BiNode* bi_node_remove_from_parent(BiNode* node)
 
 void bi_node_set_position(BiNode* n, int x, int y)
 {
-  if(n->x != x || n->y != y) {
+  if(n->_x != x || n->_y != y) {
     n->matrix_cached = false;
   }
-  n->x = x;
-  n->y = y;
+  n->_x = x;
+  n->_y = y;
 }
 
 void bi_node_set_z(BiNode* n, int z)
@@ -98,28 +106,28 @@ void bi_node_set_z(BiNode* n, int z)
 
 void bi_node_set_size(BiNode* n, int w, int h)
 {
-  if(n->w != w || n->h != h) {
+  if(n->_w != w || n->_h != h) {
     n->matrix_cached = false;
   }
-  n->w = w;
-  n->h = h;
+  n->_w = w;
+  n->_h = h;
 }
 
 void bi_node_set_scale(BiNode* n, float x, float y)
 {
-  if(n->scale_x != x || n->scale_y != y) {
+  if(n->_scale_x != x || n->_scale_y != y) {
     n->matrix_cached = false;
   }
-  n->scale_x = x;
-  n->scale_y = y;
+  n->_scale_x = x;
+  n->_scale_y = y;
 }
 
 void bi_node_set_angle(BiNode* n, float angle)
 {
-  if(n->angle != angle) {
+  if(n->_angle != angle) {
     n->matrix_cached = false;
   }
-  n->angle = angle;
+  n->_angle = angle;
 }
 
 void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_include_anchor_translate)
@@ -154,16 +162,16 @@ bool bi_node_inside(BiNode* node, int x, int y)
     bi_node_transform_local(node,x,y,&lx,&ly);
 
     // left right top bottom
-    GLfloat l = - node->anchor_x * node->w;
-    GLfloat r = l + node->w;
-    GLfloat b = - node->anchor_y * node->h;
-    GLfloat t = b + node->h;
+    GLfloat l = - node->anchor_x * node->_w;
+    GLfloat r = l + node->_w;
+    GLfloat b = - node->anchor_y * node->_h;
+    GLfloat t = b + node->_h;
 
     if(node->_matrix_include_anchor_translate){
       l = 0;
-      r = node->w;
+      r = node->_w;
       b = 0;
-      t = node->h;
+      t = node->_h;
     }
 
     if( l <= lx && lx <= r && b <= ly && ly <= t ) {
@@ -172,7 +180,7 @@ bool bi_node_inside(BiNode* node, int x, int y)
     return false;
 }
 
-//
+// Matrix
 
 bool bi_node_update_matrix(BiNode* n)
 {
@@ -181,18 +189,18 @@ bool bi_node_update_matrix(BiNode* n)
   }
   n->matrix_cached = true;
 
-  GLfloat tx = n->x;
-  GLfloat ty = n->y;
-  GLfloat sx = n->scale_x ;
-  GLfloat sy = n->scale_y ;
+  GLfloat tx = n->_x;
+  GLfloat ty = n->_y;
+  GLfloat sx = n->_scale_x ;
+  GLfloat sy = n->_scale_y ;
   // XXX: non-zero angle calculation is super slow!
-  GLfloat cos_v = cos(n->angle);
-  GLfloat sin_v = sin(n->angle);
+  GLfloat cos_v = cos(n->_angle);
+  GLfloat sin_v = sin(n->_angle);
   // local
-  GLfloat lx = - n->anchor_x * n->w;
-  GLfloat ly = - n->anchor_y * n->h;
-  GLfloat lsx = n->w;
-  GLfloat lsy = n->h;
+  GLfloat lx = - n->anchor_x * n->_w;
+  GLfloat ly = - n->anchor_y * n->_h;
+  GLfloat lsx = n->_w;
+  GLfloat lsy = n->_h;
 
   // matrix chain
   if(n->parent == NULL){
@@ -252,5 +260,70 @@ bool bi_node_update_matrix(BiNode* n)
     bi_mat4_multiply(local_scale,n->draw,n->draw);
   }
 
+  if(n->_texture_cropped) {
+    // offset
+    GLfloat x = n->_cx;
+    GLfloat y = n->_oh - n->_th - n->_cy;
+    // normalize
+    x = x * n->_w / n->_ow;
+    y = y * n->_h / n->_oh;
+    // add anchor
+    if( n->_matrix_include_anchor_translate == false ) {
+      x += - n->anchor_x * n->_w;
+      y += - n->anchor_y * n->_h;
+    }
+    // scale with normalize
+    GLfloat w = (GLfloat)n->_tw * n->_w / n->_ow;
+    GLfloat h = (GLfloat)n->_th * n->_h / n->_oh;
+    // trans & scale
+    GLfloat tmp[16] = {
+      w,  0,  0,  0,
+      0,  h,  0,  0,
+      0,  0,  1,  0,
+      x,  y,  0,  1
+    };
+    bi_mat4_copy(n->_matrix_texture_with_cropped,tmp);
+  }
+
   return true;
+}
+
+
+// Texture
+void bi_node_set_texture(BiNode* n, BiTexture* t, uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th)
+{
+  bi_node_set_cropped_texture(n,t,tx,ty,tw,th,0,0,tw,th);
+}
+
+void bi_node_set_cropped_texture(BiNode* n, BiTexture* t,
+  uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th,
+  uint16_t cx, uint16_t cy, uint16_t ow, uint16_t oh )
+{
+  n->matrix_cached = false;
+  n->_texture = t;
+  n->_tx = tx;
+  n->_ty = ty;
+  n->_tw = tw;
+  n->_th = th;
+  // left, top, right, bottom
+  n->_texture_uv_left  = (GLfloat)tx      / t->w;
+  n->_texture_uv_top   = (GLfloat)(ty+th) / t->h;
+  n->_texture_uv_right = (GLfloat)(tx+tw) / t->w;
+  n->_texture_uv_bottom= (GLfloat)ty      / t->h;
+  // crop position and original image size
+  n->_cx = cx;
+  n->_cy = cy;
+  n->_ow = ow;
+  n->_oh = oh;
+  if(ow>0 && oh>0 && (tw!=ow || th!=oh)) {
+    n->_texture_cropped = true;
+  } else {
+    n->_texture_cropped = false;
+  }
+}
+
+void bi_node_unset_texture(BiNode* n)
+{
+  n->_texture = NULL;
+  n->_texture_cropped = false;
 }

@@ -4,12 +4,10 @@
 
 static BiNode* create_tile(int x, int y,BiTexture *tex)
 {
-  BiNode* node = bi_node_init(malloc(sizeof(BiNode)));
-  // texture mapping
-  node->texture_mapping = bi_texture_mapping_init(malloc(sizeof(BiTextureMapping)),tex);
   int tx = rand()%(tex->w/TILE_SIZE) * TILE_SIZE;
   int ty = rand()%(tex->h/TILE_SIZE) * TILE_SIZE;
-  bi_texture_mapping_set_bound(node->texture_mapping,tx,ty,TILE_SIZE,TILE_SIZE);
+  BiNode* node = bi_node_init(ALLOC(BiNode));
+  bi_node_set_texture(node,tex,tx,ty,TILE_SIZE,TILE_SIZE);
   bi_node_set_position(node,x,y);
   bi_node_set_size(node,TILE_SIZE,TILE_SIZE);
   return node;
@@ -27,7 +25,7 @@ int main(int argc,char* argv[])
   BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   bi_add_layer(context,layer);
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);
-  layer->textures[0] = layer->root->texture_mapping->texture;
+  layer->textures[0] = layer->root->_texture;
   layer->textures[1] = texture;
 
   const int W = context->w/TILE_SIZE+1;

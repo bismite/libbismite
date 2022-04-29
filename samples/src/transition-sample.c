@@ -50,7 +50,7 @@ static bool on_click_to_transition(BiContext *context,BiNode* n, int x, int y, i
 static void on_update_rotate_face(BiContext* c, BiTimer* t,double dt)
 {
   BiNode* n = (BiNode*)t->node;
-  bi_node_set_angle(n,n->angle+dt*0.01);
+  bi_node_set_angle(n,n->_angle+dt*0.01);
 }
 
 static BiLayer* scene_a(BiContext* context)
@@ -63,8 +63,8 @@ static BiLayer* scene_a(BiContext* context)
   BiLayer *layer = malloc(sizeof(BiLayer));
   bi_layer_init(layer);
   layer->root = bg;
-  layer->textures[1] = bg->texture_mapping->texture;
-  layer->textures[0] = face->texture_mapping->texture;
+  layer->textures[1] = bg->_texture;
+  layer->textures[0] = face->_texture;
   bi_node_set_on_click(layer->root, on_click_to_transition);
   return layer;
 }
@@ -79,8 +79,8 @@ static BiLayer* scene_b(BiContext* context)
   BiLayer *layer = malloc(sizeof(BiLayer));
   bi_layer_init(layer);
   layer->root = bg;
-  layer->textures[1] = bg->texture_mapping->texture;
-  layer->textures[0] = face->texture_mapping->texture;
+  layer->textures[1] = bg->_texture;
+  layer->textures[0] = face->_texture;
   bi_node_set_on_click(layer->root, on_click_to_transition);
   return layer;
 }

@@ -3,14 +3,12 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, false, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
   print_info(context);
 
   // Straight Alpha Texture
-  BiTexture* tex = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",true);
-  BiTextureMapping *mapping = bi_texture_mapping_init(ALLOC(BiTextureMapping),tex);
-  BiNode *sprite = make_sprite_from_mapping(mapping);
+  BiTexture* tex = MAKE_TEXTURE("assets/tester.png");
+  BiNode *sprite = make_sprite_from_texture(tex);
   bi_node_set_anchor(sprite,0,0);
 
   // Canvas
@@ -33,7 +31,7 @@ int main(int argc, char* argv[])
   bi_layer_init(layer);
   bi_add_layer(context,layer);
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);
-  layer->textures[0] = layer->root->texture_mapping->texture;
+  layer->textures[0] = layer->root->_texture;
   // straight blending
   bi_set_blend_factor(&layer->blend_factor,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
@@ -43,7 +41,7 @@ int main(int argc, char* argv[])
   bi_node_set_anchor(canvas_sprite,0.5,0.5);
   bi_node_set_position(canvas_sprite,context->w/2,context->h/2);
   BiTexture *canvas_texture = bi_canvas_to_texture(canvas,ALLOC(BiTexture));
-  canvas_sprite->texture_mapping = bi_texture_mapping_init(ALLOC(BiTextureMapping),canvas_texture);
+  bi_node_set_texture(canvas_sprite,canvas_texture,0,0,canvas_texture->w,canvas_texture->h);
   layer->textures[1] = canvas_texture;
   bi_node_add_node(layer->root, canvas_sprite);
 

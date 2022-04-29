@@ -165,30 +165,6 @@ void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale
   glUniform4fv(shader->optional_attributes_location, 1, attributes );
 }
 
-static void calc_clipped_texture_mapping_matrix(BiNode* n, GLfloat mat[16])
-{
-  // offset
-  GLfloat ox = n->texture_mapping->offset_x;
-  GLfloat oy = n->texture_mapping->offset_y;
-  if( n->_matrix_include_anchor_translate == false ) {
-    // anchor
-    GLfloat ax = - n->anchor_x * n->w;
-    GLfloat ay = - n->anchor_y * n->h;
-    ox += ax;
-    oy += ay;
-  }
-  GLfloat ow = (GLfloat)n->texture_mapping->w * n->w / n->texture_mapping->outer_w;
-  GLfloat oh = (GLfloat)n->texture_mapping->h * n->h / n->texture_mapping->outer_h;
-  // trans -> scale
-  GLfloat texture_size[16] = {
-   ow,  0,  0,  0,
-    0, oh,  0,  0,
-    0,  0,  1,  0,
-   ox, oy,  0,  1
-  };
-  bi_mat4_multiply(texture_size,n->transform,mat);
-}
-
 void bi_shader_draw(BiShader* shader,Array* queue)
 {
   const size_t len = queue->size;
@@ -201,32 +177,29 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   for(int i=0;i<len;i++){
     BiNode* node = queue->objects[i];
     opacity[i] = node->opacity;
-    if(node->texture_mapping != NULL) {
-      BiTextureMapping *t = node->texture_mapping;
-      if(t->flip_horizontal) {
-        uv[i*4+0] = t->_uv[2]; // Left <-> Right
-        uv[i*4+2] = t->_uv[0];
+    if(node->_texture != NULL) {
+      if(node->_texture_flip_horizontal) {
+        uv[i*4+0] = node->_texture_uv_right; // Left <-> Right
+        uv[i*4+2] = node->_texture_uv_left;
       }else{
-        uv[i*4+0] = t->_uv[0];
-        uv[i*4+2] = t->_uv[2];
+        uv[i*4+0] = node->_texture_uv_left;
+        uv[i*4+2] = node->_texture_uv_right;
       }
-      if(!t->flip_vertical) { // XXX: DEFAULT flipped
-        uv[i*4+1] = t->_uv[3]; // Top <-> Bottom
-        uv[i*4+3] = t->_uv[1];
+      if( node->_texture_flip_vertical == false ) { // XXX: DEFAULT flipped
+        uv[i*4+1] = node->_texture_uv_bottom; // Top <-> Bottom
+        uv[i*4+3] = node->_texture_uv_top;
       }else{
-        uv[i*4+1] = t->_uv[1];
-        uv[i*4+3] = t->_uv[3];
+        uv[i*4+1] = node->_texture_uv_top;
+        uv[i*4+3] = node->_texture_uv_bottom;
       }
-      texture_z[i] = t->texture->_texture_unit;
+      texture_z[i] = node->_texture->_texture_unit;
     }else{
       texture_z[i] = -1; // no-texture
     }
 
     // Matrix
-    if(node->texture_mapping && node->texture_mapping->clipped){
-      GLfloat tmp[16];
-      calc_clipped_texture_mapping_matrix(node,tmp);
-      bi_mat4_copy(transforms[i], tmp);
+    if(node->_texture_cropped){
+      bi_mat4_multiply(node->_matrix_texture_with_cropped,node->transform,transforms[i]);
     }else{
       bi_mat4_copy(transforms[i], node->draw);
     }

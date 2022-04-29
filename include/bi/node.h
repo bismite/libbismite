@@ -21,13 +21,10 @@ typedef bool (*on_textinput_callback)(BiContext*, BiNode*, char*); // null-termi
 
 struct _BiNode {
   BI_NODE_HEADER;
-  int x;
-  int y;
-  int w;
-  int h;
-  float angle;
-  float scale_x;
-  float scale_y;
+  int _x, _y, _w, _h;
+  float _angle;
+  float _scale_x;
+  float _scale_y;
   float anchor_x;
   float anchor_y;
   bool _matrix_include_anchor_translate;
@@ -37,12 +34,20 @@ struct _BiNode {
   uint8_t color[4];
   float opacity;
 
-  BiTextureMapping *texture_mapping;
-
   // matrix
   GLfloat transform[16];
   GLfloat draw[16];
+  GLfloat _matrix_texture_with_cropped[16];
   bool matrix_cached;
+
+  // Texture
+  BiTexture *_texture;
+  int _tx,_ty,_tw,_th;
+  GLfloat _texture_uv_left,_texture_uv_top,_texture_uv_right,_texture_uv_bottom;
+  bool _texture_cropped;
+  int _cx,_cy,_ow,_oh;
+  bool _texture_flip_horizontal;
+  bool _texture_flip_vertical;
 
   BiNode *parent;
   Array children;
@@ -68,22 +73,48 @@ extern BiNode* bi_node_remove_from_parent(BiNode* node);
 
 // geometry
 extern void bi_node_set_position(BiNode* n, int x, int y);
-static inline void bi_node_set_x(BiNode* n, int x) { bi_node_set_position(n,x,n->y); }
-static inline void bi_node_set_y(BiNode* n, int y) { bi_node_set_position(n,n->x,y); }
+static inline void bi_node_set_x(BiNode* n, int x) { bi_node_set_position(n,x,n->_y); }
+static inline void bi_node_set_y(BiNode* n, int y) { bi_node_set_position(n,n->_x,y); }
 extern void bi_node_set_z(BiNode* n, int z);
 extern void bi_node_set_size(BiNode* n, int w, int h);
-static inline void bi_node_set_w(BiNode* n, int w) { bi_node_set_size(n,w,n->h); }
-static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->w,h); }
+static inline void bi_node_set_w(BiNode* n, int w) { bi_node_set_size(n,w,n->_h); }
+static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->_w,h); }
 extern void bi_node_set_scale(BiNode* n, float x, float y);
-static inline void bi_node_set_scale_x(BiNode* n, float x) { bi_node_set_scale(n,x,n->scale_y); }
-static inline void bi_node_set_scale_y(BiNode* n, float y) { bi_node_set_scale(n,n->scale_x,y); }
+static inline void bi_node_set_scale_x(BiNode* n, float x) { bi_node_set_scale(n,x,n->_scale_y); }
+static inline void bi_node_set_scale_y(BiNode* n, float y) { bi_node_set_scale(n,n->_scale_x,y); }
 static inline void bi_node_set_anchor(BiNode* n, float x, float y) { n->anchor_x=x; n->anchor_y=y; }
 extern void bi_node_set_angle(BiNode* n, float angle);
 static inline void bi_node_set_degree(BiNode* n, float degree) { bi_node_set_angle(n,degree*(M_PI/180.f)); }
-static inline double bi_node_get_degree(BiNode* n) { return n->angle*(180.f/M_PI); }
+static inline double bi_node_get_degree(BiNode* n) { return n->_angle*(180.f/M_PI); }
 extern void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_include_anchor_translate);
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);
+
+// Matrix
+extern bool bi_node_update_matrix(BiNode* n);
+
+// Texture
+extern void bi_node_set_texture(BiNode*, BiTexture*, uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th);
+extern void bi_node_set_cropped_texture(BiNode*, BiTexture*,
+  uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th,
+  uint16_t cx, uint16_t cy, uint16_t ow, uint16_t oh );
+extern void bi_node_unset_texture(BiNode*);
+//
+//  Original Image(cropped)   Texture in Sprite Sheet      Sprite Node
+//  0/0 ----------------- ^   0/0 -----------------    -------------------   ^
+//   |        cy        | |    |        ty        |    |                 |   |
+//   |     --------- ^  | |    |     --------- ^  |    |     ---------   |   |
+//   | cx  |Texture| th | oh   |  tx |Texture| th |    |  X  |Texture|   | node_h
+//   |     --------- v  | |    |     --------- v  |    |     ---------   |   |
+//   |     <-- tw ->    | |    |     <-- tw ->    |    |         Y       |   |
+//   -------------------- v    --------------------   0/0 ----------------   v
+//   <-------- ow ------>                              <----- node_w ---->
+//                                                      X = ow/node_w*cx
+// Original Image(non cropped)                          Y = oh/node_h*(oh-th-cy)
+//  cx=0/cy=0-------- ^
+//     |   Texture  | th = oh
+//     -------------- v
+//     <-- tw = ow ->
 
 // Timer
 static inline void bi_node_add_timer(BiNode* node,BiTimer* timer){ bi_raw_node_add_timer((BiRawNode*)node,timer); }
@@ -96,8 +127,5 @@ static inline void bi_node_set_on_move_finger(BiNode* node, on_move_finger_callb
 static inline void bi_node_set_on_touch(BiNode* node, on_touch_callback callback){node->_on_touch = callback;}
 static inline void bi_node_set_on_keyinput(BiNode* node, on_keyinput_callback callback){node->_on_keyinput = callback;}
 static inline void bi_node_set_on_textinput(BiNode* node, on_textinput_callback callback){node->_on_textinput = callback;}
-
-//
-extern bool bi_node_update_matrix(BiNode* n);
 
 #endif

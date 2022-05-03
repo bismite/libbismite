@@ -169,14 +169,16 @@ void bi_shader_draw(BiShader* shader,Array* queue)
 {
   const size_t len = queue->size;
 
+  GLfloat transforms[len][16];
   GLfloat uv[4*len]; // [ left, top, right, bottom ]
   GLfloat texture_z[len];
-  GLfloat opacity[len];
-  GLfloat transforms[len][16];
   GLfloat tint[len][4];
+  GLfloat opacity[len];
   for(int i=0;i<len;i++){
     BiNode* node = queue->objects[i];
-    opacity[i] = node->opacity;
+    // Matrix
+    bi_mat4_copy(transforms[i], node->_draw_matrix);
+    // Texture
     if(node->_texture != NULL) {
       if(node->_texture_flip_horizontal) {
         uv[i*4+0] = node->_texture_uv_right; // Left <-> Right
@@ -196,29 +198,22 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     }else{
       texture_z[i] = -1; // no-texture
     }
-
-    // Matrix
-    if(node->_texture_cropped){
-      bi_mat4_multiply(node->_matrix_texture_with_cropped,node->transform,transforms[i]);
-    }else{
-      bi_mat4_copy(transforms[i], node->draw);
-    }
-
     // color
     tint[i][0] = node->color[0] / 255.0;
     tint[i][1] = node->color[1] / 255.0;
     tint[i][2] = node->color[2] / 255.0;
     tint[i][3] = node->color[3] / 255.0;
+    opacity[i] = node->opacity;
   }
 
   //
   // update vbo
   // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
   //
-  // opacity
-  glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, opacity);
+  // transform
+  glBindBuffer(GL_ARRAY_BUFFER, shader->transform_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, transforms);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   // texture_z (texture index send as float. not integer.)
   glBindBuffer(GL_ARRAY_BUFFER, shader->texture_z_buffer);
@@ -230,15 +225,15 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, uv);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // transform
-  glBindBuffer(GL_ARRAY_BUFFER, shader->transform_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, transforms);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   // tint color
   glBindBuffer(GL_ARRAY_BUFFER, shader->tint_color_buffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, tint);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // opacity
+  glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, opacity);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   //

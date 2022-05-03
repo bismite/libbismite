@@ -4,7 +4,7 @@
 static BiNode* create_new_node(int x, int y)
 {
   BiNode* node = bi_node_init(ALLOC(BiNode));
-  node->anchor_x = node->anchor_y = 0.5;
+  bi_node_set_anchor(node,0.5,0.5);
   bi_node_set_position(node,x,y);
   bi_node_set_size(node,40,80);
   bi_set_rgb( node->color, rand()%0xff,rand()%0xff,rand()%0xff );

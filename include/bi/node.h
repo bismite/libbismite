@@ -25,9 +25,8 @@ struct _BiNode {
   float _angle;
   float _scale_x;
   float _scale_y;
-  float anchor_x;
-  float anchor_y;
-  bool _matrix_include_anchor_translate;
+  float _anchor_x;
+  float _anchor_y;
   bool visible;
   bool _final_visibility;
 
@@ -35,10 +34,10 @@ struct _BiNode {
   float opacity;
 
   // matrix
-  GLfloat transform[16];
-  GLfloat draw[16];
-  GLfloat _matrix_texture_with_cropped[16];
-  bool matrix_cached;
+  GLfloat _transform_matrix[16];
+  GLfloat _draw_matrix[16];
+  bool _transform_matrix_cached;
+  bool _draw_matrix_cached;
 
   // Texture
   BiTexture *_texture;
@@ -82,11 +81,10 @@ static inline void bi_node_set_h(BiNode* n, int h) { bi_node_set_size(n,n->_w,h)
 extern void bi_node_set_scale(BiNode* n, float x, float y);
 static inline void bi_node_set_scale_x(BiNode* n, float x) { bi_node_set_scale(n,x,n->_scale_y); }
 static inline void bi_node_set_scale_y(BiNode* n, float y) { bi_node_set_scale(n,n->_scale_x,y); }
-static inline void bi_node_set_anchor(BiNode* n, float x, float y) { n->anchor_x=x; n->anchor_y=y; }
+extern void bi_node_set_anchor(BiNode* n, float x, float y);
 extern void bi_node_set_angle(BiNode* n, float angle);
 static inline void bi_node_set_degree(BiNode* n, float degree) { bi_node_set_angle(n,degree*(M_PI/180.f)); }
 static inline double bi_node_get_degree(BiNode* n) { return n->_angle*(180.f/M_PI); }
-extern void bi_node_set_matrix_include_anchor_translate(BiNode* n, bool matrix_include_anchor_translate);
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);
 

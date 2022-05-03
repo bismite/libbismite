@@ -12,32 +12,44 @@ int main(int argc, char* argv[])
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   BiNode* n = NULL;
 
-  // Angle and Scale
+  // Normal
   n = make_sprite_from_texture(tex);
   bi_node_set_position(n,120,240);
-  bi_node_set_degree(n,45);
-  bi_node_set_scale(n, 0.8,0.8);
+  bi_node_add_node(background,n);
+  // Crop
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,120,240);
+  bi_node_set_cropped_texture(n,tex, 64,32,64,96, 64,32,128,128 );
   bi_node_add_node(background,n);
 
-  // Flip Horizontal and Anchor
+  // Flip Horizontal (Crop)
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,360,240);
+  bi_node_set_cropped_texture(n,tex, 64,32,64,96, 64,32,128,128 );
+  n->_texture_flip_horizontal = true;
+  bi_node_add_node(background,n);
+  // Flip Horizontal (Normal)
   n = make_sprite_from_texture(tex);
   bi_node_set_position(n,360,240);
   n->_texture_flip_horizontal = true;
-  bi_node_set_anchor(n,1,1);
   bi_node_add_node(background,n);
 
-  // Flip Vertical and Resize
+  // Flip Vertical (Crop)
   n = make_sprite_from_texture(tex);
   bi_node_set_position(n,120,80);
   n->_texture_flip_vertical = true;
-  bi_node_set_size(n, 64,64);
+  bi_node_set_cropped_texture(n,tex, 64,32,64,96, 64,32,128,128 );
+  bi_node_add_node(background,n);
+  // Flip Vertical (Normal)
+  n = make_sprite_from_texture(tex);
+  bi_node_set_position(n,120,80);
+  n->_texture_flip_vertical = true;
   bi_node_add_node(background,n);
 
-  // Crop and Anchor
+  // Crop only
   n = make_sprite_from_texture(tex);
   bi_node_set_position(n,360,80);
-  bi_node_set_cropped_texture(n,tex, 32,0,64,128, 32,0,128,128 );
-  bi_node_set_matrix_include_anchor_translate(n,true);
+  bi_node_set_cropped_texture(n,tex, 64,32,64,96, 64,32,128,128 );
   bi_node_add_node(background,n);
 
   // layer

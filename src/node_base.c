@@ -6,7 +6,7 @@ void bi_raw_node_init(BiRawNode* node,BiNodeType type)
 {
   node->type = type;
   node->z = 0;
-  node->_index = 0;
+  node->index = 0;
   node->interaction_enabled = true;
   // timers
   node->time_scale = 1.0;

@@ -10,7 +10,7 @@ typedef struct _BiTexture {
   GLuint texture_id;
   uint16_t w;
   uint16_t h;
-  GLuint _texture_unit;
+  GLuint texture_unit;
 } BiTexture;
 
 // Texture

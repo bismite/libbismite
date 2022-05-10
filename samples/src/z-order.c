@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   bi_layer_init(layer);
   bi_add_layer(context,layer);
   layer->root = root;
-  layer->textures[0] = face_a->_texture;
+  layer->textures[0] = face_a->texture;
 
   bi_start_run_loop(context);
   return 0;

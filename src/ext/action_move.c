@@ -15,8 +15,8 @@ static void bi_action_move_by_update(BiAction* action, double rate,int delta_tim
 static void bi_action_move_by_start(BiAction* action)
 {
   BiActionMove* move = action->action_data;
-  move->from_x = action->node->_x;
-  move->from_y = action->node->_y;
+  move->from_x = action->node->x;
+  move->from_y = action->node->y;
 }
 
 void bi_action_move_by_init(BiAction* action,int duration,int dx,int dy)
@@ -43,8 +43,8 @@ static void bi_action_move_to_update(BiAction* action, double rate,int delta_tim
 static void bi_action_move_to_start(BiAction* action)
 {
   BiActionMove* move = action->action_data;
-  move->from_x = action->node->_x;
-  move->from_y = action->node->_y;
+  move->from_x = action->node->x;
+  move->from_y = action->node->y;
 }
 
 void bi_action_move_to_init(BiAction* action,int duration,int dx,int dy)

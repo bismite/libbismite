@@ -37,13 +37,13 @@ struct _BiContext {
   BiLayerGroup layers;
 
   // queue
-  Array _rendering_queue;
-  Array _interaction_queue;
-  Array _timer_queue;
+  Array rendering_queue;
+  Array interaction_queue;
+  Array timer_queue;
 
   // timers
-  int64_t _frame_start_at;
-  int64_t _last_update;
+  int64_t frame_start_at;
+  int64_t last_update;
   int max_delta;
 
   // default shader
@@ -53,8 +53,8 @@ struct _BiContext {
   SDL_Window *window;
 
   //
-  BiFramebuffer _layer_framebuffer;
-  BiFramebuffer _post_process_framebuffer;
+  BiFramebuffer layer_framebuffer;
+  BiFramebuffer post_process_framebuffer;
 
   //
   void* userdata;

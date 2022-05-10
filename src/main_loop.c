@@ -15,54 +15,54 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
   bool swallow = false;
   switch(e->type){
     case SDL_MOUSEMOTION:
-      if(n->_on_move_cursor!=NULL){
+      if(n->on_move_cursor!=NULL){
         int y = context->h - e->motion.y;
-        swallow = n->_on_move_cursor(context,n,e->motion.x,y);
+        swallow = n->on_move_cursor(context,n,e->motion.x,y);
       }
       break;
     case SDL_MOUSEBUTTONDOWN:
-      if(n->_on_click!=NULL){
+      if(n->on_click!=NULL){
         int y = context->h - e->button.y;
-        swallow = n->_on_click(context,n,e->button.x,y,e->button.button,true);
+        swallow = n->on_click(context,n,e->button.x,y,e->button.button,true);
       }
       break;
     case SDL_MOUSEBUTTONUP:
-      if(n->_on_click!=NULL){
+      if(n->on_click!=NULL){
         int y = context->h - e->button.y;
-        swallow = n->_on_click(context,n,e->button.x,y,e->button.button,false);
+        swallow = n->on_click(context,n,e->button.x,y,e->button.button,false);
       }
       break;
     case SDL_FINGERMOTION:
-      if(n->_on_move_finger!=NULL){
+      if(n->on_move_finger!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_move_finger(context,n, e->tfinger.x, y, e->tfinger.fingerId);
+        swallow = n->on_move_finger(context,n, e->tfinger.x, y, e->tfinger.fingerId);
       }
       break;
     case SDL_FINGERDOWN:
-      if(n->_on_touch!=NULL){
+      if(n->on_touch!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_touch(context,n,e->tfinger.x,y,e->tfinger.fingerId,true);
+        swallow = n->on_touch(context,n,e->tfinger.x,y,e->tfinger.fingerId,true);
       }
       break;
     case SDL_FINGERUP:
-      if(n->_on_touch!=NULL){
+      if(n->on_touch!=NULL){
         float y = 1.0 - e->tfinger.y;
-        swallow = n->_on_touch(context,n,e->tfinger.x,y,e->tfinger.fingerId,false);
+        swallow = n->on_touch(context,n,e->tfinger.x,y,e->tfinger.fingerId,false);
       }
       break;
     case SDL_KEYDOWN:
-      if(n->_on_keyinput!=NULL){
-        swallow = n->_on_keyinput(context,n,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,true);
+      if(n->on_keyinput!=NULL){
+        swallow = n->on_keyinput(context,n,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,true);
       }
       break;
     case SDL_KEYUP:
-      if(n->_on_keyinput!=NULL){
-        swallow = n->_on_keyinput(context,n,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,false);
+      if(n->on_keyinput!=NULL){
+        swallow = n->on_keyinput(context,n,e->key.keysym.scancode,e->key.keysym.sym,e->key.keysym.mod,false);
       }
       break;
     case SDL_TEXTINPUT:
-      if(n->_on_textinput!=NULL){
-        swallow = n->_on_textinput(context,n,e->text.text);
+      if(n->on_textinput!=NULL){
+        swallow = n->on_textinput(context,n,e->text.text);
       }
       break;
   }
@@ -72,14 +72,14 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 static void main_loop( void* arg )
 {
   BiContext *context = (BiContext*)arg;
-  context->_frame_start_at = bi_get_now();
-  double delta_time = context->_last_update==0 ? 0 : (context->_frame_start_at - context->_last_update);
+  context->frame_start_at = bi_get_now();
+  double delta_time = context->last_update==0 ? 0 : (context->frame_start_at - context->last_update);
   if(delta_time > context->max_delta) delta_time = context->max_delta;
-  context->_last_update = context->_frame_start_at;
+  context->last_update = context->frame_start_at;
 
-  bi_profile_record(&context->profile,context->_frame_start_at);
+  bi_profile_record(&context->profile,context->frame_start_at);
 
-  context->profile.callback_planned_nodes_size = context->_interaction_queue.size;
+  context->profile.callback_planned_nodes_size = context->interaction_queue.size;
 
   //
   // callback and event handling
@@ -89,20 +89,20 @@ static void main_loop( void* arg )
   SDL_PumpEvents();
   int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
   // timer
-  for(int i=context->_timer_queue.size-1;i>=0;i--){
-    BiRawNode *n = context->_timer_queue.objects[i];
+  for(int i=context->timer_queue.size-1;i>=0;i--){
+    BiRawNode *n = context->timer_queue.objects[i];
     if( n == NULL ) continue;
     // Timer
     bi_node_run_timers(context,n,delta_time);
   }
   // callback
-  for(int i=context->_interaction_queue.size-1;i>=0;i--){
-    BiRawNode *n = context->_interaction_queue.objects[i];
+  for(int i=context->interaction_queue.size-1;i>=0;i--){
+    BiRawNode *n = context->interaction_queue.objects[i];
     if( n == NULL ) continue;
     // Event Handler
     if( n->type != BI_NODE_TYPE_NODE ) continue;
     BiNode* node = (BiNode*)n;
-    if( node->_final_visibility ) {
+    if( node->final_visibility ) {
       for(int i=0;i<event_size;i++) {
         if(e[i].type == 0) continue;
         bool swallow = node_event_handle(node,context,&e[i]);
@@ -121,8 +121,8 @@ static void main_loop( void* arg )
   }
 
   // reset queue
-  array_clear(&context->_interaction_queue);
-  array_clear(&context->_timer_queue);
+  array_clear(&context->interaction_queue);
+  array_clear(&context->timer_queue);
 
   int64_t phase2 = bi_get_now();
 
@@ -135,7 +135,7 @@ static void main_loop( void* arg )
   int64_t phase3 = bi_get_now();
 
   //
-  context->profile.time_spent_on_callback = phase2 - context->_frame_start_at;
+  context->profile.time_spent_on_callback = phase2 - context->frame_start_at;
   context->profile.time_spent_on_rendering = phase3 - phase2;
 }
 

@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   bi_layer_init(layer);
   bi_add_layer(context,layer);
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);
-  layer->textures[0] = layer->root->_texture;
+  layer->textures[0] = layer->root->texture;
   // straight blending
   bi_set_blend_factor(&layer->blend_factor,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 

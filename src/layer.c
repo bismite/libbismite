@@ -57,16 +57,16 @@ static int layer_order_compare(const void *_a, const void *_b )
 {
   const BiRawNode *a = *(BiRawNode**)_a;
   const BiRawNode *b = *(BiRawNode**)_b;
-  return a->z == b->z ? a->_index - b->_index : a->z - b->z;
+  return a->z == b->z ? a->index - b->index : a->z - b->z;
 }
 
 void bi_layer_group_update_order(BiLayerGroup* layer_group)
 {
   int size = layer_group->layers.size;
   BiRawNode** objects = (BiRawNode**)layer_group->layers.objects;
-  for( int i=0; i<size; i++ ) { objects[i]->_index = i; }
+  for( int i=0; i<size; i++ ) { objects[i]->index = i; }
   qsort( objects, size, sizeof(void*), layer_order_compare );
-  for( int i=0; i<size; i++ ) { objects[i]->_index = i; }
+  for( int i=0; i<size; i++ ) { objects[i]->index = i; }
 }
 
 int bi_layer_group_get_z_order(BiLayerGroup* layer_group)

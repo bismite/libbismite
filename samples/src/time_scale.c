@@ -3,7 +3,7 @@
 static void rotate_face(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = (BiNode*)timer->node;
-  bi_node_set_angle(node, node->_angle + dt * M_PI/180);
+  bi_node_set_angle(node, node->angle + dt * M_PI/180);
 }
 
 int main(int argc,char* argv[])
@@ -30,7 +30,7 @@ int main(int argc,char* argv[])
   }
 
   // textures
-  layer->textures[0] = layer->root->_texture;
+  layer->textures[0] = layer->root->texture;
   layer->textures[1] = tex;
 
   // fps layer

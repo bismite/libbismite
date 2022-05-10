@@ -25,7 +25,7 @@ int main(int argc,char* argv[])
   BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   bi_add_layer(context,layer);
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);
-  layer->textures[0] = layer->root->_texture;
+  layer->textures[0] = layer->root->texture;
   layer->textures[1] = texture;
 
   const int W = context->w/TILE_SIZE+1;

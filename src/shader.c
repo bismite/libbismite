@@ -177,24 +177,24 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   for(int i=0;i<len;i++){
     BiNode* node = queue->objects[i];
     // Matrix
-    bi_mat4_copy(transforms[i], node->_draw_matrix);
+    bi_mat4_copy(transforms[i], node->draw_matrix);
     // Texture
-    if(node->_texture != NULL) {
-      if(node->_texture_flip_horizontal) {
-        uv[i*4+0] = node->_texture_uv_right; // Left <-> Right
-        uv[i*4+2] = node->_texture_uv_left;
+    if(node->texture != NULL) {
+      if(node->texture_flip_horizontal) {
+        uv[i*4+0] = node->texture_uv_right; // Left <-> Right
+        uv[i*4+2] = node->texture_uv_left;
       }else{
-        uv[i*4+0] = node->_texture_uv_left;
-        uv[i*4+2] = node->_texture_uv_right;
+        uv[i*4+0] = node->texture_uv_left;
+        uv[i*4+2] = node->texture_uv_right;
       }
-      if( node->_texture_flip_vertical == false ) { // XXX: DEFAULT flipped
-        uv[i*4+1] = node->_texture_uv_bottom; // Top <-> Bottom
-        uv[i*4+3] = node->_texture_uv_top;
+      if( node->texture_flip_vertical == false ) { // XXX: DEFAULT flipped
+        uv[i*4+1] = node->texture_uv_bottom; // Top <-> Bottom
+        uv[i*4+3] = node->texture_uv_top;
       }else{
-        uv[i*4+1] = node->_texture_uv_top;
-        uv[i*4+3] = node->_texture_uv_bottom;
+        uv[i*4+1] = node->texture_uv_top;
+        uv[i*4+3] = node->texture_uv_bottom;
       }
-      texture_z[i] = node->_texture->_texture_unit;
+      texture_z[i] = node->texture->texture_unit;
     }else{
       texture_z[i] = -1; // no-texture
     }

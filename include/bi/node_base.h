@@ -15,7 +15,7 @@ typedef enum {
 
 #define BI_NODE_HEADER BiNodeType type; \
   int z; \
-  int _index; \
+  int index; \
   bool interaction_enabled; \
   struct { \
     int size; \
@@ -28,7 +28,6 @@ typedef enum {
 struct _BiRawNode{
   BI_NODE_HEADER
 };
-
 
 extern void bi_raw_node_init(BiRawNode* node,BiNodeType type);
 extern void bi_raw_node_add_timer(BiRawNode* node,BiTimer* timer);

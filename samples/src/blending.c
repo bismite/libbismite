@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
   BiLayer *bg = bi_layer_init(malloc(sizeof(BiLayer)));
   bi_add_layer(context,bg);
   bg->root = make_sprite_with_anchor("assets/map.png",0,0);
-  bg->textures[0] = bg->root->_texture;
+  bg->textures[0] = bg->root->texture;
 
   //
   struct Blend{ GLuint src; GLuint dst; GLuint asrc; GLuint adst; };
@@ -31,9 +31,9 @@ int main(int argc, char* argv[])
     BiLayer *a = bi_layer_init(ALLOC(BiLayer));
     bi_add_layer(context,a);
     a->root = make_sprite_with_anchor("assets/tester.png",0,0);
-    bi_node_set_scale(a->root, (float)IW/a->root->_w, (float)IH/a->root->_h );
+    bi_node_set_scale(a->root, (float)IW/a->root->w, (float)IH/a->root->h );
     bi_node_set_position(a->root, (context->w-IW*W)/(W+1)*(1+i%W)+IW*(i%W), (context->h-IH*H)/(H+1)*(1+i/W)+IH*(i/W));
-    a->textures[0] = a->root->_texture;
+    a->textures[0] = a->root->texture;
     a->blend_factor.src = b[i].src;
     a->blend_factor.dst = b[i].dst;
   }

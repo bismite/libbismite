@@ -34,7 +34,7 @@ struct _BiProfile
     int64_t time_spent_on_callback;
     int64_t time_spent_on_rendering;
 
-    BiProfileStats _stats_tmp;
+    BiProfileStats stats_tmp;
     BiProfileStats stats;
 };
 

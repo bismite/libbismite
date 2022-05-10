@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
   // layer
   bi_node_add_node(layer->root,sprite);
-  layer->textures[0] = layer->root->_texture;
+  layer->textures[0] = layer->root->texture;
   layer->textures[1] = texture;
 
   bi_start_run_loop(context);

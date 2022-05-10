@@ -90,7 +90,7 @@ BiTexture* bi_canvas_to_texture(BiCanvas* canvas,BiTexture* texture)
   texture->w = canvas->w;
   texture->h = canvas->h;
   texture->texture_id = canvas->framebuffer.texture_id;
-  texture->_texture_unit = 0;
+  texture->texture_unit = 0;
   return texture;
 }
 

@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   for(int i=0; i<4; i++){
     BiNode* label = bi_node_init(malloc(sizeof(BiNode)));
     bi_node_set_anchor(label,0,0);
-    bi_node_set_position( label, -popup->_w/2+20, 20+i*14 );
+    bi_node_set_position( label, -popup->w/2+20, 20+i*14 );
     bi_label_set_text(label,fonts[i], "The quick brown fox jumps over the lazy dog");
     bi_node_add_node(popup,label);
   }
@@ -102,8 +102,8 @@ int main(int argc, char* argv[])
   popup_shade->visible = false;
 
   // assign textures to layer
-  layer->textures[0] = layer->root->_texture;
-  layer->textures[1] = img->_texture;
+  layer->textures[0] = layer->root->texture;
+  layer->textures[1] = img->texture;
   layer->textures[2] = font_texture;
 
   //

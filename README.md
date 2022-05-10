@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 4.0.0 - 2022/5/10
+- TextureMapping removed.
+- Cropped Texture supported.
 ## 3.0.0 - 2022/4/14
 - update ext/font
   - organize function names

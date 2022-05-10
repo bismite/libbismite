@@ -51,8 +51,8 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
   // velocity
   struct particle_data* p = malloc(sizeof(struct particle_data));
   node->userdata = p;
-  p->x = node->_x;
-  p->y = node->_y;
+  p->x = node->x;
+  p->y = node->y;
   p->vx = (rand()%100/100.0) * 0.4 * (rand()%2==0 ? 1 : -1);
   p->vy = (rand()%100/100.0) * 0.4 * (rand()%2==0 ? 1 : -1);
 
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   bi_layer_init(layer);
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);;
   bi_add_layer(context,layer);
-  layer->textures[0] = layer->root->_texture;
+  layer->textures[0] = layer->root->texture;
   layer->textures[1] = ball_texture;
   // additive blending
   layer->blend_factor.src = GL_SRC_ALPHA;

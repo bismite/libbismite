@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(face,context->w/2,context->h/2);
   BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   layer->root = face;
-  layer->textures[0] = face->_texture;
+  layer->textures[0] = face->texture;
   BiLayerGroup* lg = bi_layer_group_init(malloc(sizeof(BiLayerGroup)));
   bi_layer_group_add_layer(lg,layer);
 
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(bg,context->w/2,context->h/2);
   BiLayer* layer2 = bi_layer_init(malloc(sizeof(BiLayer)));
   layer2->root = bg;
-  layer2->textures[0] = bg->_texture;
+  layer2->textures[0] = bg->texture;
   BiLayerGroup* lg2 = bi_layer_group_init(malloc(sizeof(BiLayerGroup)));
   bi_layer_group_add_layer(lg2,layer2);
 

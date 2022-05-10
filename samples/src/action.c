@@ -108,8 +108,8 @@ int main(int argc, char* argv[])
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_set_position(face,240,160);
   bi_node_add_node(layer->root,face);
-  layer->textures[0] = layer->root->_texture;
-  layer->textures[1] = face->_texture;
+  layer->textures[0] = layer->root->texture;
+  layer->textures[1] = face->texture;
 
   // callback
   bi_node_set_on_click(face, on_click);

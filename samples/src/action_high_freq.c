@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(face2,240,320/3*2);
   bi_node_add_node(layer->root,face2);
 
-  layer->textures[0] = layer->root->_texture;
+  layer->textures[0] = layer->root->texture;
   layer->textures[1] = t;
 
   // action

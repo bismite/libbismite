@@ -15,8 +15,8 @@ static void bi_action_scale_by_update(BiAction* action, double rate,int delta_ti
 static void bi_action_scale_by_start(BiAction* action)
 {
   BiActionScale* scale = action->action_data;
-  scale->from_x = action->node->_scale_x;
-  scale->from_y = action->node->_scale_y;
+  scale->from_x = action->node->scale_x;
+  scale->from_y = action->node->scale_y;
 }
 
 void bi_action_scale_by_init(BiAction* action,int duration,double dx,double dy)
@@ -43,8 +43,8 @@ static void bi_action_scale_to_update(BiAction* action, double rate,int delta_ti
 static void bi_action_scale_to_start(BiAction* action)
 {
   BiActionScale* scale = action->action_data;
-  scale->from_x = action->node->_scale_x;
-  scale->from_y = action->node->_scale_y;
+  scale->from_x = action->node->scale_x;
+  scale->from_y = action->node->scale_y;
 }
 
 void bi_action_scale_to_init(BiAction* action,int duration,double dx,double dy)

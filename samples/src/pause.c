@@ -17,7 +17,7 @@ static BiAction* alloc_action(size_t size, void* payload)
 static void rotate_on_timer(BiContext* context,BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
-  bi_node_set_angle(node, node->_angle + 2.0*M_PI/180.0);
+  bi_node_set_angle(node, node->angle + 2.0*M_PI/180.0);
 }
 
 static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, bool pressed)
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = bg;
   bi_layer_group_add_layer(&context->layers,layer);
-  layer->textures[0] = bg->_texture;
+  layer->textures[0] = bg->texture;
 
   layer_group_a = malloc(sizeof(BiLayerGroup));
   init_layer_group(context, layer_group_a, 320/3*2);

@@ -19,8 +19,8 @@ struct _BiTransition {
   bi_transition_callback callback;
   BiTimer timer;
   bool invert;
-  int64_t _start_at;
-  bool _done;
+  int64_t start_at;
+  bool done;
   void* userdata;
   int delay_count;
   double progress;

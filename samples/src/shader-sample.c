@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   BiNode* bg = make_sprite("assets/check.png");
   bi_node_set_position(bg,context->w/2,context->h/2);
   bi_node_add_node(bg_layer->root,bg);
-  bg_layer->textures[0] = bg->_texture;
+  bg_layer->textures[0] = bg->texture;
   bg_layer->shader = bg_shader;
   bi_layer_group_add_layer(layer_group,bg_layer);
   // post process
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   bi_layer_init(fg_layer);
   fg_layer->root = root;
   bi_node_set_scale(root,2.0,2.0);
-  fg_layer->textures[0] = root->_texture;
+  fg_layer->textures[0] = root->texture;
   fg_layer->shader = fg_shader;
   bi_layer_group_add_layer(layer_group,fg_layer);
   fg_layer->post_process.shader = fg_pp_shader;

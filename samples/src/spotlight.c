@@ -4,7 +4,7 @@
 static void spin(BiContext* context,BiTimer* t,double dt)
 {
   BiNode *node = (BiNode*)t->node;
-  bi_node_set_angle(node, node->_angle + 0.01);
+  bi_node_set_angle(node, node->angle + 0.01);
 }
 
 static BiNode* create_spotlight(BiTexture* texture,float x, float y)
@@ -43,8 +43,8 @@ int main(int argc,char* argv[])
   BiLayer *layer = malloc(sizeof(BiLayer));
   bi_layer_init(layer);
   layer->root = bg;
-  layer->textures[0] = bg->_texture;
-  layer->textures[1] = face->_texture;
+  layer->textures[0] = bg->texture;
+  layer->textures[1] = face->texture;
 
   bi_add_layer(context,layer);
 
@@ -67,8 +67,8 @@ int main(int argc,char* argv[])
   spotlight_layer->blend_factor.src = GL_DST_COLOR;
   spotlight_layer->blend_factor.dst = GL_ONE;
   // textures
-  spotlight_layer->textures[0] = spotlight->_texture;
-  spotlight_layer->textures[1] = spotlight2->_texture;
+  spotlight_layer->textures[0] = spotlight->texture;
+  spotlight_layer->textures[1] = spotlight2->texture;
 
   bi_add_layer(context,spotlight_layer);
 

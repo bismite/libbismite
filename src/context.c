@@ -164,14 +164,14 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 
   context->program_start_at = bi_get_now();
 
-  array_init(&context->_rendering_queue);
-  array_init(&context->_interaction_queue);
-  array_init(&context->_timer_queue);
+  array_init(&context->rendering_queue);
+  array_init(&context->interaction_queue);
+  array_init(&context->timer_queue);
 
   bi_layer_group_init(&context->layers);
 
   // timers
-  context->_last_update = 0;
+  context->last_update = 0;
   context->max_delta = 100;
 
   //
@@ -204,8 +204,8 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   // framebuffer
   GLint dims[4] = {0};
   glGetIntegerv(GL_VIEWPORT, dims);
-  bi_framebuffer_init(&context->_layer_framebuffer,dims[2],dims[3]);
-  bi_framebuffer_init(&context->_post_process_framebuffer,dims[2],dims[3]);
+  bi_framebuffer_init(&context->layer_framebuffer,dims[2],dims[3]);
+  bi_framebuffer_init(&context->post_process_framebuffer,dims[2],dims[3]);
 
   return context;
 }

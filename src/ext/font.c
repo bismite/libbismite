@@ -16,7 +16,7 @@ static BiGlyphNode* make_glyph_node()
 
 static bool __bi_font_init__(SDL_RWops* rwops, BiFontAtlas* font)
 {
-  font->_pool = NULL;
+  font->pool = NULL;
   for(int i=0;i<0x100;i++) { font->table[i] = NULL; }
   int64_t fsize = SDL_RWsize(rwops);
   BiFontHeader header;
@@ -32,14 +32,14 @@ static bool __bi_font_init__(SDL_RWops* rwops, BiFontAtlas* font)
     LOG("wrong file size\n");
     return false;
   }
-  font->_pool = malloc(sizeof(BiGlyphLayout)*header.glyph_count);
-  size_t glyph_count = SDL_RWread(rwops,font->_pool,sizeof(BiGlyphLayout),header.glyph_count);
+  font->pool = malloc(sizeof(BiGlyphLayout)*header.glyph_count);
+  size_t glyph_count = SDL_RWread(rwops,font->pool,sizeof(BiGlyphLayout),header.glyph_count);
   if(glyph_count!=header.glyph_count){
     LOG("wrong glyph count %zu (require %d)\n",glyph_count,header.glyph_count);
     return false;
   }
   for(int i=0; i<header.glyph_count; i++){
-    BiGlyphLayout *l = &font->_pool[i];
+    BiGlyphLayout *l = &font->pool[i];
     uint32_t cp = l->codepoint;
     // uint8_t d = cp>>24 & 0xff;
     uint8_t c = cp>>16 & 0xff;
@@ -170,7 +170,7 @@ void bi_label_set_text_with_color(BiNode* node, const BiFontAtlas* font, const c
   }
   bi_node_set_size(node,x,line_height);
   // set position to zero
-  bi_node_set_position(label, -node->_w*node->_anchor_x, -node->_h*node->_anchor_y);
+  bi_node_set_position(label, -node->w*node->anchor_x, -node->h*node->anchor_y);
 }
 
 void bi_label_set_text(BiNode* label, const BiFontAtlas* font, const char* text)
@@ -202,4 +202,10 @@ void bi_label_set_color_with_range(BiNode* node, int start, int end,
     bi_set_color( n->color, r,g,b,a );
     n->opacity = opacity;
   }
+}
+
+void bi_label_anchor_reposition(BiNode* node)
+{
+  BiNode* label = get_label_node(node);
+  bi_node_set_position(label, -node->w*node->anchor_x, -node->h*node->anchor_y);
 }

@@ -1,4 +1,4 @@
-name: Build Emscripten
+name: Build Emscripten no-simd
 on:
   push:
     tags:

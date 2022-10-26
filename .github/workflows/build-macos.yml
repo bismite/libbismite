@@ -7,7 +7,7 @@ jobs:
   macOS:
     runs-on: macos-12
     env:
-      SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+      SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2

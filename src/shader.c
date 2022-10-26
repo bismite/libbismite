@@ -168,16 +168,25 @@ void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale
 void bi_shader_draw(BiShader* shader,Array* queue)
 {
   const size_t len = queue->size;
+  static size_t len_max = 0;
+  static GLfloat *transforms = NULL;
+  static GLfloat *uv = NULL; // [ left, top, right, bottom ]
+  static GLfloat *texture_z = NULL;
+  static GLfloat *tint = NULL;
+  static GLfloat *opacity = NULL;
+  if(len>len_max){
+    len_max = len;
+    transforms = realloc( transforms, sizeof(GLfloat)*len*16 );
+    uv = realloc( uv, sizeof(GLfloat)*len*4 );
+    texture_z = realloc( texture_z, sizeof(GLfloat)*len );
+    tint = realloc( tint, sizeof(GLfloat)*len*4 );
+    opacity = realloc( opacity, sizeof(GLfloat)*len );
+  }
 
-  GLfloat transforms[len][16];
-  GLfloat uv[4*len]; // [ left, top, right, bottom ]
-  GLfloat texture_z[len];
-  GLfloat tint[len][4];
-  GLfloat opacity[len];
-  for(int i=0;i<len;i++){
+  for( uint64_t i=0; i<len; i++ ) {
     BiNode* node = queue->objects[i];
     // Matrix
-    bi_mat4_copy(transforms[i], node->draw_matrix);
+    bi_mat4_copy(&transforms[i*16], node->draw_matrix);
     // Texture
     if(node->texture != NULL) {
       if(node->texture_flip_horizontal) {
@@ -199,10 +208,10 @@ void bi_shader_draw(BiShader* shader,Array* queue)
       texture_z[i] = -1; // no-texture
     }
     // color
-    tint[i][0] = node->color[0] / 255.0;
-    tint[i][1] = node->color[1] / 255.0;
-    tint[i][2] = node->color[2] / 255.0;
-    tint[i][3] = node->color[3] / 255.0;
+    tint[i*4+0] = node->color[0] / 255.0;
+    tint[i*4+1] = node->color[1] / 255.0;
+    tint[i*4+2] = node->color[2] / 255.0;
+    tint[i*4+3] = node->color[3] / 255.0;
     opacity[i] = node->opacity;
   }
 

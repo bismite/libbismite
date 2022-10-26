@@ -4,6 +4,7 @@
 #include "fps.h"
 
 #ifdef __EMSCRIPTEN__
+#include <emscripten/version.h>
 #define SHADER_HEADER "#version 100\n" "precision highp float;\n"
 #else
 #define SHADER_HEADER "#version 120\n"

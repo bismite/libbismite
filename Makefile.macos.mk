@@ -1,25 +1,26 @@
+BUILD_DIR=build/macos
 CC=clang
 AR=ar
 CFLAGS=-Wall -O3 -fPIC -arch arm64 -arch x86_64
-INCLUDE_PATHS=-Iinclude -Ibuild/macos/SDL/include/SDL2
+INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/SDL/include/SDL2
 
-LIB_DIR=build/macos/lib
+LIB_DIR=$(BUILD_DIR)/lib
 TARGET=$(LIB_DIR)/libbismite.a
-OBJ_DIR=build/macos/objs
+OBJ_DIR=$(BUILD_DIR)/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 SDL_TGZ=build/SDL-macOS-UniversalBinaries.tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-macOS-UniversalBinaries/releases/download/1.2/SDL-macOS-UniversalBinaries.tgz
-SDL_DIR=build/macos/SDL
+SDL_DIR=$(BUILD_DIR)/SDL
 
-SAMPLE_DIR=build/macos/samples
+SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS =-L$(LIB_DIR) -Lbuild/macos/SDL/lib -lSDL2 -lSDL2_image -framework OpenGL -lbismite
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -L$(BUILD_DIR)/SDL/lib -lSDL2 -lSDL2_image -framework OpenGL -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
-ARCHIVE=build/macos/libbismite-macos.tgz
+ARCHIVE=$(BUILD_DIR)/libbismite-macos.tgz
 
 # ----
 
@@ -27,7 +28,7 @@ all: $(OBJ_DIR) $(LIB_DIR) $(SDL_DIR) $(TARGET)
 samples: all $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
 release: all $(ARCHIVE)
 clean:
-	rm -rf build/macos
+	rm -rf $(BUILD_DIR)
 
 $(SDL_TGZ):
 	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
@@ -60,11 +61,11 @@ $(SAMPLE_DIR)/%.exe: samples/src/%.c
 copyassets:
 	cp -R samples/assets $(SAMPLE_DIR)
 copysdl:
-	cp -R build/macos/SDL/lib build/macos/SDL/licenses $(SAMPLE_DIR)
+	cp -R $(BUILD_DIR)/SDL/lib $(BUILD_DIR)/SDL/licenses $(SAMPLE_DIR)
 
 # ----
 
 $(ARCHIVE):
-	cp -R include build/macos
-	cp LICENSE.txt build/macos/LICENSE.txt
-	tar -cz -C build/macos -f $(ARCHIVE) lib LICENSE.txt include
+	cp -R include $(BUILD_DIR)
+	cp LICENSE.txt $(BUILD_DIR)/LICENSE.txt
+	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE) lib LICENSE.txt include

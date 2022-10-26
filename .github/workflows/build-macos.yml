@@ -5,7 +5,7 @@ on:
       - '*'
 jobs:
   macOS:
-    runs-on: macos-10.15
+    runs-on: macos-12
     env:
       SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
     steps:

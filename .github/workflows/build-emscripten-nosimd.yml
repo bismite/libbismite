@@ -1,4 +1,4 @@
-name: Build Linux
+name: Build Emscripten
 on:
   push:
     tags:
@@ -7,18 +7,15 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install libgl-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libyaml-dev clang
+      - uses: mymindstorm/setup-emsdk@v9
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: make -f Makefile.linux.mk release
+      - run: make -f Makefile.emscripten-nosimd.mk release
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/linux/libbismite-linux.tgz
-          asset_name: libbismite-linux.tgz
+          file: build/emscripten-nosimd/libbismite-emscripten-nosimd.tgz
+          asset_name: libbismite-emscripten-nosimd.tgz
           tag: ${{ github.ref }}
           overwrite: true

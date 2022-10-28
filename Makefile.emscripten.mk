@@ -38,12 +38,10 @@ ARCHIVE_SAMPLES=build/emscripten/libbismite-emscripten-samples.tgz
 
 # ----
 
-all: release release-samples
+all: samples samples-nosimd $(ARCHIVE) $(ARCHIVE_SAMPLES)
 lib: $(LIB_DIR) $(OBJ_DIR) $(TARGET) $(OBJ_DIR_NOSIMD) $(TARGET_NOSIMD)
 samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES)
 samples-nosimd: lib $(SAMPLE_DIR_NOSIMD) $(SAMPLE_EXES_NOSIMD)
-release: lib $(ARCHIVE)
-release-samples: samples samples-nosimd $(ARCHIVE_SAMPLES)
 
 clean:
 	rm -rf build/emscripten

@@ -9,12 +9,20 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: make -f Makefile.macos.mk release
-      - name: Upload binaries to release
+      - run: make -f Makefile.macos.mk
+      - name: Upload library
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/macos/libbismite-macos.tgz
           asset_name: libbismite-macos.tgz
+          tag: ${{ github.ref }}
+          overwrite: true
+      - name: Upload samples
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/macos/libbismite-macos-samples.tgz
+          asset_name: libbismite-macos-samples.tgz
           tag: ${{ github.ref }}
           overwrite: true

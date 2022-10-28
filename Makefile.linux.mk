@@ -16,12 +16,14 @@ SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite `sdl2-config --libs` -lSDL2_image -lSDL2_
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=build/linux/libbismite-linux.tgz
+ARCHIVE_SAMPLES=build/linux/libbismite-linux-samples.tgz
 
 # ----
 
-all: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
-samples: all $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets
-release: all $(ARCHIVE)
+all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
+lib: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
+samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets
+
 clean:
 	rm -rf build/linux
 
@@ -52,5 +54,11 @@ copyassets:
 
 $(ARCHIVE):
 	cp -R include build/linux
-	cp LICENSE.txt build/linux/LICENSE.txt
-	tar -cz -C build/linux -f $(ARCHIVE) lib LICENSE.txt include
+	mkdir -p build/linux/licenses
+	cp LICENSE.txt build/linux/licenses/libbismite-LICENSE.txt
+	tar -cz -C build/linux -f $(ARCHIVE) lib include licenses
+
+$(ARCHIVE_SAMPLES):
+	mkdir -p build/linux/licenses
+	cp LICENSE.txt build/linux/licenses/libbismite-LICENSE.txt
+	tar -cz -C build/linux -f $(ARCHIVE_SAMPLES) samples licenses

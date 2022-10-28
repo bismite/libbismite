@@ -27,9 +27,9 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32-samples.tgz
 
 # ----
 
+all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 libs: $(OBJ_DIR) $(LIB_DIR) $(LIBSDL2) $(TARGET)
 samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
-all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 
 clean:
 	rm -rf $(BUILD_DIR)

@@ -1,11 +1,11 @@
 #include <bi/canvas.h>
-#include <bi/matrix.h>
 #include <bi/camera.h>
 #include <bi/bi_gl.h>
 #include <bi/render.h>
 #include <bi/node.h>
 #include <bi/shader.h>
 #include <bi/context.h>
+#include "matrix.h"
 
 BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h)
 {

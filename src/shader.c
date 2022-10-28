@@ -1,10 +1,10 @@
 #include <bi/shader.h>
-#include <bi/matrix.h>
 #include <bi/camera.h>
 #include <bi/util.h>
 #include <bi/bi_sdl.h>
 #include <bi/texture.h>
 #include <bi/node.h>
+#include "matrix.h"
 #include <stdbool.h>
 #include <stdio.h>
 

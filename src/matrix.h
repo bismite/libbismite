@@ -2,14 +2,14 @@
 #define __BI_CORE_MATRIX_H__
 
 // https://github.com/datenwolf/linmath.h
-#include <bi/linmath.h>
+#include "linmath.h"
 
 #if defined(__ARM_NEON)
-#include <bi/matrix_neon.h>
+#include "matrix_neon.h"
 #elif (defined(__EMSCRIPTEN__) && defined(WASM_SIMD_ENABLED))
-#include <bi/matrix_sse.h>
+#include "matrix_sse.h"
 #elif (! defined(__EMSCRIPTEN__))
-#include <bi/matrix_sse.h>
+#include "matrix_sse.h"
 #else
 static inline void bi_mat4_multiply(float *left, float* right, float* result) {
   mat4x4_mul((vec4*)result, (vec4*)right, (vec4*)left);

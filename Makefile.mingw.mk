@@ -1,41 +1,43 @@
+BUILD_DIR=build/x86_64-w64-mingw32
+
 CC=x86_64-w64-mingw32-gcc
 AR=x86_64-w64-mingw32-ar
 CFLAGS=-Wall -O3 -Dmain=SDL_main
-INCLUDE_PATHS= -I include -I build/x86_64-w64-mingw32/SDL/include/SDL2
+INCLUDE_PATHS= -Iinclude -I$(BUILD_DIR)/include/SDL2
 
-LIB_DIR=build/x86_64-w64-mingw32/lib
+LIB_DIR=$(BUILD_DIR)/lib
 TARGET=$(LIB_DIR)/libbismite.a
-OBJ_DIR=build/x86_64-w64-mingw32/objs
+OBJ_DIR=$(BUILD_DIR)/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-SDL_TGZ=build/x86_64-w64-mingw32/SDL-x86_64-w64-mingw32.tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-x86_64-w64-mingw32/releases/download/0.2.0/SDL-x86_64-w64-mingw32.tgz
-SDL_DIR=build/x86_64-w64-mingw32/SDL
+LIBSDL2=$(BUILD_DIR)/lib/libSDL2.a
+SDL_TGZ=$(BUILD_DIR)/SDL-x86_64-w64-mingw32.tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-x86_64-w64-mingw32/releases/download/1.1.1/SDL-x86_64-w64-mingw32.tgz
 
-SAMPLE_DIR=build/x86_64-w64-mingw32/samples
+SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS=-Lbuild/x86_64-w64-mingw32/SDL/lib -Lbuild/x86_64-w64-mingw32/SDL/bin -L$(LIB_DIR)
+SAMPLE_LDFLAGS=-L$(BUILD_DIR)/bin -L$(LIB_DIR)
 SAMPLE_LIBS = -lbismite -lmingw32 -lSDL2main -lSDL2 -mwindows -lSDL2_mixer -lSDL2_image -lopengl32
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
-ARCHIVE=build/x86_64-w64-mingw32/libbismite-x86_64-w64-mingw32.tgz
+ARCHIVE=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32.tgz
+ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32-samples.tgz
 
 # ----
 
-all: $(OBJ_DIR) $(LIB_DIR) $(SDL_DIR) $(TARGET)
-samples: all $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
-release: all $(ARCHIVE)
+libs: $(OBJ_DIR) $(LIB_DIR) $(LIBSDL2) $(TARGET)
+samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
+all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
+
 clean:
-	rm -rf build/x86_64-w64-mingw32
+	rm -rf $(BUILD_DIR)
 
-$(SDL_TGZ):
+$(LIBSDL2):
+	mkdir -p $(BUILD_DIR)
 	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
-
-$(SDL_DIR): $(SDL_TGZ)
-	mkdir -p $@
-	tar --strip-component 1 -zxf $(SDL_TGZ) -C $@
+	tar xf $(SDL_TGZ) -C $(BUILD_DIR)
 
 $(OBJ_DIR):
 	mkdir -p $@/ext
@@ -60,11 +62,18 @@ $(SAMPLE_DIR)/%.exe: samples/src/%.c
 copyassets:
 	cp -R samples/assets $(SAMPLE_DIR)
 copysdl:
-	cp -R build/x86_64-w64-mingw32/SDL/bin/*.dll build/x86_64-w64-mingw32/SDL/licenses $(SAMPLE_DIR)
+	cp -R $(BUILD_DIR)/bin/*.dll $(SAMPLE_DIR)
 
 # ----
 
 $(ARCHIVE):
-	cp -R include build/x86_64-w64-mingw32
-	cp LICENSE.txt build/x86_64-w64-mingw32/LICENSE.txt
-	tar -cz -C build/x86_64-w64-mingw32 -f $(ARCHIVE) lib LICENSE.txt include
+	cp -R include $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/licenses
+	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
+	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE) bin lib include licenses
+
+$(ARCHIVE_SAMPLES):
+	cp -R include $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/licenses
+	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
+	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE_SAMPLES) samples licenses

@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 4.1.2 - 2022/10/29
+- fix sse alignment
 ## 4.1.1 - 2022/10/26
 - SIMD support : WASM, MacOS(arm), x86_64
 - src/shader.c : dynamic allocate temporary buffers

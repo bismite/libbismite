@@ -1,5 +1,6 @@
 
-in vec3 uv;
+in vec2 uv;
+flat in int _texture_index;
 in vec4 color;
 uniform sampler2D sampler[16];
 uniform float time;
@@ -29,8 +30,8 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 
 void main()
 {
-  vec4 noise = getTextureColor(1, uv.xy);
-  vec4 c = getTextureColor(0, uv.xy);
+  vec4 noise = getTextureColor(1, uv);
+  vec4 c = getTextureColor(0, uv);
   float level = sin(time*2.0) + 0.1;
   float height = noise.r;
 

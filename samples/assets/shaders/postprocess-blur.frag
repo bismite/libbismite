@@ -1,5 +1,6 @@
 
-in vec3 uv;
+in vec2 uv;
+flat in int _texture_index;
 in vec4 color;
 uniform sampler2D sampler[16];
 uniform float time;
@@ -33,16 +34,15 @@ vec4 blur(int i, vec2 direction,float power)
   vec2 s = direction/resolution;
   float d = power / 110.0;
   for(float q=1.0; q<=10.0; q+=1.0) {
-    c += getTextureColor(i, uv.xy + s*q ) * d*(11.0-q);
-    c += getTextureColor(i, uv.xy - s*q ) * d*(11.0-q);
+    c += getTextureColor(i, uv + s*q ) * d*(11.0-q);
+    c += getTextureColor(i, uv - s*q ) * d*(11.0-q);
   }
   return c;
 }
 
 void main()
 {
-  int i = int(uv.z);
   float power = cos(time*3.0)*0.5 + 0.5;
-  vec4 c = getTextureColor(i, uv.xy) * (1.0-power);
-  output_color = c + blur( i, vec2(1.0,0.0), power );;
+  vec4 c = getTextureColor(_texture_index, uv) * (1.0-power);
+  output_color = c + blur( _texture_index, vec2(1.0,0.0), power );;
 }

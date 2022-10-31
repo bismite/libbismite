@@ -1,5 +1,6 @@
 
-in vec3 uv;
+in vec2 uv;
+flat in int _texture_index;
 in vec4 color;
 uniform sampler2D sampler[16];
 uniform float time;
@@ -42,8 +43,8 @@ void main()
   );
   if( distance(xy,orbit) < BALL_SIZE ) {
     float offset = cos(uv.x * 10.0 + time*5.0) * AMPLITUDE / resolution.y;
-    output_color = getTextureColor(int(uv.z), vec2(uv.x,uv.y+offset) );
+    output_color = getTextureColor(_texture_index, vec2(uv.x,uv.y+offset) );
   } else {
-    output_color = getTextureColor(int(uv.z), uv.xy);
+    output_color = getTextureColor(_texture_index, uv);
   }
 }

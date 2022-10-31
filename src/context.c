@@ -6,77 +6,7 @@
 #include <stdlib.h>
 #include "default_shader.h"
 
-#if !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-
-PFNGLUSEPROGRAMPROC glUseProgram;
-PFNGLUNIFORM1IVPROC glUniform1iv;
-PFNGLUNIFORM1IPROC glUniform1i;
-PFNGLUNIFORM1FPROC glUniform1f;
-PFNGLUNIFORM2FPROC glUniform2f;
-PFNGLUNIFORM4FVPROC glUniform4fv;
-PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
-PFNGLBINDBUFFERPROC glBindBuffer;
-PFNGLBUFFERDATAPROC glBufferData;
-PFNGLBUFFERSUBDATAPROC glBufferSubData;
-PFNGLCREATESHADERPROC glCreateShader;
-PFNGLSHADERSOURCEPROC glShaderSource;
-PFNGLCOMPILESHADERPROC glCompileShader;
-PFNGLGETSHADERIVPROC glGetShaderiv;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
-PFNGLATTACHSHADERPROC  glAttachShader;
-PFNGLDELETESHADERPROC  glDeleteShader;
-PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
-PFNGLCREATEPROGRAMPROC glCreateProgram;
-PFNGLLINKPROGRAMPROC  glLinkProgram;
-PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-PFNGLGENBUFFERSPROC glGenBuffers;
-PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
-PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
-PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
-#define GLP(name) do{ name = SDL_GL_GetProcAddress( #name ); }while(0)
-#endif
-
-static void enable_gl_extensions(BiContext* context)
-{
-#if !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
-    GLP(glActiveTexture);
-
-    GLP(glUseProgram);
-    GLP(glUniform1i);
-    GLP(glUniform1iv);
-    GLP(glUniform1f);
-    GLP(glUniform2f);
-    GLP(glUniform4fv);
-    GLP(glUniformMatrix4fv);
-    GLP(glBindBuffer);
-    GLP(glBufferData);
-    GLP(glBufferSubData);
-    GLP(glCreateShader);
-    GLP(glShaderSource);
-    GLP(glCompileShader);
-    GLP(glGetShaderiv);
-    GLP(glGetShaderInfoLog);
-    GLP(glAttachShader);
-    GLP(glDeleteShader);
-    GLP(glBindFramebuffer);
-    GLP(glCreateProgram);
-    GLP(glLinkProgram);
-    GLP(glGetUniformLocation);
-    GLP(glGetAttribLocation);
-    GLP(glGenBuffers);
-    GLP(glEnableVertexAttribArray);
-    GLP(glVertexAttribPointer);
-    GLP(glGenFramebuffers);
-    GLP(glDeleteFramebuffers);
-    GLP(glFramebufferTexture2D);
-    GLP(glBlendFuncSeparate);
-#endif
-}
+extern void enable_gl_extensions(BiContext* context);
 
 BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
@@ -90,7 +20,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(__APPLE__)
+#else
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);

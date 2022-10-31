@@ -19,10 +19,11 @@ in vec4 transform_a;
 in vec4 transform_b;
 in vec4 transform_c;
 in vec4 transform_d;
-in float texture_z;
+in int texture_index;
 in float opacity;
 in vec4 tint_color;
-out vec3 uv;
+out vec2 uv;
+flat out int _texture_index;
 out vec4 _tint_color;
 out float _opacity;
 void main()
@@ -31,21 +32,23 @@ void main()
   // vertex = [ left-top, left-bottom, right-top, right-bottom ]
   // texture_uv = [ x:left, y:top, z:right, w:bottom ]
   if( gl_VertexID == 0 ){
-    uv = vec3(texture_uv.x,texture_uv.y,texture_z); // left-top
+    uv = vec2(texture_uv.x,texture_uv.y); // left-top
   }else if( gl_VertexID == 1 ){
-    uv = vec3(texture_uv.x,texture_uv.w,texture_z); // left-bottom
+    uv = vec2(texture_uv.x,texture_uv.w); // left-bottom
   }else if( gl_VertexID == 2 ){
-    uv = vec3(texture_uv.z,texture_uv.y,texture_z); // right-top
+    uv = vec2(texture_uv.z,texture_uv.y); // right-top
   }else if( gl_VertexID == 3 ){
-    uv = vec3(texture_uv.z,texture_uv.w,texture_z); // right-bottom
+    uv = vec2(texture_uv.z,texture_uv.w); // right-bottom
   }
+  _texture_index = texture_index;
   _tint_color = tint_color;
   _opacity = opacity;
 }
 );
 
 static const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
-in vec3 uv;
+in vec2 uv;
+flat in int _texture_index;
 in vec4 _tint_color;
 in float _opacity;
 uniform float time;
@@ -75,9 +78,8 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 
 void main()
 {
-  int samplerID = int(uv.z);
-  if( 0 <= samplerID && samplerID < 16 ) {
-    vec4 c = getTextureColor(samplerID, uv.xy);
+  if( 0 <= _texture_index && _texture_index < 16 ) {
+    vec4 c = getTextureColor( _texture_index, uv);
     color = vec4(_tint_color.rgb*_tint_color.a*c.a+c.rgb*(1.0-_tint_color.a),c.a) * _opacity;
   }else{
     color = _tint_color * _opacity;

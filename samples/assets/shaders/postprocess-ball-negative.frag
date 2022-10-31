@@ -1,5 +1,6 @@
 
-in vec3 uv;
+in vec2 uv;
+flat in int _texture_index;
 in vec4 color;
 uniform sampler2D sampler[16];
 uniform float time;
@@ -35,7 +36,7 @@ void main()
 {
   vec2 xy = gl_FragCoord.xy / scale;
 
-  vec4 c = getTextureColor(int(uv.z), uv.xy);
+  vec4 c = getTextureColor(_texture_index, uv);
   vec2 orbit = vec2(
     (ORBIT_R * sin(time) + resolution.x * 0.5),
     (ORBIT_R * cos(time) + resolution.y * 0.5)

@@ -1,5 +1,6 @@
 
-in vec3 uv;
+in vec2 uv;
+flat in int _texture_index;
 in vec4 _tint_color;
 in float _opacity;
 uniform sampler2D sampler[16];
@@ -30,7 +31,7 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 
 void main()
 {
-  vec4 c = getTextureColor(int(uv.z), uv.xy);
+  vec4 c = getTextureColor(_texture_index, uv);
   c = vec4(_tint_color.rgb + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
   output_color = vec4(c.r, c.g, c.b*0.2, c.a );
 }

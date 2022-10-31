@@ -48,7 +48,6 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   // Attribute locations
   shader->vertex_location = glGetAttribLocation(program_id, "vertex");
   shader->texture_uv_location = glGetAttribLocation(program_id, "texture_uv");
-  shader->vertex_index_location = glGetAttribLocation(program_id, "vertex_index");
   shader->opacity_location = glGetAttribLocation(program_id, "opacity");
   shader->texture_z_location = glGetAttribLocation(program_id, "texture_z");
   shader->tint_color_location = glGetAttribLocation(program_id, "tint_color");
@@ -92,13 +91,6 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, vertex, GL_DYNAMIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  // create vbo : vertex index
-  glGenBuffers(1, &shader->vertex_index_buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, shader->vertex_index_buffer);
-  GLfloat vertex_index[4] = {0,1,2,3}; // XXX: prior OpenGL3 and ES3, can not send int...
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4, vertex_index, GL_DYNAMIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
   // generate vao
   glGenVertexArrays(1, &shader->vao);
   glBindVertexArray(shader->vao);
@@ -112,11 +104,6 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
     glBindBuffer(GL_ARRAY_BUFFER,shader->uv_buffer);
     glEnableVertexAttribArray(shader->texture_uv_location);
     glVertexAttribPointer(shader->texture_uv_location, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    // vertex_index (XXX: glVertexAttribIPointer is not available in WebGL 1.0)
-    glBindBuffer(GL_ARRAY_BUFFER,shader->vertex_index_buffer);
-    glEnableVertexAttribArray(shader->vertex_index_location);
-    glVertexAttribPointer(shader->vertex_index_location,1,GL_FLOAT,GL_FALSE,0,NULL);
 
     // opacity
     glBindBuffer(GL_ARRAY_BUFFER,shader->opacity_buffer);
@@ -145,7 +132,6 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
     // for instancing
     glVertexAttribDivisor(shader->vertex_location, 0);
     glVertexAttribDivisor(shader->texture_uv_location, 1);
-    glVertexAttribDivisor(shader->vertex_index_location, 0);
     glVertexAttribDivisor(shader->opacity_location, 1);
     glVertexAttribDivisor(shader->texture_z_location, 1);
     glVertexAttribDivisor(shader->tint_color_location, 1);

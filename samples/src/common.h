@@ -5,9 +5,9 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/version.h>
-#define SHADER_HEADER "#version 100\n" "precision highp float;\n"
+#define SHADER_HEADER "#version 300 es\n" "precision highp float;\n"
 #else
-#define SHADER_HEADER "#version 120\n"
+#define SHADER_HEADER "#version 410\n"
 #endif
 
 #define ALLOC(x) malloc(sizeof(x))

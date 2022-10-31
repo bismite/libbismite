@@ -6,25 +6,18 @@
 #endif
 
 #if defined(__EMSCRIPTEN__)
-#include <SDL_opengles2.h>
+#include <GLES3/gl3.h>
+
 #elif defined(__APPLE__)
-#include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
+#include <OpenGL/gl3.h>
+
 #else
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
 
-#ifndef GL_GLEXT_PROTOTYPES
-extern void (*glGenVertexArrays)(GLsizei, GLuint*);
-extern void (*glBindVertexArray)(GLuint);
-extern void (*glDrawArraysInstanced)(GLenum, int, GLsizei, GLsizei);
-extern void (*glVertexAttribDivisor)(GLuint,GLuint);
-
-#ifndef __EMSCRIPTEN__
-#ifndef __APPLE__
+#if !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
-#endif
 extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLUNIFORM1IVPROC glUniform1iv;
 extern PFNGLUNIFORM1IPROC glUniform1i;
@@ -54,7 +47,6 @@ extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 extern PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 extern PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
-#endif
 #endif
 
 #endif // __BI_CORE_GL_H__

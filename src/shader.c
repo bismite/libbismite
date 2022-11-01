@@ -1,12 +1,12 @@
+#include <stdbool.h>
+#include <stdio.h>
 #include <bi/shader.h>
 #include <bi/camera.h>
 #include <bi/util.h>
 #include <bi/bi_sdl.h>
 #include <bi/texture.h>
 #include <bi/node.h>
-#include "matrix.h"
-#include <stdbool.h>
-#include <stdio.h>
+#include "matrix/matrix.h"
 
 static void print_shader_log(const char* name, GLuint shader_id)
 {

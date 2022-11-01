@@ -1,5 +1,5 @@
 #include <bi/camera.h>
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 GLfloat* bi_camera_matrix(GLfloat* matrix,float x,float y,float w,float h,bool flip_vertical)
 {

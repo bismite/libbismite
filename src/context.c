@@ -4,7 +4,7 @@
 #include <bi/layer.h>
 #include <bi/logger.h>
 #include <stdlib.h>
-#include "default_shader.h"
+#include "shader/default_shader.h"
 
 extern void enable_gl_extensions(BiContext* context);
 

@@ -3,7 +3,7 @@
 #include <bi/texture.h>
 #include <bi/camera.h>
 #include <bi/bi_gl.h>
-#include "texconv_shader.h"
+#include "shader/texconv_shader.h"
 
 typedef struct {
   GLuint program_id;

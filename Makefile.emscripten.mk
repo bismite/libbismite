@@ -6,7 +6,7 @@ INCLUDE_PATHS=-Iinclude
 LIB_DIR=build/emscripten/lib
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 
-CFLAGS_NOSIMD=-std=gnu11 -Wall -O3 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png] -fPIC
+CFLAGS_NOSIMD=-std=gnu11 -Wall -O3 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png] -fPIC -sMAX_WEBGL_VERSION=2
 TARGET_NOSIMD=$(LIB_DIR)/libbismite-nosimd.a
 OBJ_DIR_NOSIMD=build/emscripten/objs-nosimd
 OBJECTS_NOSIMD = $(SOURCES:src/%.c=$(OBJ_DIR_NOSIMD)/%.o)
@@ -39,9 +39,10 @@ ARCHIVE_SAMPLES=build/emscripten/libbismite-emscripten-samples.tgz
 # ----
 
 all: samples samples-nosimd $(ARCHIVE) $(ARCHIVE_SAMPLES)
-lib: $(LIB_DIR) $(OBJ_DIR) $(TARGET) $(OBJ_DIR_NOSIMD) $(TARGET_NOSIMD)
+lib: $(LIB_DIR) $(OBJ_DIR) $(TARGET)
+lib-nosimd: $(LIB_DIR) $(OBJ_DIR_NOSIMD) $(TARGET_NOSIMD)
 samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES)
-samples-nosimd: lib $(SAMPLE_DIR_NOSIMD) $(SAMPLE_EXES_NOSIMD)
+samples-nosimd: lib-nosimd $(SAMPLE_DIR_NOSIMD) $(SAMPLE_EXES_NOSIMD)
 
 clean:
 	rm -rf build/emscripten

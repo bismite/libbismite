@@ -2,7 +2,7 @@ BUILD_DIR=build/macos
 
 CC=clang
 AR=ar
-CFLAGS=-Wall -O3 -fPIC -arch arm64 -arch x86_64
+CFLAGS=-Wall -O3 -fPIC -arch arm64 -arch x86_64 -Wno-deprecated-declarations
 INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib
@@ -12,7 +12,7 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 LIBSDL2=build/macos/lib/libSDL2.dylib
-SDL_TGZ=build/macos/SDL-macOS-UniversalBinaries.tgz
+SDL_TGZ=build/SDL-macOS-UniversalBinaries.tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-macOS-UniversalBinaries/releases/download/1.3.1/SDL-macOS-UniversalBinaries.tgz
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
@@ -33,9 +33,11 @@ samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
 clean:
 	rm -rf $(BUILD_DIR)
 
-$(LIBSDL2):
-	mkdir -p $(BUILD_DIR)
+$(SDL_TGZ):
 	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
+
+$(LIBSDL2): $(SDL_TGZ)
+	mkdir -p $(BUILD_DIR)
 	tar --strip-component 1 -zxf $(SDL_TGZ) -C $(BUILD_DIR)
 
 $(LIB_DIR):

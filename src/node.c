@@ -1,5 +1,5 @@
 #include <bi/node.h>
-#include "matrix.h"
+#include "matrix/matrix.h"
 #include <stdlib.h>
 #include <string.h>
 

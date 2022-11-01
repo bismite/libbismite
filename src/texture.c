@@ -38,8 +38,9 @@ static bool get_format(SDL_PixelFormatEnum sdl_format, GLint* tex_format, GLenum
       break;
     case SDL_PIXELFORMAT_ARGB8888:
     case SDL_PIXELFORMAT_RGB888:
-      *tex_format = GL_RGBA;
-      *img_format = GL_BGRA_EXT;
+      // *tex_format = GL_RGBA;
+      // *img_format = GL_BGRA_EXT;
+      return false;
       break;
     case SDL_PIXELFORMAT_RGB24:
       *tex_format = GL_RGB;

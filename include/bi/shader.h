@@ -10,9 +10,8 @@ struct _BiShader {
   GLuint vao;
   GLuint vertex_buffer;
   GLuint uv_buffer;
-  GLuint vertex_index_buffer;
   GLuint opacity_buffer;
-  GLuint texture_z_buffer;
+  GLuint texture_index_buffer;
   GLuint tint_color_buffer;
   GLuint transform_buffer;
 
@@ -23,9 +22,8 @@ struct _BiShader {
   // attribute location
   GLint vertex_location;
   GLint texture_uv_location;
-  GLint vertex_index_location;
   GLint opacity_location;
-  GLint texture_z_location;
+  GLint texture_index_location;
   GLint tint_color_location;
   GLint transform_locations[4];
 

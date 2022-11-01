@@ -1,11 +1,11 @@
+#include <math.h>
 #include <bi/render.h>
 #include <bi/node.h>
 #include <bi/context.h>
 #include <bi/camera.h>
 #include <bi/layer.h>
 #include <bi/bi_gl.h>
-#include "matrix.h"
-#include <math.h>
+#include "matrix/matrix.h"
 
 static int node_order_compare(const void *_a, const void *_b )
 {

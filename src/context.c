@@ -4,133 +4,9 @@
 #include <bi/layer.h>
 #include <bi/logger.h>
 #include <stdlib.h>
-#include "default_shader.h"
+#include "shader/default_shader.h"
 
-#ifndef GL_GLEXT_PROTOTYPES
-void (*glGenVertexArrays)(GLsizei, GLuint*);
-void (*glBindVertexArray)(GLuint);
-void (*glDrawArraysInstanced)(GLenum, int, GLsizei, GLsizei);
-void (*glVertexAttribDivisor)(GLuint,GLuint);
-
-#ifndef __EMSCRIPTEN__
-#ifndef __APPLE__
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-#endif
-PFNGLUSEPROGRAMPROC glUseProgram;
-PFNGLUNIFORM1IVPROC glUniform1iv;
-PFNGLUNIFORM1IPROC glUniform1i;
-PFNGLUNIFORM1FPROC glUniform1f;
-PFNGLUNIFORM2FPROC glUniform2f;
-PFNGLUNIFORM4FVPROC glUniform4fv;
-PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
-PFNGLBINDBUFFERPROC glBindBuffer;
-PFNGLBUFFERDATAPROC glBufferData;
-PFNGLBUFFERSUBDATAPROC glBufferSubData;
-PFNGLCREATESHADERPROC glCreateShader;
-PFNGLSHADERSOURCEPROC glShaderSource;
-PFNGLCOMPILESHADERPROC glCompileShader;
-PFNGLGETSHADERIVPROC glGetShaderiv;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
-PFNGLATTACHSHADERPROC  glAttachShader;
-PFNGLDELETESHADERPROC  glDeleteShader;
-PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
-PFNGLCREATEPROGRAMPROC glCreateProgram;
-PFNGLLINKPROGRAMPROC  glLinkProgram;
-PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-PFNGLGENBUFFERSPROC glGenBuffers;
-PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
-PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
-PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
-#define GLP(name) do{ name = SDL_GL_GetProcAddress( #name ); }while(0)
-#endif
-#endif
-
-static void enable_gl_extensions(BiContext* context)
-{
-#if ! defined(GL_GLEXT_PROTOTYPES) && ! defined(__EMSCRIPTEN__)
-#ifndef __APPLE__
-    GLP(glActiveTexture);
-#endif
-    GLP(glUseProgram);
-    GLP(glUniform1i);
-    GLP(glUniform1iv);
-    GLP(glUniform1f);
-    GLP(glUniform2f);
-    GLP(glUniform4fv);
-    GLP(glUniformMatrix4fv);
-    GLP(glBindBuffer);
-    GLP(glBufferData);
-    GLP(glBufferSubData);
-    GLP(glCreateShader);
-    GLP(glShaderSource);
-    GLP(glCompileShader);
-    GLP(glGetShaderiv);
-    GLP(glGetShaderInfoLog);
-    GLP(glAttachShader);
-    GLP(glDeleteShader);
-    GLP(glBindFramebuffer);
-    GLP(glCreateProgram);
-    GLP(glLinkProgram);
-    GLP(glGetUniformLocation);
-    GLP(glGetAttribLocation);
-    GLP(glGenBuffers);
-    GLP(glEnableVertexAttribArray);
-    GLP(glVertexAttribPointer);
-    GLP(glGenFramebuffers);
-    GLP(glDeleteFramebuffers);
-    GLP(glFramebufferTexture2D);
-    GLP(glBlendFuncSeparate);
-#endif
-
-#ifndef GL_GLEXT_PROTOTYPES
-#ifdef __EMSCRIPTEN__
-    // https://www.khronos.org/registry/OpenGL/extensions/OES/OES_vertex_array_object.txt
-    if(SDL_GL_ExtensionSupported("GL_OES_vertex_array_object")) {
-      glGenVertexArrays = SDL_GL_GetProcAddress("glGenVertexArraysOES");
-      glBindVertexArray = SDL_GL_GetProcAddress("glBindVertexArrayOES");
-    }
-
-    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_instanced_arrays.txt
-    if(SDL_GL_ExtensionSupported("GL_EXT_instanced_arrays")) {
-      glDrawArraysInstanced = SDL_GL_GetProcAddress("glDrawArraysInstancedEXT");
-      glVertexAttribDivisor = SDL_GL_GetProcAddress("glVertexAttribDivisorEXT");
-    }
-
-    // https://www.khronos.org/registry/OpenGL/extensions/ANGLE/ANGLE_instanced_arrays.txt
-    if(SDL_GL_ExtensionSupported("GL_ANGLE_instanced_arrays")) {
-      glDrawArraysInstanced = SDL_GL_GetProcAddress("glDrawArraysInstancedANGLE");
-      glVertexAttribDivisor = SDL_GL_GetProcAddress("glVertexAttribDivisorANGLE");
-    }
-#else
-    // https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_vertex_array_object.txt
-    if( SDL_GL_ExtensionSupported("GL_APPLE_vertex_array_object") ) {
-        glGenVertexArrays = SDL_GL_GetProcAddress("glGenVertexArraysAPPLE");
-        glBindVertexArray = SDL_GL_GetProcAddress("glBindVertexArrayAPPLE");
-    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_vertex_array_object.txt
-    } else if( SDL_GL_ExtensionSupported("GL_ARB_vertex_array_object")) {
-        glGenVertexArrays = SDL_GL_GetProcAddress("glGenVertexArrays");
-        glBindVertexArray = SDL_GL_GetProcAddress("glBindVertexArray");
-    }
-
-    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_instanced_arrays.txt
-    if( SDL_GL_ExtensionSupported("GL_ARB_instanced_arrays")) {
-      glVertexAttribDivisor = SDL_GL_GetProcAddress("glVertexAttribDivisorARB");
-    }
-
-    // https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_draw_instanced.txt
-    if( SDL_GL_ExtensionSupported("GL_ARB_draw_instanced") ) {
-      glDrawArraysInstanced = SDL_GL_GetProcAddress("glDrawArraysInstancedARB");
-    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_draw_instanced.txt
-    } else if(SDL_GL_ExtensionSupported("GL_EXT_draw_instanced")) {
-      glDrawArraysInstanced = SDL_GL_GetProcAddress("glDrawArraysInstancedEXT");
-    }
-#endif
-#endif
-}
+extern void enable_gl_extensions(BiContext* context);
 
 BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
@@ -140,13 +16,16 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   }
 
   SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__)
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 #endif
 
   Uint32 flag = SDL_WINDOW_OPENGL;

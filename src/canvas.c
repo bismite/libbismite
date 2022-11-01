@@ -5,7 +5,7 @@
 #include <bi/node.h>
 #include <bi/shader.h>
 #include <bi/context.h>
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h)
 {

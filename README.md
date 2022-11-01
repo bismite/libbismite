@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 5.0.0 - 2022/11/1
+- Update to WebGL 2.0
 ## 4.1.2 - 2022/10/29
 - fix sse alignment
 ## 4.1.1 - 2022/10/26

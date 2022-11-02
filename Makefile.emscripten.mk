@@ -6,7 +6,7 @@ INCLUDE_PATHS=-Iinclude
 LIB_DIR=build/emscripten/lib
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 
-CFLAGS_NOSIMD=-std=gnu11 -Wall -O3 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png] -fPIC -sMAX_WEBGL_VERSION=2
+CFLAGS_NOSIMD=-std=gnu11 -Wall -O3 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS=[png] -fPIC
 TARGET_NOSIMD=$(LIB_DIR)/libbismite-nosimd.a
 OBJ_DIR_NOSIMD=build/emscripten/objs-nosimd
 OBJECTS_NOSIMD = $(SOURCES:src/%.c=$(OBJ_DIR_NOSIMD)/%.o)
@@ -76,7 +76,7 @@ $(SAMPLE_DIR):
 	mkdir -p $@
 
 $(SAMPLE_DIR)/%.html: samples/src/%.c
-	$(CC) $^ -o $@ $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
+	$(CC) $^ -o $@ $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2
 
 # ----
 
@@ -84,7 +84,7 @@ $(SAMPLE_DIR_NOSIMD):
 	mkdir -p $@
 
 $(SAMPLE_DIR_NOSIMD)/%.html: samples/src/%.c
-	$(CC) $^ -o $@ $(SAMPLE_CFLAGS_NOSIMD) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS_NOSIMD)
+	$(CC) $^ -o $@ $(SAMPLE_CFLAGS_NOSIMD) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS_NOSIMD) -sMAX_WEBGL_VERSION=2
 
 # ----
 

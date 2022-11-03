@@ -30,6 +30,10 @@ static char* read_shader(const char* filename)
 {
   int header_size = strlen(SHADER_HEADER);
   FILE *file = fopen(filename,"rb");
+  if(file==NULL){
+    printf("shader load error %s\n",filename);
+    exit(1);
+  }
   fseek(file, 0, SEEK_END);
   int file_size = ftell(file);
   rewind(file);
@@ -76,6 +80,10 @@ __attribute__((unused)) static BiNode* make_sprite_from_texture(BiTexture* t)
 __attribute__((unused)) static BiNode* make_sprite(const char* name)
 {
   BiTexture *texture = MAKE_TEXTURE(name);
+  if(texture==NULL){
+    printf("load failed %s\n",name);
+    exit(1);
+  }
   return make_sprite_from_texture(texture);
 }
 

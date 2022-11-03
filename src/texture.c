@@ -36,12 +36,6 @@ static bool get_format(SDL_PixelFormatEnum sdl_format, GLint* tex_format, GLenum
       *tex_format = GL_RGBA;
       *img_format = GL_RGBA;
       break;
-    case SDL_PIXELFORMAT_ARGB8888:
-    case SDL_PIXELFORMAT_RGB888:
-      // *tex_format = GL_RGBA;
-      // *img_format = GL_BGRA_EXT;
-      return false;
-      break;
     case SDL_PIXELFORMAT_RGB24:
       *tex_format = GL_RGB;
       *img_format = GL_RGB;
@@ -66,6 +60,7 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
   if( get_format(img->format->format,&tex_format,&img_format) ) {
     texture_id = create_texture_from_pixels(img->w,img->h,img->pixels,tex_format,img_format);
   }else{
+    LOG("Convert image format %s\n", SDL_GetPixelFormatName(img->format->format) );
     SDL_Surface* tmp = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_ABGR8888, 0);
     if(tmp) {
       tex_format = GL_RGBA;
@@ -73,7 +68,7 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
       texture_id = create_texture_from_pixels(tmp->w,tmp->h,tmp->pixels,tex_format,img_format);
       SDL_FreeSurface(tmp);
     }else{
-      LOG("ConvertSurfaceFormat failed. Format:%s Error:%s",
+      LOG("Convert image format failed. Format:%s Error:%s\n",
           SDL_GetPixelFormatName(img->format->format), SDL_GetError() );
     }
   }
@@ -97,12 +92,18 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
 
 BiTexture* bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool straight_alpha)
 {
+  SDL_RWops *rw = SDL_RWFromMem(buffer,size);
+  if(rw==NULL) return NULL;
   return load_texture_from_image( texture, SDL_RWFromMem(buffer,size), straight_alpha );
 }
 
 BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool straight_alpha)
 {
-  return load_texture_from_image( texture, SDL_RWFromFile(filename,"rb"), straight_alpha );
+  FILE* fp = fopen(filename,"rb");
+  if(fp==NULL) return NULL;
+  SDL_RWops *rw = SDL_RWFromFP(fp,true);
+  if(rw==NULL) return NULL;
+  return load_texture_from_image( texture, rw, straight_alpha );
 }
 
 void bi_texture_set_anti_alias(BiTexture* texture,bool anti_alias)

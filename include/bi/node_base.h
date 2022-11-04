@@ -5,7 +5,6 @@
 #include <bi/timer.h>
 
 typedef struct _BiRawNode BiRawNode;
-typedef struct _BiTimerManager BiTimerManager;
 
 typedef enum {
   BI_NODE_TYPE_NODE,

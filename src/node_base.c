@@ -56,8 +56,8 @@ void bi_node_run_timers(BiContext* context,BiRawNode* node,double delta_time)
     t->wait -= delta_time;
     if(t->wait < 0) {
       t->count -= 1;
-      t->callback(context,t,delta_time);
       t->wait = t->interval;
+      t->callback(context,t,delta_time);
     }
   }
 

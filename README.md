@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 5.1.0 - 2022/11/4
+- timer: Fix violation when timer is released in callback.
+- src/texture.c: SDL_RWFromFile replaced by SDL_RWFromFP
 ## 5.0.0 - 2022/11/1
 - Update to WebGL 2.0
 ## 4.1.2 - 2022/10/29

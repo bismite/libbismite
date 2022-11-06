@@ -34,26 +34,28 @@ BiTimers* bi_timers_init(BiTimers* timers)
   return timers;
 }
 
-void bi_timers_add(BiTimers* timers, BiTimer* timer)
+BiTimer* bi_timers_add(BiTimers* timers, BiTimer* timer)
 {
-  if( !timers || !timer ) return;
+  if( !timers || !timer ) return NULL;
   for(int i=0;i<timers->size;i++){
     if(timers->timers[i] == timer){
-      return; // already
+      return timer; // already
     }
   }
   timers->size += 1;
   timers->timers = realloc(timers->timers, sizeof(BiTimer*)*timers->size);
   timers->timers[timers->size-1] = timer;
+  return timer;
 }
 
-void bi_timers_remove(BiTimers* timers, BiTimer* timer)
+BiTimer* bi_timers_remove(BiTimers* timers, BiTimer* timer)
 {
-  if( !timers || !timer ) return;
+  if( !timers || !timer ) return NULL;
   for(int i=0;i<timers->size;i++){
     if(timers->timers[i] == timer){
       timers->timers[i] = NULL;
-      return;
+      return timer;
     }
   }
+  return NULL;
 }

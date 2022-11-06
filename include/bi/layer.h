@@ -52,8 +52,8 @@ extern BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group);
 static inline int bi_layer_get_z_order(BiLayer* layer){ return layer->z; }
 static inline void bi_layer_set_z_order(BiLayer* layer,int z){ layer->z = z; }
 // Timer
-static inline void bi_layer_add_timer(BiLayer* layer,BiTimer* timer){ bi_timers_add(&layer->timers,timer); }
-static inline void bi_layer_remove_timer(BiLayer* layer,BiTimer* timer){ bi_timers_remove(&layer->timers,timer); }
+static inline BiTimer* bi_layer_add_timer(BiLayer* layer,BiTimer* timer){ return bi_timers_add(&layer->timers,timer); }
+static inline BiTimer* bi_layer_remove_timer(BiLayer* layer,BiTimer* timer){ return bi_timers_remove(&layer->timers,timer); }
 
 //
 // layer group
@@ -67,7 +67,7 @@ extern void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGro
 extern void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj);
 extern void bi_layer_group_update_order(BiLayerGroup* layer_group);
 // Timer
-static inline void bi_layer_group_add_timer(BiLayerGroup* lg,BiTimer* timer){ bi_timers_add(&lg->timers,timer); }
-static inline void bi_layer_group_remove_timer(BiLayerGroup* lg,BiTimer* timer){ bi_timers_remove(&lg->timers,timer); }
+static inline BiTimer* bi_layer_group_add_timer(BiLayerGroup* lg,BiTimer* timer){ return bi_timers_add(&lg->timers,timer); }
+static inline BiTimer* bi_layer_group_remove_timer(BiLayerGroup* lg,BiTimer* timer){ return bi_timers_remove(&lg->timers,timer); }
 
 #endif

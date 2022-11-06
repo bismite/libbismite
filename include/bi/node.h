@@ -122,8 +122,8 @@ extern void bi_node_unset_texture(BiNode*);
 //     <-- tw = ow ->
 
 // Timer
-static inline void bi_node_add_timer(BiNode* node,BiTimer* timer){ bi_timers_add(&node->timers,timer); }
-static inline void bi_node_remove_timer(BiNode* node,BiTimer* timer){ bi_timers_remove(&node->timers,timer); }
+static inline BiTimer* bi_node_add_timer(BiNode* node,BiTimer* timer){ return bi_timers_add(&node->timers,timer); }
+static inline BiTimer* bi_node_remove_timer(BiNode* node,BiTimer* timer){ return bi_timers_remove(&node->timers,timer); }
 
 // event handler
 static inline void bi_node_set_on_click(BiNode* node, on_click_callback callback){node->on_click=callback;}

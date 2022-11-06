@@ -8,13 +8,14 @@ BiLayer *layer_a;
 BiLayer *layer_b;
 BiLayer *current_layer;
 
-static void end_callback(BiContext* context, BiTransition* transition)
+static void end_callback(BiTransition* transition)
 {
   free(transition);
 }
 
-static void mid_callback(BiContext* context, BiTransition* transition)
+static void mid_callback(BiTransition* transition)
 {
+  BiContext* context = transition->context;
   // Dummy
   SDL_Delay(500);
 
@@ -47,9 +48,9 @@ static bool on_click_to_transition(BiContext *context,BiNode* n, int x, int y, i
   return true;
 }
 
-static void on_update_rotate_face(BiContext* c, BiTimer* t,double dt)
+static void on_update_rotate_face(BiTimer* t,double dt)
 {
-  BiNode* n = (BiNode*)t->node;
+  BiNode* n = t->userdata;
   bi_node_set_angle(n,n->angle+dt*0.01);
 }
 

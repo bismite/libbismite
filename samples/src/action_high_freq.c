@@ -42,11 +42,11 @@ static void add_action(BiNode *node)
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(malloc(sizeof(BiContext)),480,320,0,false,__FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
   print_info(context);
 
   // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = make_sprite_with_anchor("assets/check.png",0,0);
   bi_add_layer(context,layer);
 

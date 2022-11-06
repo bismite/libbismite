@@ -9,9 +9,10 @@ typedef struct _BiContext BiContext;
 typedef struct _BiShader BiShader;
 typedef struct _BiTransition BiTransition;
 
-typedef void (*bi_transition_callback)(BiContext*, BiTransition*);
+typedef void (*bi_transition_callback)(BiTransition*);
 
 struct _BiTransition {
+  BiContext* context;
   BiLayerGroup *layer_group;
   BiLayer layer;
   BiShader* shader;

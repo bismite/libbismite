@@ -1,5 +1,6 @@
 #include "common.h"
-
+#define WIDTH 480
+#define HEIGHT 320
 struct particle_data {
   float x;
   float y;
@@ -7,22 +8,22 @@ struct particle_data {
   float vy;
 };
 
-static void random_move(BiContext* c,BiTimer* t,double dt)
+static void random_move(BiTimer* t,double dt)
 {
-  BiNode *node = (BiNode*)t->node;
+  BiNode *node = t->userdata;
   struct particle_data *p = node->userdata;
 
   p->x += p->vx;
   p->y += p->vy;
   if(p->x < 0) p->x = 0;
-  if(p->x > c->w) p->x = c->w;
+  if(p->x > WIDTH) p->x = WIDTH;
   if(p->y < 0) p->y = 0;
-  if(p->y > c->h) p->y = c->h;
+  if(p->y > HEIGHT) p->y = HEIGHT;
 
-  if( p->x == 0 || p->x == c->w) {
+  if( p->x == 0 || p->x == WIDTH) {
     p->vx = - p->vx;
   }
-  if( p->y == 0 || p->y == c->h) {
+  if( p->y == 0 || p->y == HEIGHT) {
     p->vy = - p->vy;
   }
 
@@ -63,7 +64,7 @@ int main(int argc, char* argv[])
 {
   srand( bi_get_now() );
   BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, true, __FILE__);
+  bi_init_context(context, WIDTH, HEIGHT, 0, true, __FILE__);
   print_info(context);
 
   // texture

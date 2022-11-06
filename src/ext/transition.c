@@ -25,7 +25,7 @@ void bi_transition_init(BiTransition *transition,
   transition->layer.post_process.shader = transition->shader;
 }
 
-static void transition_update(BiContext* context,BiTimer* timer,double delta_time)
+static void transition_update(BiTimer* timer,double delta_time)
 {
   BiTransition *transition = timer->userdata;
 
@@ -42,7 +42,7 @@ static void transition_update(BiContext* context,BiTimer* timer,double delta_tim
     bi_layer_group_remove_layer(transition->layer_group,&transition->layer);
     transition->layer_group->interaction_enabled = true;
     if(transition->callback){
-      transition->callback(context,transition);
+      transition->callback(transition);
     }
   } else {
     // progress
@@ -56,6 +56,7 @@ static void transition_update(BiContext* context,BiTimer* timer,double delta_tim
 
 void bi_transition_start(BiContext* context, BiTransition* transition)
 {
+  transition->context = context;
   transition->layer_group->interaction_enabled = false;
   bi_layer_group_add_layer(transition->layer_group,&transition->layer);
   transition->layer.post_process.shader_attributes[0] = transition->invert ? 1.0 : 0.0;

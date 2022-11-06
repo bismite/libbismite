@@ -1,18 +1,18 @@
 #include "common.h"
 
-static void rotate_face(BiContext* context,BiTimer* timer,double dt)
+static void rotate_face(BiTimer* timer,double dt)
 {
-  BiNode *node = (BiNode*)timer->node;
+  BiNode *node = timer->userdata;
   bi_node_set_angle(node, node->angle + dt * M_PI/180);
 }
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = bi_init_context(malloc(sizeof(BiContext)),480,320,0,false,__FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
   print_info(context);
 
   // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
   layer->root = make_sprite_with_anchor("assets/check.png",0,0);
 
@@ -23,9 +23,7 @@ int main(int argc,char* argv[])
     BiNode* face = make_sprite_from_texture(tex);
     bi_node_add_node(layer->root,face);
     bi_node_set_position(face,i*480/5+480/5,160);
-    BiTimer *timer_rotate_face = ALLOC(BiTimer);
-    bi_timer_init(timer_rotate_face, rotate_face, 0, -1, NULL);
-    bi_node_add_timer(face,timer_rotate_face);
+    bi_node_add_timer(face, bi_timer_init(ALLOC(BiTimer), rotate_face, 0, -1, face) );
     face->time_scale = TIMESCALES[i];
   }
 

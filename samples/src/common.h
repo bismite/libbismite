@@ -21,7 +21,7 @@ __attribute__((unused)) static BiFontAtlas* load_font_atlas(const char* name, Bi
 
 __attribute__((unused)) static BiTimer* onupdate(BiNode* n,timer_callback func)
 {
-  BiTimer *t = bi_timer_init(malloc(sizeof(BiTimer)),func,0,-1,NULL);
+  BiTimer *t = bi_timer_init(malloc(sizeof(BiTimer)),func,0,-1,n);
   bi_node_add_timer(n,t);
   return t;
 }

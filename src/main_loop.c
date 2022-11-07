@@ -4,6 +4,7 @@
 #include <bi/node.h>
 #include <bi/render.h>
 #include <bi/util.h>
+#include <bi/node_base.h>
 #include <bi/logger.h>
 
 #ifdef __EMSCRIPTEN__
@@ -69,6 +70,55 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
   return swallow;
 }
 
+
+static void __run_timers__(BiContext* context,BiNodeBase* node,double delta_time)
+{
+  BiTimers* timers = NULL;
+  switch(node->type){
+  case BI_NODE_TYPE_NODE:
+    timers = &((BiNode*)node)->timers;
+    break;
+  case BI_NODE_TYPE_LAYER:
+    timers = &((BiLayer*)node)->timers;
+    break;
+  case BI_NODE_TYPE_LAYER_GROUP:
+    timers = &((BiLayerGroup*)node)->timers;
+    break;
+  default:
+    return;
+  }
+  delta_time *= timers->scale;
+
+  for(int i=0;i<timers->size;i++){
+    BiTimer* t = timers->timers[i];
+    // skip
+    if(t==NULL) continue;
+    if(t->state == BI_TIMER_STATE_PAUSED) continue;
+    if(t->count == 0) continue;
+    // check schedule
+    t->wait -= delta_time;
+    if(t->wait < 0) {
+      t->count -= 1;
+      t->wait = t->interval;
+      t->callback(t,delta_time);
+    }
+  }
+
+  // remove and resize
+  int new_size = 0;
+  for(int i=0;i<timers->size;i++){
+    BiTimer *t = timers->timers[i];
+    if(t!=NULL && t->count != 0){
+      timers->timers[new_size] = timers->timers[i];
+      new_size++;
+    }
+  }
+  if( timers->size != new_size ){
+    timers->size = new_size;
+    timers->timers = realloc( timers->timers, sizeof(BiTimer*) * timers->size );
+  }
+}
+
 static void main_loop( void* arg )
 {
   BiContext *context = (BiContext*)arg;
@@ -90,14 +140,14 @@ static void main_loop( void* arg )
   int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
   // timer
   for(int i=context->timer_queue.size-1;i>=0;i--){
-    BiRawNode *n = context->timer_queue.objects[i];
+    BiNodeBase *n = context->timer_queue.objects[i];
     if( n == NULL ) continue;
     // Timer
-    bi_node_run_timers(context,n,delta_time);
+    __run_timers__(context,n,delta_time);
   }
   // callback
   for(int i=context->interaction_queue.size-1;i>=0;i--){
-    BiRawNode *n = context->interaction_queue.objects[i];
+    BiNodeBase *n = context->interaction_queue.objects[i];
     if( n == NULL ) continue;
     // Event Handler
     if( n->type != BI_NODE_TYPE_NODE ) continue;

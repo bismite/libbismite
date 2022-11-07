@@ -25,16 +25,16 @@ void bi_render_node_sort(BiNode* node)
 
 static int layer_order_compare(const void *_a, const void *_b )
 {
-  const BiRawNode *a = *(BiRawNode**)_a;
-  const BiRawNode *b = *(BiRawNode**)_b;
+  const BiNodeBase *a = *(BiNodeBase**)_a;
+  const BiNodeBase *b = *(BiNodeBase**)_b;
   return a->z == b->z ? a->index - b->index : a->z - b->z;
 }
 
 static void layer_sort(BiLayerGroup* layer_group)
 {
   Array* a = &layer_group->layers;
-  for( int i=0; i<a->size; i++ ){ ((BiRawNode*)(a->objects[i]))->index = i; }
-  qsort( a->objects, a->size, sizeof(BiRawNode*), layer_order_compare);
+  for( int i=0; i<a->size; i++ ){ ((BiNodeBase*)(a->objects[i]))->index = i; }
+  qsort( a->objects, a->size, sizeof(BiNodeBase*), layer_order_compare);
 }
 
 static bool node_has_event_handler(BiNode* n)
@@ -157,7 +157,7 @@ static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext r
   bi_shader_draw(shader,render_context.rendering_queue);
 }
 
-static void render_texture(BiContext* context, GLuint texture, BiRawNode* target)
+static void render_texture(BiContext* context, GLuint texture, BiNodeBase* target)
 {
   BiTexture t;
   t.texture_id = texture;
@@ -230,7 +230,7 @@ static void render_layer_group(BiContext* context,
   // render
   layer_sort(lg);
   for( int i=0; i<lg->layers.size; i++ ) {
-    BiRawNode* n = lg->layers.objects[i];
+    BiNodeBase* n = lg->layers.objects[i];
     if( n->type == BI_NODE_TYPE_LAYER_GROUP ) {
       // Layer Group
       render_layer_group( context, (BiLayerGroup*)n, lg->framebuffer.framebuffer_id, rcontext );
@@ -259,7 +259,7 @@ static void render_layer_group(BiContext* context,
 
   // finalize
   glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer_id);
-  render_texture(context,lg->framebuffer.texture_id,(BiRawNode*)lg);
+  render_texture(context,lg->framebuffer.texture_id,(BiNodeBase*)lg);
 }
 
 void bi_render(BiContext* context)

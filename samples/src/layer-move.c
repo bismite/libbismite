@@ -11,11 +11,12 @@ static void layer_camera_position(BiLayer*l, float angle)
   l->camera_y = r - 320/2 + r*sin(angle);
 }
 
-static void lookaround(BiContext* context,BiTimer* timer,double dt)
+static void lookaround(BiTimer* timer,double dt)
 {
+  BiLayer* layer = timer->userdata;
   static float angle = 0;
   angle += dt*0.0005;
-  layer_camera_position((BiLayer*)timer->node,angle);
+  layer_camera_position(layer,angle);
 }
 
 static BiNode* create_tile(int x, int y,BiTexture *tex)
@@ -55,7 +56,7 @@ int main(int argc,char* argv[])
 
   // look around
   layer_camera_position(layer,0);
-  bi_layer_add_timer(layer,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,NULL));
+  bi_layer_add_timer(layer,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,layer));
 
   // fps layer
   add_fps_layer(context,load_font());

@@ -6,15 +6,14 @@ BiLayerGroup* layer_group_b;
 
 static BiAction* alloc_action(size_t size, void* payload)
 {
-  BiAction* action = malloc(sizeof(BiAction));
-  bi_action_init(action);
+  BiAction* action = bi_action_init(ALLOC(BiAction));
   action->action_data = malloc(size);
   action->on_finish = NULL;
   action->on_finish_callback_context = payload;
   return action;
 }
 
-static void rotate_on_timer(BiContext* context,BiTimer* timer,double dt)
+static void rotate_on_timer(BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
   bi_node_set_angle(node, node->angle + 2.0*M_PI/180.0);
@@ -28,7 +27,7 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
   return true; // swallow
 }
 
-static void init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
+static BiLayerGroup* init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
 {
   bi_layer_group_init(lg);
   bi_layer_group_add_layer_group(&context->layers, lg);
@@ -65,9 +64,9 @@ static void init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
   bi_action_start(repeat);
   // rotate by timer
   bi_set_color(faces[1]->color,0,0,0xFF,0xFF);
-  BiTimer *t = malloc(sizeof(BiTimer));
-  bi_timer_init(t, rotate_on_timer, 0, -1, faces[1]);
-  bi_node_add_timer(faces[1],t);
+  bi_node_add_timer(faces[1], bi_timer_init(ALLOC(BiTimer), rotate_on_timer, 0, -1, faces[1]));
+
+  return lg;
 }
 
 int main(int argc, char* argv[])
@@ -84,10 +83,8 @@ int main(int argc, char* argv[])
   bi_layer_group_add_layer(&context->layers,layer);
   layer->textures[0] = bg->texture;
 
-  layer_group_a = malloc(sizeof(BiLayerGroup));
-  init_layer_group(context, layer_group_a, 320/3*2);
-  layer_group_b = malloc(sizeof(BiLayerGroup));
-  init_layer_group(context, layer_group_b, 320/3*1);
+  layer_group_a = init_layer_group(context, ALLOC(BiLayerGroup), 320/3*2);
+  layer_group_b = init_layer_group(context, ALLOC(BiLayerGroup), 320/3*1);
 
   //
   // fps layer

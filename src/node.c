@@ -5,7 +5,8 @@
 
 BiNode* bi_node_init(BiNode* n)
 {
-  bi_raw_node_init((BiRawNode*)n,BI_NODE_TYPE_NODE);
+  bi_node_base_init((BiNodeBase*)n,BI_NODE_TYPE_NODE);
+  bi_timers_init(&n->timers);
   n->x = n->y = n->w = n->h = 0;
   n->angle = 0;
   n->scale_x = 1;

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <bi/timer.h>
 
-typedef struct _BiRawNode BiRawNode;
+typedef struct _BiNodeBase BiNodeBase;
 
 typedef enum {
   BI_NODE_TYPE_NODE,
@@ -16,21 +16,14 @@ typedef enum {
   int z; \
   int index; \
   bool interaction_enabled; \
-  struct { \
-    int size; \
-    BiTimer **timers; \
-    double scale; \
-  } timers; \
   double time_scale; \
+  BiTimers timers; \
   void* userdata;
 
-struct _BiRawNode{
+struct _BiNodeBase{
   BI_NODE_HEADER
 };
 
-extern void bi_raw_node_init(BiRawNode* node,BiNodeType type);
-extern void bi_raw_node_add_timer(BiRawNode* node,BiTimer* timer);
-extern void bi_raw_node_remove_timer(BiRawNode* node,BiTimer* timer);
-extern void bi_node_run_timers(BiContext* context,BiRawNode* node,double delta_time);
+extern void bi_node_base_init(BiNodeBase* node,BiNodeType type);
 
 #endif

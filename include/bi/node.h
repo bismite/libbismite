@@ -2,15 +2,15 @@
 #define __BISMITE_NODE_H__
 
 #include <stdbool.h>
+#include <bi/node_base.h>
+#include <bi/timer.h>
 #include <bi/bi_gl.h>
 #include <bi/texture.h>
 #include <bi/util.h>
 #include <bi/array.h>
-#include <bi/node_base.h>
 
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
-typedef struct _BiTimer BiTimer;
 
 typedef bool (*on_click_callback)(BiContext*, BiNode*, int, int, int, bool); // x,y,button,pressed
 typedef bool (*on_move_cursor_callback)(BiContext*, BiNode*, int, int); // x, y
@@ -122,8 +122,8 @@ extern void bi_node_unset_texture(BiNode*);
 //     <-- tw = ow ->
 
 // Timer
-static inline void bi_node_add_timer(BiNode* node,BiTimer* timer){ bi_raw_node_add_timer((BiRawNode*)node,timer); }
-static inline void bi_node_remove_timer(BiNode* node,BiTimer* timer){ bi_raw_node_remove_timer((BiRawNode*)node,timer); }
+static inline BiTimer* bi_node_add_timer(BiNode* node,BiTimer* timer){ return bi_timers_add(&node->timers,timer); }
+static inline BiTimer* bi_node_remove_timer(BiNode* node,BiTimer* timer){ return bi_timers_remove(&node->timers,timer); }
 
 // event handler
 static inline void bi_node_set_on_click(BiNode* node, on_click_callback callback){node->on_click=callback;}

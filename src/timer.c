@@ -13,7 +13,6 @@ BiTimer* bi_timer_init(BiTimer* timer,
   timer->callback = callback;
   timer->userdata = userdata;
   timer->state = BI_TIMER_STATE_RUNNING;
-  timer->node = NULL;
   return timer;
 }
 
@@ -25,4 +24,38 @@ void bi_timer_pause(BiTimer* timer)
 void bi_timer_resume(BiTimer* timer)
 {
   timer->state = BI_TIMER_STATE_RUNNING;
+}
+
+BiTimers* bi_timers_init(BiTimers* timers)
+{
+  timers->size = 0;
+  timers->timers = NULL;
+  timers->scale = 1.0;
+  return timers;
+}
+
+BiTimer* bi_timers_add(BiTimers* timers, BiTimer* timer)
+{
+  if( !timers || !timer ) return NULL;
+  for(int i=0;i<timers->size;i++){
+    if(timers->timers[i] == timer){
+      return timer; // already
+    }
+  }
+  timers->size += 1;
+  timers->timers = realloc(timers->timers, sizeof(BiTimer*)*timers->size);
+  timers->timers[timers->size-1] = timer;
+  return timer;
+}
+
+BiTimer* bi_timers_remove(BiTimers* timers, BiTimer* timer)
+{
+  if( !timers || !timer ) return NULL;
+  for(int i=0;i<timers->size;i++){
+    if(timers->timers[i] == timer){
+      timers->timers[i] = NULL;
+      return timer;
+    }
+  }
+  return NULL;
 }

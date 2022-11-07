@@ -3,8 +3,8 @@
 
 BiLayer* bi_layer_init(BiLayer* layer)
 {
-  bi_raw_node_init((BiRawNode*)layer,BI_NODE_TYPE_LAYER);
-
+  bi_node_base_init((BiNodeBase*)layer,BI_NODE_TYPE_LAYER);
+  bi_timers_init(&layer->timers);
   layer->blend_factor.src = GL_ONE;
   layer->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
   layer->blend_factor.alpha_src = GL_ONE;
@@ -38,8 +38,8 @@ BiLayer* bi_layer_init(BiLayer* layer)
 //
 BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
 {
-  bi_raw_node_init((BiRawNode*)layer_group,BI_NODE_TYPE_LAYER_GROUP);
-
+  bi_node_base_init((BiNodeBase*)layer_group,BI_NODE_TYPE_LAYER_GROUP);
+  bi_timers_init(&layer_group->timers);
   layer_group->blend_factor.src = GL_ONE;
   layer_group->blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;
   layer_group->blend_factor.alpha_src = GL_ONE;
@@ -55,15 +55,15 @@ BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
 
 static int layer_order_compare(const void *_a, const void *_b )
 {
-  const BiRawNode *a = *(BiRawNode**)_a;
-  const BiRawNode *b = *(BiRawNode**)_b;
+  const BiNodeBase *a = *(BiNodeBase**)_a;
+  const BiNodeBase *b = *(BiNodeBase**)_b;
   return a->z == b->z ? a->index - b->index : a->z - b->z;
 }
 
 void bi_layer_group_update_order(BiLayerGroup* layer_group)
 {
   int size = layer_group->layers.size;
-  BiRawNode** objects = (BiRawNode**)layer_group->layers.objects;
+  BiNodeBase** objects = (BiNodeBase**)layer_group->layers.objects;
   for( int i=0; i<size; i++ ) { objects[i]->index = i; }
   qsort( objects, size, sizeof(void*), layer_order_compare );
   for( int i=0; i<size; i++ ) { objects[i]->index = i; }

@@ -2,8 +2,7 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, true, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
   print_info(context);
 
   // Shaders
@@ -14,15 +13,12 @@ int main(int argc, char* argv[])
   BiShader *final_pp_shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-blur.frag");
 
   // Middle Layer Group
-  BiLayerGroup* layer_group = malloc(sizeof(BiLayerGroup));
-  bi_layer_group_init(layer_group);
+  BiLayerGroup* layer_group = bi_layer_group_init(ALLOC(BiLayerGroup));
   bi_layer_group_add_layer_group(&context->layers,layer_group);
 
   // Background layer
-  BiLayer *bg_layer = malloc(sizeof(BiLayer));
-  bi_layer_init(bg_layer);
-  bg_layer->root = malloc(sizeof(BiNode));
-  bi_node_init(bg_layer->root);
+  BiLayer *bg_layer = bi_layer_init(ALLOC(BiLayer));
+  bg_layer->root = bi_node_init(ALLOC(BiNode));
   BiNode* bg = make_sprite("assets/check.png");
   bi_node_set_position(bg,context->w/2,context->h/2);
   bi_node_add_node(bg_layer->root,bg);
@@ -33,26 +29,23 @@ int main(int argc, char* argv[])
   bg_layer->post_process.shader = bg_pp_shader;
 
   // Foreground layer
-  BiNode* root = make_sprite("assets/face01.png");
-  bi_node_set_position(root,context->w/2,context->h/2);
-  BiLayer *fg_layer = malloc(sizeof(BiLayer));
-  bi_layer_init(fg_layer);
-  fg_layer->root = root;
-  bi_node_set_scale(root,2.0,2.0);
-  fg_layer->textures[0] = root->texture;
+  BiLayer *fg_layer = bi_layer_init(ALLOC(BiLayer));
+  fg_layer->root = make_sprite("assets/face01.png");
+  bi_node_set_position(fg_layer->root,context->w/2,context->h/2);
+  bi_node_set_scale(fg_layer->root,2.0,2.0);
+  fg_layer->textures[0] = fg_layer->root->texture;
   fg_layer->shader = fg_shader;
   bi_layer_group_add_layer(layer_group,fg_layer);
   fg_layer->post_process.shader = fg_pp_shader;
 
+  // PostProcess on Top LayerGroup
+  BiLayer *final_pp_layer = bi_layer_init(ALLOC(BiLayer));
+  final_pp_layer->post_process.shader = final_pp_shader;
+  bi_layer_group_add_layer(&context->layers,final_pp_layer);
+
   // fps layer
   BiFontAtlas *font = load_font();
   add_fps_layer(context,font);
-
-  // PostProcess on Top LayerGroup
-  BiLayer *final_pp_layer = malloc(sizeof(BiLayer));
-  bi_layer_init(final_pp_layer);
-  final_pp_layer->post_process.shader = final_pp_shader;
-  bi_layer_group_add_layer(&context->layers,final_pp_layer);
 
   //
   bi_start_run_loop(context);

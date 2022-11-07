@@ -1,8 +1,8 @@
 #include "common.h"
 
-static void rotate(BiContext* c,BiTimer* t,double dt)
+static void rotate(BiTimer* t,double dt)
 {
-  BiNode *node = (BiNode*)t->node;
+  BiNode *node = t->userdata;
   bi_node_set_angle(node, node->angle + 2.0*M_PI/180.0);
 }
 

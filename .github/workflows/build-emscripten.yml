@@ -20,7 +20,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/emscripten/libbismite-emscripten.tgz
-          asset_name: libbismite-emscripten.tgz
+          asset_name: libbismite-emscripten-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload samples archive
@@ -28,6 +28,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/emscripten/libbismite-emscripten-samples.tgz
-          asset_name: libbismite-emscripten-samples.tgz
+          asset_name: libbismite-emscripten-samples-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true

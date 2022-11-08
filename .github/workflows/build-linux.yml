@@ -19,7 +19,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/linux/libbismite-linux.tgz
-          asset_name: libbismite-linux.tgz
+          asset_name: libbismite-linux-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload samples
@@ -27,6 +27,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/linux/libbismite-linux-samples.tgz
-          asset_name: libbismite-linux-samples.tgz
+          asset_name: libbismite-linux-samples-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true

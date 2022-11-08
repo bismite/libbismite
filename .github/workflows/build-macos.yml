@@ -15,7 +15,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/macos/libbismite-macos.tgz
-          asset_name: libbismite-macos.tgz
+          asset_name: libbismite-macos-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload samples
@@ -23,6 +23,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/macos/libbismite-macos-samples.tgz
-          asset_name: libbismite-macos-samples.tgz
+          asset_name: libbismite-macos-samples-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true

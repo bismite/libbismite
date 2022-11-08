@@ -12,7 +12,7 @@ jobs:
           sudo apt update
           sudo apt install libgl-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libyaml-dev clang
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - run: make -f Makefile.linux.mk
       - name: Upload libs
         uses: svenstaro/upload-release-action@v2

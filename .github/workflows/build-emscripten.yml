@@ -3,17 +3,24 @@ on:
   push:
     tags:
       - '*'
+env:
+  EM_VERSION: 3.1.24
+  EM_CACHE_FOLDER: 'emsdk-cache'
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Setup emsdk
-        uses: mymindstorm/setup-emsdk@v11
+      - uses: actions/checkout@v3
+      - name: Setup cache
+        id: cache-system-libraries
+        uses: actions/cache@v3
         with:
-          version: 3.1.24
-          actions-cache-folder: 'emsdk-cache'
-      - name: Check out repository code
-        uses: actions/checkout@v2
+          path: ${{env.EM_CACHE_FOLDER}}
+          key: ${{env.EM_VERSION}}-${{ runner.os }}
+      - uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: ${{env.EM_VERSION}}
+          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
       - run: make -f Makefile.emscripten.mk
       - name: Upload library archive
         uses: svenstaro/upload-release-action@v2

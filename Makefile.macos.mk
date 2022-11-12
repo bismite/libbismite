@@ -27,11 +27,17 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-macos-samples.tgz
 # ----
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
-libs: $(OBJ_DIR) $(LIB_DIR) $(LIBSDL2) $(TARGET)
+libs: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
 samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+$(LIB_DIR):
+	mkdir -p $@
+
+$(OBJ_DIR):
+	mkdir -p $@/ext
 
 $(SDL_TGZ):
 	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
@@ -40,14 +46,8 @@ $(LIBSDL2): $(SDL_TGZ)
 	mkdir -p $(BUILD_DIR)
 	tar --strip-component 1 -zxf $(SDL_TGZ) -C $(BUILD_DIR)
 
-$(LIB_DIR):
-	mkdir -p $@
-
-$(OBJ_DIR):
-	mkdir -p $@/ext
-
-$(OBJ_DIR)/%.o: src/%.c
-	$(CC) -c $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS)
+$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2)
+	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
 	libtool -static -o $@ $^
@@ -57,8 +57,8 @@ $(TARGET): $(OBJECTS)
 $(SAMPLE_DIR):
 	mkdir -p $@
 
-$(SAMPLE_DIR)/%.exe: samples/src/%.c
-	$(CC) $^ -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
+$(SAMPLE_DIR)/%.exe: samples/src/%.c $(TARGET)
+	$(CC) $< -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 	install_name_tool -add_rpath @executable_path/lib $@
 
 copyassets:

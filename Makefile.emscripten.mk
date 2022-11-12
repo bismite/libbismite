@@ -54,7 +54,7 @@ $(OBJ_DIR):
 	mkdir -p $@/ext
 
 $(OBJ_DIR)/%.o: src/%.c
-	$(CC) -c $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS)
+	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
@@ -65,7 +65,7 @@ $(OBJ_DIR_NOSIMD):
 	mkdir -p $@/ext
 
 $(OBJ_DIR_NOSIMD)/%.o: src/%.c
-	$(CC) -c $^ -o $@ $(CFLAGS_NOSIMD) $(INCLUDE_PATHS)
+	$(CC) -c $< -o $@ $(CFLAGS_NOSIMD) $(INCLUDE_PATHS)
 
 $(TARGET_NOSIMD): $(OBJECTS_NOSIMD)
 	$(AR) rcs $@ $^
@@ -75,16 +75,16 @@ $(TARGET_NOSIMD): $(OBJECTS_NOSIMD)
 $(SAMPLE_DIR):
 	mkdir -p $@
 
-$(SAMPLE_DIR)/%.html: samples/src/%.c
-	$(CC) $^ -o $@ $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2
+$(SAMPLE_DIR)/%.html: samples/src/%.c $(TARGET)
+	$(CC) $< -o $@ $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2
 
 # ----
 
 $(SAMPLE_DIR_NOSIMD):
 	mkdir -p $@
 
-$(SAMPLE_DIR_NOSIMD)/%.html: samples/src/%.c
-	$(CC) $^ -o $@ $(SAMPLE_CFLAGS_NOSIMD) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS_NOSIMD) -sMAX_WEBGL_VERSION=2
+$(SAMPLE_DIR_NOSIMD)/%.html: samples/src/%.c $(TARGET_NOSIMD)
+	$(CC) $< -o $@ $(SAMPLE_CFLAGS_NOSIMD) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS_NOSIMD) -sMAX_WEBGL_VERSION=2
 
 # ----
 

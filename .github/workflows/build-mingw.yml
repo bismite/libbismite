@@ -23,8 +23,6 @@ jobs:
       - name: Upload samples
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/x86_64-w64-mingw32/libbismite-x86_64-w64-mingw32-samples.tgz
           asset_name: libbismite-x86_64-w64-mingw32-samples-${{github.ref_name}}.tgz
-          tag: ${{ github.ref }}
           overwrite: true

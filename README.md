@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 6.0.1 - 2022/11/19
+- update workflows and makefiles
 ## 6.0.0 - 2022/11/7
 - timer system overhauled.
 - src/texture.c: SDL_RWFromFile replaced by SDL_RWFromFP

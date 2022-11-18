@@ -1,7 +1,7 @@
 # libbismite
 
 # Change Log
-## 6.0.1 - 2022/11/19
+## 6.0.2 - 2022/11/19
 - update workflows and makefiles
 ## 6.0.0 - 2022/11/7
 - timer system overhauled.

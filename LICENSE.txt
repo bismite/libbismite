@@ -1,4 +1,4 @@
-libbismite 6.0.2
+libbismite 6.0.3
 Copyright 2018-2022 kbys <work4kbys@gmail.com>
 
                                  Apache License

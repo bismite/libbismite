@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## dev
+- update canvas samples
 ## 6.0.2 - 2022/11/19
 - update workflows and makefiles
 ## 6.0.0 - 2022/11/7

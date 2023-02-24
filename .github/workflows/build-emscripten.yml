@@ -4,7 +4,7 @@ on:
     tags:
       - '*'
 env:
-  EM_VERSION: 3.1.26
+  EM_VERSION: 3.1.31
   EM_CACHE_FOLDER: 'emsdk-cache'
 jobs:
   build:
@@ -23,13 +23,13 @@ jobs:
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
       - run: make -f Makefile.emscripten.mk
       - name: Upload library archive
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.4.1
         with:
           file: build/emscripten/libbismite-emscripten.tgz
           asset_name: libbismite-emscripten-${{github.ref_name}}.tgz
           overwrite: true
       - name: Upload samples archive
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.4.1
         with:
           file: build/emscripten/libbismite-emscripten-samples.tgz
           asset_name: libbismite-emscripten-samples-${{github.ref_name}}.tgz

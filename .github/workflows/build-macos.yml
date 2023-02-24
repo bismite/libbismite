@@ -19,7 +19,7 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload samples
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.4.1
         with:
           file: build/macos/libbismite-macos-samples.tgz
           asset_name: libbismite-macos-samples-${{github.ref_name}}.tgz

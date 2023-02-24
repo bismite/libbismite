@@ -2,6 +2,8 @@
 
 # Change Log
 ## dev
+- update SDL 2.26.3, SDL_image 2.6.3, SDL_mixer 2.6.3.
+- use system-independent SDL even on emscripten and linux.
 - update canvas samples
 ## 6.0.2 - 2022/11/19
 - update workflows and makefiles

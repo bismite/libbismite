@@ -4,11 +4,17 @@
 #include "fps.h"
 
 #ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 #include <emscripten/version.h>
 #define SHADER_HEADER "#version 300 es\n" "precision highp float;\n"
+EM_JS_DEPS(sdl_deps, "$autoResumeAudioContext,$dynCall");
 #else
 #define SHADER_HEADER "#version 410\n"
 #endif
+
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
 
 #define ALLOC(x) malloc(sizeof(x))
 
@@ -94,6 +100,11 @@ __attribute__((unused)) static BiNode* make_sprite_with_anchor(const char* name,
   return n;
 }
 
+static void print_version(const char* name,const SDL_version *v)
+{
+  printf("%s : %u.%u.%u\n", name, v->major, v->minor, v->patch);
+}
+
 __attribute__((unused)) static void print_info(BiContext *context)
 {
   printf("bismite version: %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);
@@ -107,12 +118,18 @@ __attribute__((unused)) static void print_info(BiContext *context)
   printf("emscripten version: %d.%d.%d\n", __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__ );
 #endif
   printf("compiler: %s\n", __VERSION__);
-  SDL_version compiled;
-  SDL_version linked;
-  SDL_VERSION(&compiled);
-  SDL_GetVersion(&linked);
-  printf("SDL(compile): %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
-  printf("SDL(link): %d.%d.%d\n", linked.major, linked.minor, linked.patch);
+
+  SDL_version v;
+  SDL_VERSION(&v);
+  print_version("SDL(compile)",&v);
+  SDL_GetVersion(&v);
+  print_version("SDL(link)",&v);
+  SDL_IMAGE_VERSION(&v)
+  print_version("Image(compile)", &v);
+  print_version("Image(link)", IMG_Linked_Version() );
+  SDL_MIXER_VERSION(&v)
+  print_version("Mixer(compile)", &v);
+  print_version("Mixer(link)", Mix_Linked_Version() );
 
   printf("OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
   printf("OpenGL Version: %s\n", glGetString(GL_VERSION));

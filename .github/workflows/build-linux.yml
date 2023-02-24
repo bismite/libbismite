@@ -10,12 +10,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install libgl-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libyaml-dev clang
+          sudo apt install clang libgl-dev libyaml-dev
       - name: Check out repository code
         uses: actions/checkout@v3
       - run: make -f Makefile.linux.mk
       - name: Upload libs
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.4.1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/linux/libbismite-linux.tgz
@@ -23,7 +23,7 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload samples
-        uses: svenstaro/upload-release-action@v2
+        uses: svenstaro/upload-release-action@2.4.1
         with:
           file: build/linux/libbismite-linux-samples.tgz
           asset_name: libbismite-linux-samples-${{github.ref_name}}.tgz

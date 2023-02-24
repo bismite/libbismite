@@ -1,7 +1,9 @@
+BUILD_DIR=build/linux
+
 CC=clang
 AR=ar
-CFLAGS=-Wall -O3 -fPIC `sdl2-config --cflags`
-INCLUDE_PATHS=-Iinclude
+CFLAGS=-Wall -std=c11 -O3 -fPIC -D_REENTRANT
+INCLUDE_PATHS=-Iinclude -Ibuild/linux/include -Ibuild/linux/include/SDL2
 
 LIB_DIR=build/linux/lib
 TARGET=$(LIB_DIR)/libbismite.a
@@ -9,10 +11,14 @@ OBJ_DIR=build/linux/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
+LIBSDL2=build/linux/lib/libSDL2-2.0.so.0
+SDL_TGZ=build/SDL-linux-1.0.3.tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/linux-1.0.3/SDL-linux-1.0.3.tgz
+
 SAMPLE_DIR=build/linux/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm -lGL
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite -lSDL2 -lSDL2_image -lSDL2_mixer -lm -lGL '-Wl,-rpath=$$ORIGIN/../lib'
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=build/linux/libbismite-linux.tgz
@@ -30,11 +36,18 @@ clean:
 $(OBJ_DIR):
 	mkdir -p $@/ext
 
+$(SDL_TGZ):
+	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
+
+$(LIBSDL2): $(SDL_TGZ)
+	mkdir -p $(BUILD_DIR)
+	tar xf $(SDL_TGZ) -C $(BUILD_DIR)
+
 $(LIB_DIR):
 	mkdir -p $@
 
-$(OBJ_DIR)/%.o: src/%.c
-	$(CC) -c $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS)
+$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2)
+	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
@@ -45,7 +58,7 @@ $(SAMPLE_DIR):
 	mkdir -p $@
 
 $(SAMPLE_DIR)/%.exe: samples/src/%.c
-	$(CC) $^ -o $@ -I include $(CFLAGS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
+	$(CC) $< -o $@ $(CFLAGS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 
 copyassets:
 	cp -R samples/assets $(SAMPLE_DIR)

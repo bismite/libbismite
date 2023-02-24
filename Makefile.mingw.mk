@@ -12,8 +12,8 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 LIBSDL2=$(BUILD_DIR)/lib/libSDL2.a
-SDL_TGZ=$(BUILD_DIR)/SDL-x86_64-w64-mingw32.tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-x86_64-w64-mingw32/releases/download/1.1.1/SDL-x86_64-w64-mingw32.tgz
+SDL_TGZ=$(BUILD_DIR)/SDL-mingw-1.0.0.tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/mingw-1.0.0/SDL-mingw-1.0.0.tgz
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)

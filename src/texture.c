@@ -93,16 +93,20 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
 BiTexture* bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool straight_alpha)
 {
   SDL_RWops *rw = SDL_RWFromMem(buffer,size);
-  if(rw==NULL) return NULL;
+  if(rw==NULL) {
+    LOG("bi_texture_init_with_file : SDL_RWFromMem failed\n");
+    return NULL;
+  }
   return load_texture_from_image( texture, SDL_RWFromMem(buffer,size), straight_alpha );
 }
 
 BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filename, bool straight_alpha)
 {
-  FILE* fp = fopen(filename,"rb");
-  if(fp==NULL) return NULL;
-  SDL_RWops *rw = SDL_RWFromFP(fp,true);
-  if(rw==NULL) return NULL;
+  SDL_RWops *rw = SDL_RWFromFile(filename,"rb");
+  if(rw==NULL) {
+    LOG("bi_texture_init_with_filename : SDL_RWFromFile(%s) failed.\n",filename);
+    return NULL;
+  }
   return load_texture_from_image( texture, rw, straight_alpha );
 }
 

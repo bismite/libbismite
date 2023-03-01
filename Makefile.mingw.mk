@@ -2,7 +2,7 @@ BUILD_DIR=build/x86_64-w64-mingw32
 
 CC=x86_64-w64-mingw32-gcc
 AR=x86_64-w64-mingw32-ar
-CFLAGS=-Wall -O3 -Dmain=SDL_main
+CFLAGS=-Wall -std=c11 -O3 -Dmain=SDL_main
 INCLUDE_PATHS= -Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib
@@ -11,15 +11,16 @@ OBJ_DIR=$(BUILD_DIR)/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-LIBSDL2=$(BUILD_DIR)/lib/libSDL2.a
-SDL_TGZ=$(BUILD_DIR)/SDL-mingw-1.0.0.tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/mingw-1.0.0/SDL-mingw-1.0.0.tgz
+LIBSDL2=$(BUILD_DIR)/bin/SDL2.dll
+SDL_TAG=mingw-1.0.1
+SDL_TGZ=build/SDL-$(SDL_TAG).tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS=-L$(BUILD_DIR)/bin -L$(LIB_DIR)
-SAMPLE_LIBS = -lbismite -lmingw32 -lSDL2main -lSDL2 -mwindows -lSDL2_mixer -lSDL2_image -lopengl32
+SAMPLE_LDFLAGS=-L$(BUILD_DIR)/bin
+SAMPLE_LIBS = $(BUILD_DIR)/lib/libbismite.a -lmingw32 $(BUILD_DIR)/lib/libSDL2main.a -lSDL2 -mwindows -lSDL2_mixer -lSDL2_image -lopengl32
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32.tgz
@@ -34,19 +35,21 @@ samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
 clean:
 	rm -rf $(BUILD_DIR)
 
-$(LIBSDL2):
-	mkdir -p $(BUILD_DIR)
-	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
-	tar xf $(SDL_TGZ) -C $(BUILD_DIR)
-
 $(OBJ_DIR):
 	mkdir -p $@/ext
 
 $(LIB_DIR):
 	mkdir -p $@
 
-$(OBJ_DIR)/%.o: src/%.c
-	$(CC) -c $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS)
+$(SDL_TGZ):
+	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
+
+$(LIBSDL2): $(SDL_TGZ)
+	mkdir -p $(BUILD_DIR)
+	tar xf $(SDL_TGZ) -C $(BUILD_DIR)
+
+$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2)
+	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS)
 
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
@@ -57,7 +60,7 @@ $(SAMPLE_DIR):
 	mkdir -p $@
 
 $(SAMPLE_DIR)/%.exe: samples/src/%.c
-	$(CC) $^ -o $@ $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) $(SAMPLE_LDFLAGS)
+	$(CC) $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) $(SAMPLE_LDFLAGS)
 
 copyassets:
 	cp -R samples/assets $(SAMPLE_DIR)

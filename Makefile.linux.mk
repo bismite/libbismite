@@ -11,9 +11,10 @@ OBJ_DIR=build/linux/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-LIBSDL2=build/linux/lib/libSDL2-2.0.so.0
-SDL_TGZ=build/SDL-linux-1.0.3.tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/linux-1.0.3/SDL-linux-1.0.3.tgz
+LIBSDL2=build/linux/lib/libSDL2.so
+SDL_TAG=linux-1.0.4
+SDL_TGZ=build/SDL-$(SDL_TAG).tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 
 SAMPLE_DIR=build/linux/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)

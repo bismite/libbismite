@@ -1,9 +1,10 @@
 # libbismite
 
 # Change Log
-## dev
+## 6.0.3 - 2023/3/3
 - update SDL 2.26.3, SDL_image 2.6.3, SDL_mixer 2.6.3.
 - use system-independent SDL even on emscripten and linux.
+- LTO enabled.
 - update canvas samples
 ## 6.0.2 - 2022/11/19
 - update workflows and makefiles

@@ -2,28 +2,28 @@ BUILD_DIR=build/linux
 
 CC=clang
 AR=ar
-CFLAGS=-Wall -std=c11 -O3 -fPIC -D_REENTRANT
-INCLUDE_PATHS=-Iinclude -Ibuild/linux/include -Ibuild/linux/include/SDL2
+CFLAGS=-Wall -std=c11 -O3 -flto -fPIC -D_REENTRANT
+INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include -I$(BUILD_DIR)/include/SDL2
 
-LIB_DIR=build/linux/lib
+LIB_DIR=$(BUILD_DIR)/lib
 TARGET=$(LIB_DIR)/libbismite.a
-OBJ_DIR=build/linux/objs
+OBJ_DIR=$(BUILD_DIR)/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-LIBSDL2=build/linux/lib/libSDL2.so
+LIBSDL2=$(BUILD_DIR)/lib/libSDL2.so
 SDL_TAG=linux-1.0.4
 SDL_TGZ=build/SDL-$(SDL_TAG).tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 
-SAMPLE_DIR=build/linux/samples
+SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
 SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite -lSDL2 -lSDL2_image -lSDL2_mixer -lm -lGL '-Wl,-rpath=$$ORIGIN/../lib'
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
-ARCHIVE=build/linux/libbismite-linux.tgz
-ARCHIVE_SAMPLES=build/linux/libbismite-linux-samples.tgz
+ARCHIVE=$(BUILD_DIR)/libbismite-linux.tgz
+ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-linux-samples.tgz
 
 # ----
 
@@ -32,7 +32,7 @@ lib: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
 samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets
 
 clean:
-	rm -rf build/linux
+	rm -rf $(BUILD_DIR)
 
 $(OBJ_DIR):
 	mkdir -p $@/ext
@@ -67,12 +67,12 @@ copyassets:
 # ----
 
 $(ARCHIVE):
-	cp -R include build/linux
-	mkdir -p build/linux/licenses
-	cp LICENSE.txt build/linux/licenses/libbismite-LICENSE.txt
-	tar -cz -C build/linux -f $(ARCHIVE) lib include licenses
+	cp -R include $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/licenses
+	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
+	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE) lib include licenses
 
 $(ARCHIVE_SAMPLES):
-	mkdir -p build/linux/licenses
-	cp LICENSE.txt build/linux/licenses/libbismite-LICENSE.txt
-	tar -cz -C build/linux -f $(ARCHIVE_SAMPLES) samples licenses
+	mkdir -p $(BUILD_DIR)/licenses
+	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
+	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE_SAMPLES) samples licenses

@@ -2,7 +2,7 @@ BUILD_DIR=build/macos
 
 CC=clang
 AR=ar
-CFLAGS=-std=c11 -Wall -O3 -fPIC -arch arm64 -arch x86_64 -Wno-deprecated-declarations
+CFLAGS=-std=c11 -Wall -O3 -fPIC -flto -arch arm64 -arch x86_64 -Wno-deprecated-declarations
 INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib
@@ -11,14 +11,15 @@ OBJ_DIR=$(BUILD_DIR)/objs
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
-LIBSDL2=build/macos/lib/libSDL2.dylib
-SDL_TGZ=build/SDL-macos-1.0.4.tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/macos-1.0.4/SDL-macos-1.0.4.tgz
+LIBSDL2=$(BUILD_DIR)/lib/libSDL2.dylib
+SDL_TAG=macos-1.0.4
+SDL_TGZ=build/SDL-$(SDL_TAG).tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/src/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS =-L$(LIB_DIR) -lSDL2 -lSDL2_image -framework OpenGL -lbismite
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -lSDL2 -lSDL2_image -lSDL2_mixer -framework OpenGL -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=$(BUILD_DIR)/libbismite-macos.tgz

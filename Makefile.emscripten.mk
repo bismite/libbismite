@@ -7,7 +7,7 @@ INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include/SDL2
 LIB_DIR=$(BUILD_DIR)/lib
 SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 
-CFLAGS_NOSIMD=-std=gnu11 -Wall -O3 -s USE_SDL=0 -fPIC
+CFLAGS_NOSIMD=-std=gnu11 -Wall -O3 -flto -s USE_SDL=0 -fPIC
 TARGET_NOSIMD=$(LIB_DIR)/libbismite-nosimd.a
 OBJ_DIR_NOSIMD=$(BUILD_DIR)/objs-nosimd
 OBJECTS_NOSIMD = $(SOURCES:src/%.c=$(OBJ_DIR_NOSIMD)/%.o)

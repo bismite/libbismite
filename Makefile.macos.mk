@@ -2,7 +2,7 @@ BUILD_DIR=build/macos
 
 CC=clang
 AR=ar
-CFLAGS=-std=c11 -Wall -O3 -fPIC -arch arm64 -arch x86_64 -Wno-deprecated-declarations
+CFLAGS=-std=c11 -Wall -O3 -fPIC -flto -arch arm64 -arch x86_64 -Wno-deprecated-declarations
 INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib

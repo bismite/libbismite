@@ -2,7 +2,7 @@ BUILD_DIR=build/x86_64-w64-mingw32
 
 CC=x86_64-w64-mingw32-gcc
 AR=x86_64-w64-mingw32-ar
-CFLAGS=-Wall -std=c11 -O3 -Dmain=SDL_main
+CFLAGS=-Wall -std=c11 -O3 -flto -Dmain=SDL_main
 INCLUDE_PATHS= -Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib

@@ -12,7 +12,7 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 LIBSDL2=$(BUILD_DIR)/bin/SDL2.dll
-SDL_TAG=mingw-1.0.1
+SDL_TAG=mingw-1.0.2
 SDL_TGZ=build/SDL-$(SDL_TAG).tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 

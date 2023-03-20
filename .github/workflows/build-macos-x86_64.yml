@@ -1,0 +1,26 @@
+name: Build macOS x86_64
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  macOS:
+    runs-on: macos-12
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: make -f Makefile.macos.mk ARCH=x86_64
+      - name: Upload library
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/macos-x86_64/libbismite-macos.tgz
+          asset_name: libbismite-macos-x86_64-${{github.ref_name}}.tgz
+          tag: ${{ github.ref }}
+          overwrite: true
+      - name: Upload samples
+        uses: svenstaro/upload-release-action@2.4.1
+        with:
+          file: build/macos-x86_64/libbismite-macos-samples.tgz
+          asset_name: libbismite-macos-samples-x86_64-${{github.ref_name}}.tgz
+          overwrite: true

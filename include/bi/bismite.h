@@ -17,8 +17,8 @@
 #include <bi/timer.h>
 #include <bi/util.h>
 
-#define BISMITE_MAJOR_VERSION 6
+#define BISMITE_MAJOR_VERSION 7
 #define BISMITE_MINOR_VERSION 0
-#define BISMITE_PATCHLEVEL 5
+#define BISMITE_PATCHLEVEL 0
 
 #endif

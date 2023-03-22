@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 7.0.0 - 2023/03/22
+- license change : zlib license
 ## 6.0.5 - 2023/03/20
 - update SDL 2.26.4
 - split macOS binaries into arm64/x86_64.
@@ -70,7 +72,6 @@
 - Shader receives display scale as uniform attribute.
 
 # License
+Copyright 2018-2023 kbys <work4kbys@gmail.com>
 
-Copyright 2018-2022 kbys <work4kbys@gmail.com>
-
-Apache License Version 2.0
+zlib license

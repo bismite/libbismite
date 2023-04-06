@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 7.0.2 - 2023/04/07
+- update SDL 2.26.5
 ## 7.0.0 - 2023/03/22
 - license change : zlib license
 ## 6.0.5 - 2023/03/20

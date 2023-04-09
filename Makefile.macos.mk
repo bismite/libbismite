@@ -29,7 +29,7 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-macos-samples.tgz
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 libs: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
-samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
+samples: libs $(SAMPLE_DIR) copyassets copysdl $(SAMPLE_EXES)
 
 clean:
 	rm -rf $(BUILD_DIR)

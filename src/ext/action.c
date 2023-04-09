@@ -2,11 +2,6 @@
 #include <bi/context.h>
 #include <stdlib.h>
 
-typedef struct {
-  BiNode *node;
-  BiAction* action;
-} ActionDoer;
-
 BiAction* bi_action_init(BiAction *action)
 {
   action->start = NULL;
@@ -15,9 +10,10 @@ BiAction* bi_action_init(BiAction *action)
   action->state = BI_ACTION_STATE_READY;
   action->duration = 0;
   action->progress = 0.0;
-  action->action_data = NULL;
   action->node = NULL;
   action->on_finish_callback_context = NULL;
+  action->repeat = 1;
+  action->repeat_count = 1;
   return action;
 }
 
@@ -31,21 +27,33 @@ static void do_actions(BiTimer* timer,double delta_time)
 {
   BiAction* a = timer->userdata;
 
+  if(a->repeat_count==0) return;
+
   if(a->duration==0){
     a->progress = 1.0;
   }else{
-    a->progress += (double)delta_time / a->duration;
+    a->progress += delta_time / a->duration;
   }
-  if(a->progress<0.0){ a->progress = 0.0; }
-  if(a->progress>1.0){ a->progress = 1.0; }
 
-  a->update(a,a->progress,delta_time);
-
-  if( a->progress >= 1.0 ) {
-    if( a->state != BI_ACTION_STATE_FINISHED ) {
-      a->state = BI_ACTION_STATE_FINISHED;
+  double remain = a->progress;
+  bool dirty = false;
+  bool done = false;
+  while(remain>0){
+    if(remain>=1.0){
+      dirty = true;
+      a->progress = 1.0;
+      a->update(a,1.0);
+      if(a->repeat_count>0) a->repeat_count -= 1;
+      if(a->repeat_count==0) done = true;
       if(a->on_finish) a->on_finish(a,a->on_finish_callback_context);
+      if(done) break;
+    }else{
+      dirty = false;
+      a->progress = remain;
+      a->update(a,remain);
     }
+    if(dirty) a->start(a);
+    remain -= 1.0;
   }
 }
 
@@ -59,4 +67,10 @@ void bi_add_action(BiNode* node,BiAction* action)
 void bi_remove_action(BiNode* node, BiAction* action)
 {
   bi_node_remove_timer(node,&action->timer);
+}
+
+void bi_action_set_repeat(BiAction *action,int repeat)
+{
+  action->repeat = repeat;
+  action->repeat_count = repeat;
 }

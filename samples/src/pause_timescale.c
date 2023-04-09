@@ -4,15 +4,6 @@
 BiLayerGroup* layer_group_a;
 BiLayerGroup* layer_group_b;
 
-static BiAction* alloc_action(size_t size, void* payload)
-{
-  BiAction* action = bi_action_init(ALLOC(BiAction));
-  action->action_data = malloc(size);
-  action->on_finish = NULL;
-  action->on_finish_callback_context = payload;
-  return action;
-}
-
 static void rotate_on_timer(BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
@@ -56,12 +47,10 @@ static BiLayerGroup* init_layer_group(BiContext* context, BiLayerGroup* lg, int 
 
   // rotate by action
   bi_set_color(faces[0]->color,0xFF,0,0,0xFF);
-  BiAction* rot = alloc_action( sizeof(BiActionRotate), NULL );
-  bi_action_rotate_by_init(rot,0,2);
-  BiAction* repeat = alloc_action( sizeof(BiActionRepeat), NULL );
-  bi_action_repeat_init(repeat,rot);
-  bi_add_action(faces[0],repeat);
-  bi_action_start(repeat);
+  BiAction* rot = (BiAction*)bi_action_rotate_by_init(ALLOC(BiActionRotate),0,2);
+  bi_action_set_repeat(rot,-1);
+  bi_add_action(faces[0],rot);
+  bi_action_start(rot);
   // rotate by timer
   bi_set_color(faces[1]->color,0,0,0xFF,0xFF);
   bi_node_add_timer(faces[1], bi_timer_init(ALLOC(BiTimer), rotate_on_timer, 0, -1, faces[1]));

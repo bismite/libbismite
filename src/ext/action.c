@@ -2,10 +2,13 @@
 #include <bi/context.h>
 #include <stdlib.h>
 
+static void bi_action_update_callback_nop(BiAction* action, double rate){}
+static void bi_action_start_callback_nop(BiAction* action){}
+
 BiAction* bi_action_init(BiAction *action)
 {
-  action->start = NULL;
-  action->update = NULL;
+  action->start = bi_action_start_callback_nop;
+  action->update = bi_action_update_callback_nop;
   action->on_finish = NULL;
   action->state = BI_ACTION_STATE_READY;
   action->duration = 0;

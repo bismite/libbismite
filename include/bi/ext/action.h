@@ -40,10 +40,6 @@ extern void bi_action_set_repeat(BiAction *action,int repeat);
 // actions
 //
 
-// Base
-
-extern void bi_action_base_init(BiAction* action);
-
 // Fade In / Fade Out
 typedef struct {
   BiAction action;

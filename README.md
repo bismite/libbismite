@@ -1,9 +1,9 @@
 # libbismite
 
 # Change Log
-## 8.0.1 - 2023/04/10
+## 8.0.2 - 2023/04/10
 - BiActionRepeat is no longer available. add repeat flag to actions.
-- Fix ScaleBy action
+- Fix ScaleBy action and ScaleTo aciton
 ## 7.0.2 - 2023/04/07
 - update SDL 2.26.5
 ## 7.0.0 - 2023/03/22

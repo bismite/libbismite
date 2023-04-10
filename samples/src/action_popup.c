@@ -6,15 +6,6 @@
 BiNode* popup_shade;
 BiNode* popup;
 
-static BiAction* alloc_action(size_t size, void* func, void* payload)
-{
-  BiAction* action = bi_action_init(malloc(sizeof(BiAction)));
-  action->action_data = malloc(size);
-  action->on_finish = func;
-  action->on_finish_callback_context = payload;
-  return action;
-}
-
 static bool close(BiContext* context,BiNode* n, int x, int y, int button, bool pressed)
 {
   if(n->opacity==1.0 && !pressed) {
@@ -38,14 +29,14 @@ static bool open(BiContext* context,BiNode* n, int x, int y, int button, bool pr
     bi_node_set_scale(popup,0.5,0.5);
 
     // Fade In
-    BiAction* fade_in = alloc_action( sizeof(BiActionFade), callback_end, NULL );
-    bi_action_fade_in_init(fade_in,DURATION);
+    BiAction* fade_in = (BiAction*)bi_action_fade_in_init( ALLOC(BiActionFade), DURATION);
+    fade_in->on_finish = callback_end;
     bi_add_action(popup,fade_in);
     bi_action_start(fade_in);
 
     // Scale To
-    BiAction* scale_to = alloc_action( sizeof(BiActionScale), callback_end, NULL );
-    bi_action_scale_to_init(scale_to,DURATION,1.0,1.0);
+    BiAction* scale_to = (BiAction*)bi_action_scale_to_init(ALLOC(BiActionScale),DURATION,1.0,1.0);
+    scale_to->on_finish = callback_end;
     bi_add_action(popup,scale_to);
     bi_action_start(scale_to);
 
@@ -56,22 +47,22 @@ static bool open(BiContext* context,BiNode* n, int x, int y, int button, bool pr
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(malloc(sizeof(BiContext)),480,320,0,false,__FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
   print_info(context);
 
   // Layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = make_sprite_with_anchor("assets/check.png",0,0);
   bi_add_layer(context,layer);
 
   // shade
-  popup_shade = bi_node_init(malloc(sizeof(BiNode)));
+  popup_shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(popup_shade,context->w,context->h);
   bi_set_color(popup_shade->color, 0, 0, 0, 0);
   bi_node_add_node(layer->root,popup_shade);
 
   // popup
-  popup = bi_node_init(malloc(sizeof(BiNode)));
+  popup = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(popup,380,240);
   bi_node_set_anchor(popup,0.5,0.5);
   bi_node_set_position(popup,context->w/2,context->h/2);

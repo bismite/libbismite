@@ -37,8 +37,8 @@ static void bi_action_scale_to_update(BiAction* action, double rate)
 {
   BiActionScale* scale = (BiActionScale*)action;
   bi_node_set_scale(action->node,
-                    scale->from_x + (scale->dx - scale->from_x) * rate,
-                    scale->from_x + (scale->dx - scale->from_x) * rate);
+                    scale->from_x + (scale->dx-scale->from_x) * rate,
+                    scale->from_x + (scale->dx-scale->from_x) * rate);
 }
 
 static void bi_action_scale_to_start(BiAction* action)

@@ -52,7 +52,7 @@ PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 
 #define GLP(name) do{ name = SDL_GL_GetProcAddress( #name ); }while(0)
 
-void enable_gl_extensions(BiContext* context)
+void enable_gl_extensions()
 {
 #if !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
 #if defined(__MINGW32__)

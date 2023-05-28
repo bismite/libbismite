@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "shader/default_shader.h"
 
-extern void enable_gl_extensions(BiContext* context);
+extern void enable_gl_extensions();
 
 BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {

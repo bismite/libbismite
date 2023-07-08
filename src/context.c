@@ -37,7 +37,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
     exit(1);
   }
 
-  enable_gl_extensions(context);
+  enable_gl_extensions();
   glEnable(GL_BLEND);
 
   context->program_start_at = bi_get_now();

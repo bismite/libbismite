@@ -4,7 +4,7 @@ on:
     tags:
       - '*'
 env:
-  EM_VERSION: 3.1.31
+  EM_VERSION: 3.1.42
   EM_CACHE_FOLDER: 'emsdk-cache'
 jobs:
   build:

@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 9.0.0 - 2023/07/07
+- remove emscripten-nosimd.
+- update emscripten 3.1.42.
 ## 8.0.2 - 2023/04/10
 - BiActionRepeat is no longer available. add repeat flag to actions.
 - Fix ScaleBy action and ScaleTo aciton

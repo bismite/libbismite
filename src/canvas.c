@@ -58,7 +58,7 @@ void bi_canvas_draw(BiCanvas* canvas,BiNode* node)
   // set projection and view
   GLfloat camera[16];
   bi_camera_matrix(camera,0,0,canvas->w,canvas->h,true);
-  glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
+  glUniformMatrix4fv(shader->uniform.camera, 1, GL_FALSE, camera);
 
   // blend function
   glBlendFuncSeparate(

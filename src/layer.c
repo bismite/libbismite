@@ -17,14 +17,14 @@ BiLayer* bi_layer_init(BiLayer* layer)
     layer->textures[i] = NULL;
   }
   layer->shader = NULL;
-  for(int i=0;i<4;i++) {
-    layer->shader_attributes[i] = 0;
+  for(int i=0;i<16;i++) {
+    layer->shader_extra_data[i] = 0;
   }
   // Post Process
   layer->post_process.shader = NULL;
   layer->post_process.framebuffer_enabled = false;
-  for(int i=0;i<4;i++) {
-    layer->post_process.shader_attributes[i] = 0;
+  for(int i=0;i<16;i++) {
+    layer->post_process.shader_extra_data[i] = 0;
   }
   layer->post_process.blend_factor.src = GL_ONE;
   layer->post_process.blend_factor.dst = GL_ONE_MINUS_SRC_ALPHA;

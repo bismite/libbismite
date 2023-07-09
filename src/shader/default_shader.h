@@ -15,20 +15,21 @@ static const char *DEFAULT_VERTEX_SHADER = SHADER_VERSION VERTEX_SHADER_HEADER D
 uniform mat4 camera;
 in vec2 vertex;
 in vec4 texture_uv;
-in vec4 transform_a;
-in vec4 transform_b;
-in vec4 transform_c;
-in vec4 transform_d;
+in mat4 transform;
 in int texture_index;
 in float opacity;
-in vec4 tint_color;
+in vec4 color0;
+in vec4 color1;
+in mat4 node_extra_data;
 out vec2 uv;
 flat out int _texture_index;
-out vec4 _tint_color;
 out float _opacity;
+out vec4 c0;
+out vec4 c1;
+out mat4 _node_extra_data;
 void main()
 {
-  gl_Position = camera * mat4(transform_a,transform_b,transform_c,transform_d) * vec4(vertex,0.0,1.0);
+  gl_Position = camera * transform * vec4(vertex,0.0,1.0);
   // vertex = [ left-top, left-bottom, right-top, right-bottom ]
   // texture_uv = [ x:left, y:top, z:right, w:bottom ]
   if( gl_VertexID == 0 ){
@@ -41,19 +42,23 @@ void main()
     uv = vec2(texture_uv.z,texture_uv.w); // right-bottom
   }
   _texture_index = texture_index;
-  _tint_color = tint_color;
+  c0 = color0 / 255.0;
+  c1 = color1 / 255.0;
   _opacity = opacity;
+  _node_extra_data = node_extra_data;
 }
 );
 
 static const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 in vec2 uv;
 flat in int _texture_index;
-in vec4 _tint_color;
 in float _opacity;
+in vec4 c0;
+in vec4 c1;
+in mat4 _node_extra_data;
 uniform float time;
 uniform vec2 resolution;
-uniform vec4 optional_attributes;
+uniform mat4 layer_extra_data;
 uniform sampler2D sampler[16];
 out vec4 color;
 vec4 getTextureColor(int samplerID,vec2 xy) {
@@ -80,9 +85,10 @@ void main()
 {
   if( 0 <= _texture_index && _texture_index < 16 ) {
     vec4 c = getTextureColor( _texture_index, uv);
-    color = vec4(_tint_color.rgb*_tint_color.a*c.a+c.rgb*(1.0-_tint_color.a),c.a) * _opacity;
+    c = vec4(c1.r*c.r, c1.g*c.g, c1.b*c.b, c.a);
+    color = vec4( c0.rgb*c0.a*c.a + c.rgb*(1.0-c0.a), c.a ) * _opacity;
   }else{
-    color = _tint_color * _opacity;
+    color = c0 * _opacity;
   }
 }
 );

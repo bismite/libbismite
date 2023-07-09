@@ -46,23 +46,22 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->program_id = program_id;
 
   // Attribute locations
-  shader->vertex_location = glGetAttribLocation(program_id, "vertex");
-  shader->texture_uv_location = glGetAttribLocation(program_id, "texture_uv");
-  shader->opacity_location = glGetAttribLocation(program_id, "opacity");
-  shader->texture_index_location = glGetAttribLocation(program_id, "texture_index");
-  shader->tint_color_location = glGetAttribLocation(program_id, "tint_color");
-  shader->transform_locations[0] = glGetAttribLocation(program_id, "transform_a");
-  shader->transform_locations[1] = glGetAttribLocation(program_id, "transform_b");
-  shader->transform_locations[2] = glGetAttribLocation(program_id, "transform_c");
-  shader->transform_locations[3] = glGetAttribLocation(program_id, "transform_d");
+  shader->attribute.vertex = glGetAttribLocation(program_id, "vertex");
+  shader->attribute.texture_uv = glGetAttribLocation(program_id, "texture_uv");
+  shader->attribute.texture_index = glGetAttribLocation(program_id, "texture_index");
+  shader->attribute.opacity = glGetAttribLocation(program_id, "opacity");
+  shader->attribute.color[0] = glGetAttribLocation(program_id, "color0");
+  shader->attribute.color[1] = glGetAttribLocation(program_id, "color1");
+  shader->attribute.transform = glGetAttribLocation(program_id, "transform");
+  shader->attribute.node_extra_data = glGetAttribLocation(program_id, "node_extra_data");
 
-  // Uniform locations
-  shader->camera_location = glGetUniformLocation(program_id, "camera");
-  shader->texture_locations[0] = glGetUniformLocation(program_id, "sampler[0]");
-  shader->time_location = glGetUniformLocation(program_id, "time");
-  shader->resolution_location = glGetUniformLocation(program_id, "resolution");
-  shader->scale_location = glGetUniformLocation(program_id, "scale");
-  shader->optional_attributes_location = glGetUniformLocation(program_id, "optional_attributes");
+  // Uniform
+  shader->uniform.camera = glGetUniformLocation(program_id, "camera");
+  shader->uniform.texture = glGetUniformLocation(program_id, "sampler[0]");
+  shader->uniform.time = glGetUniformLocation(program_id, "time");
+  shader->uniform.resolution = glGetUniformLocation(program_id, "resolution");
+  shader->uniform.scale = glGetUniformLocation(program_id, "scale");
+  shader->uniform.layer_extra_data = glGetUniformLocation(program_id, "layer_extra_data");
 }
 
 void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source)
@@ -73,19 +72,21 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glUseProgram(shader->program_id);
   int texture_location_indexes[BI_LAYER_MAX_TEXTURES];
   for(int i=0; i<BI_LAYER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
-  glUniform1iv(shader->texture_locations[0], BI_LAYER_MAX_TEXTURES, texture_location_indexes);
+  glUniform1iv(shader->uniform.texture, BI_LAYER_MAX_TEXTURES, texture_location_indexes);
   glUseProgram(0);
 
   // create vbo
-  glGenBuffers(1, &shader->uv_buffer);
-  glGenBuffers(1, &shader->opacity_buffer);
-  glGenBuffers(1, &shader->texture_index_buffer);
-  glGenBuffers(1, &shader->tint_color_buffer);
-  glGenBuffers(1, &shader->transform_buffer);
+  glGenBuffers(1, &shader->buffer.uv);
+  glGenBuffers(1, &shader->buffer.texture_index);
+  glGenBuffers(1, &shader->buffer.opacity);
+  glGenBuffers(1, &shader->buffer.color[0]);
+  glGenBuffers(1, &shader->buffer.color[1]);
+  glGenBuffers(1, &shader->buffer.transform);
+  glGenBuffers(1, &shader->buffer.node_extra_data);
 
   // create vbo : vertex
-  glGenBuffers(1, &shader->vertex_buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, shader->vertex_buffer);
+  glGenBuffers(1, &shader->buffer.vertex);
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.vertex);
   GLfloat l=0, t=1, r=1, b=0; // vertex left,top,right,bottom
   GLfloat vertex[8] = { l,t, l,b, r,t, r,b };
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, vertex, GL_DYNAMIC_DRAW);
@@ -96,47 +97,60 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glBindVertexArray(shader->vao);
 
     // vertex
-    glBindBuffer(GL_ARRAY_BUFFER,shader->vertex_buffer);
-    glEnableVertexAttribArray(shader->vertex_location);
-    glVertexAttribPointer(shader->vertex_location,2,GL_FLOAT,GL_FALSE,0,NULL);
+    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.vertex);
+    glEnableVertexAttribArray(shader->attribute.vertex);
+    glVertexAttribPointer(shader->attribute.vertex,2,GL_FLOAT,GL_FALSE,0,NULL);
 
     // texture_uv
-    glBindBuffer(GL_ARRAY_BUFFER,shader->uv_buffer);
-    glEnableVertexAttribArray(shader->texture_uv_location);
-    glVertexAttribPointer(shader->texture_uv_location, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    // opacity
-    glBindBuffer(GL_ARRAY_BUFFER,shader->opacity_buffer);
-    glEnableVertexAttribArray(shader->opacity_location );
-    glVertexAttribPointer(shader->opacity_location,1,GL_FLOAT,GL_FALSE,0,NULL);
+    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.uv);
+    glEnableVertexAttribArray(shader->attribute.texture_uv);
+    glVertexAttribPointer(shader->attribute.texture_uv, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
     // texture_index
-    glBindBuffer(GL_ARRAY_BUFFER,shader->texture_index_buffer);
-    glEnableVertexAttribArray(shader->texture_index_location );
-    glVertexAttribIPointer(shader->texture_index_location,1,GL_BYTE,0,NULL);
+    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.texture_index);
+    glEnableVertexAttribArray(shader->attribute.texture_index );
+    glVertexAttribIPointer(shader->attribute.texture_index,1,GL_BYTE,0,NULL);
 
-    // tint color
-    glBindBuffer(GL_ARRAY_BUFFER,shader->tint_color_buffer);
-    glEnableVertexAttribArray(shader->tint_color_location);
-    glVertexAttribPointer(shader->tint_color_location,4,GL_FLOAT,GL_FALSE,0,NULL);
+    // opacity
+    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.opacity);
+    glEnableVertexAttribArray(shader->attribute.opacity);
+    glVertexAttribPointer(shader->attribute.opacity,1,GL_FLOAT,GL_FALSE,0,NULL);
+
+    // color
+    for(int i=0; i<2; i++){
+      glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.color[i]);
+      glEnableVertexAttribArray(shader->attribute.color[i]);
+      glVertexAttribPointer(shader->attribute.color[i],4,GL_FLOAT,GL_FALSE,0,NULL);
+    }
 
     // transform
     for(int i=0;i<4;i++){
-      glBindBuffer(GL_ARRAY_BUFFER,shader->transform_buffer);
-      glEnableVertexAttribArray(shader->transform_locations[i] );
+      glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.transform);
+      glEnableVertexAttribArray(shader->attribute.transform+i );
       GLsizei stride = sizeof(GLfloat)*4*4;
       void* position = NULL+sizeof(GLfloat)*4*i;
-      glVertexAttribPointer(shader->transform_locations[i],4,GL_FLOAT,GL_FALSE,stride,position);
+      glVertexAttribPointer(shader->attribute.transform+i,4,GL_FLOAT,GL_FALSE,stride,position);
+    }
+
+    // extra data (node)
+    for(int i=0;i<4;i++){
+      glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.node_extra_data);
+      glEnableVertexAttribArray(shader->attribute.node_extra_data+i );
+      GLsizei stride = sizeof(GLfloat)*4*4;
+      void* position = NULL+sizeof(GLfloat)*4*i;
+      glVertexAttribPointer(shader->attribute.node_extra_data+i,4,GL_FLOAT,GL_FALSE,stride,position);
     }
 
     // for instancing
-    glVertexAttribDivisor(shader->vertex_location, 0);
-    glVertexAttribDivisor(shader->texture_uv_location, 1);
-    glVertexAttribDivisor(shader->opacity_location, 1);
-    glVertexAttribDivisor(shader->texture_index_location, 1);
-    glVertexAttribDivisor(shader->tint_color_location, 1);
+    glVertexAttribDivisor(shader->attribute.vertex, 0);
+    glVertexAttribDivisor(shader->attribute.texture_uv, 1);
+    glVertexAttribDivisor(shader->attribute.texture_index, 1);
+    glVertexAttribDivisor(shader->attribute.opacity, 1);
+    glVertexAttribDivisor(shader->attribute.color[0], 1);
+    glVertexAttribDivisor(shader->attribute.color[1], 1);
     for(int i=0;i<4;i++){
-      glVertexAttribDivisor(shader->transform_locations[i], 1);
+      glVertexAttribDivisor(shader->attribute.transform+i, 1);
+      glVertexAttribDivisor(shader->attribute.node_extra_data+i, 1);
     }
 
   // unbind vao
@@ -145,10 +159,10 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
 
 void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float* attributes)
 {
-  glUniform1f(shader->time_location, time);
-  glUniform2f(shader->resolution_location, w, h );
-  glUniform1f(shader->scale_location, scale );
-  glUniform4fv(shader->optional_attributes_location, 1, attributes );
+  glUniform1f( shader->uniform.time, time);
+  glUniform2f( shader->uniform.resolution, w, h );
+  glUniform1f( shader->uniform.scale, scale );
+  glUniformMatrix4fv(shader->uniform.layer_extra_data, 1, GL_FALSE, attributes );
 }
 
 void bi_shader_draw(BiShader* shader,Array* queue)
@@ -158,15 +172,19 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   static GLfloat *transforms = NULL;
   static GLfloat *uv = NULL; // [ left, top, right, bottom ]
   static char *texture_index = NULL;
-  static GLfloat *tint = NULL;
-  static GLfloat *opacity = NULL;
+  static GLfloat* opacity = NULL;
+  static GLfloat* color[2] = {NULL};
+  static GLfloat *extra_data = NULL;
+
   if(len>len_max){
     len_max = len;
     transforms = realloc( transforms, sizeof(GLfloat)*len*16 );
     uv = realloc( uv, sizeof(GLfloat)*len*4 );
     texture_index = realloc( texture_index, sizeof(char)*len );
-    tint = realloc( tint, sizeof(GLfloat)*len*4 );
     opacity = realloc( opacity, sizeof(GLfloat)*len );
+    color[0] = realloc( color[0], sizeof(GLfloat)*4*len );
+    color[1] = realloc( color[1], sizeof(GLfloat)*4*len );
+    extra_data = realloc( extra_data, sizeof(GLfloat)*len*16 );
   }
 
   for( uint64_t i=0; i<len; i++ ) {
@@ -193,12 +211,18 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     }else{
       texture_index[i] = -1; // no-texture
     }
-    // color
-    tint[i*4+0] = node->color[0] / 255.0;
-    tint[i*4+1] = node->color[1] / 255.0;
-    tint[i*4+2] = node->color[2] / 255.0;
-    tint[i*4+3] = node->color[3] / 255.0;
+    // opacity, color, color2
     opacity[i] = node->opacity;
+    color[0][i*4+0] = node->color[0];
+    color[0][i*4+1] = node->color[1];
+    color[0][i*4+2] = node->color[2];
+    color[0][i*4+3] = node->color[3];
+    color[1][i*4+0] = node->color2[0];
+    color[1][i*4+1] = node->color2[1];
+    color[1][i*4+2] = node->color2[2];
+    color[1][i*4+3] = node->color2[3];
+    // extra_data
+    bi_mat4_copy(&extra_data[i*16], node->shader_extra_data);
   }
 
   //
@@ -206,29 +230,36 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
   //
   // transform
-  glBindBuffer(GL_ARRAY_BUFFER, shader->transform_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.transform);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, transforms);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   // texture_index
-  glBindBuffer(GL_ARRAY_BUFFER, shader->texture_index_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.texture_index);
   glBufferData(GL_ARRAY_BUFFER, sizeof(char) * 1 * len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(char) * 1 * len, texture_index);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   // uv
-  glBindBuffer(GL_ARRAY_BUFFER, shader->uv_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.uv);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, uv);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // tint color
-  glBindBuffer(GL_ARRAY_BUFFER, shader->tint_color_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, tint);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   // opacity
-  glBindBuffer(GL_ARRAY_BUFFER, shader->opacity_buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 1 * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 1 * len, opacity);
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.opacity);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * len, opacity);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // color
+  for(int i=0;i<2;i++){
+    glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.color[i]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, color[i]);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+  }
+  // extra_data
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.node_extra_data);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16 * len, extra_data);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   //

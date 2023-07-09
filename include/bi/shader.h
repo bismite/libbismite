@@ -8,30 +8,37 @@ typedef struct _BiShader BiShader;
 struct _BiShader {
   GLuint program_id;
   GLuint vao;
-  GLuint vertex_buffer;
-  GLuint uv_buffer;
-  GLuint opacity_buffer;
-  GLuint texture_index_buffer;
-  GLuint tint_color_buffer;
-  GLuint transform_buffer;
+
+  struct {
+    GLuint vertex;
+    GLuint uv;
+    GLuint texture_index;
+    GLuint opacity;
+    GLuint color[2];
+    GLuint transform;
+    GLuint node_extra_data;
+  } buffer;
+
+  // attribute locations
+  struct {
+    GLint vertex;
+    GLint texture_uv;
+    GLint texture_index;
+    GLint opacity;
+    GLint color[2];
+    GLint transform;
+    GLint node_extra_data;
+  } attribute;
 
   // uniform location
-  GLint texture_locations[BI_LAYER_MAX_TEXTURES];
-  GLint camera_location;
-
-  // attribute location
-  GLint vertex_location;
-  GLint texture_uv_location;
-  GLint opacity_location;
-  GLint texture_index_location;
-  GLint tint_color_location;
-  GLint transform_locations[4];
-
-  //
-  GLint time_location;
-  GLint resolution_location;
-  GLint scale_location;
-  GLint optional_attributes_location;
+  struct {
+    GLint camera;
+    GLint texture;
+    GLint time;
+    GLint resolution;
+    GLint scale;
+    GLint layer_extra_data;
+  } uniform;
 };
 
 extern void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source);

@@ -26,12 +26,12 @@ struct _BiLayer {
   BiNode* root;
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
   BiShader *shader;
-  GLfloat shader_attributes[4];
+  GLfloat shader_extra_data[16];
   // Post Process
   struct {
     BiShader* shader;
     BiLayerBlendFactor blend_factor;
-    GLfloat shader_attributes[4];
+    GLfloat shader_extra_data[16];
     bool framebuffer_enabled;
   } post_process;
 };

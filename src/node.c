@@ -17,8 +17,14 @@ BiNode* bi_node_init(BiNode* n)
   n->final_visibility = true;
 
   // color
-  bi_set_color(n->color,0,0,0,0);
   n->opacity = 1.0;
+  bi_set_color(n->color,0,0,0,0);
+  bi_set_color(n->color2,0xff,0xff,0xff,0xff);
+
+  //
+  for(int i=0;i<16;i++) {
+    n->shader_extra_data[i] = 0;
+  }
 
   bi_mat4_identity(n->transform_matrix);
   bi_mat4_identity(n->draw_matrix);

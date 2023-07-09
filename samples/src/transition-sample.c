@@ -88,8 +88,7 @@ static BiLayer* scene_b(BiContext* context)
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, true, __FILE__);
+  BiContext* context = bi_init_context(malloc(sizeof(BiContext)), 480, 320, 0, true, __FILE__);
 
   transition_shader = create_shader_with_default_vertex_shader("assets/shaders/transition.frag");
 

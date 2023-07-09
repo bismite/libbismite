@@ -30,8 +30,13 @@ struct _BiNode {
   bool visible;
   bool final_visibility;
 
-  uint8_t color[4];
+  //
   float opacity;
+  uint8_t color[4];
+  uint8_t color2[4];
+
+  //
+  GLfloat shader_extra_data[16];
 
   // matrix
   GLfloat transform_matrix[16];

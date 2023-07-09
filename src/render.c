@@ -136,7 +136,7 @@ static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext r
   int drawable_w,drawable_h;
   SDL_GL_GetDrawableSize(context->window, &drawable_w, &drawable_h);
   float scale = (float)drawable_h / context->h;
-  bi_shader_set_uniforms(shader,time,context->w,context->h,scale,layer->shader_attributes);
+  bi_shader_set_uniforms(shader,time,context->w,context->h,scale,layer->shader_extra_data);
 
   // textures
   bi_render_activate_textures(layer->textures);
@@ -144,7 +144,7 @@ static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext r
   // set projection and view
   GLfloat camera[16];
   bi_camera_matrix(camera,layer->camera_x,layer->camera_y,context->w,context->h,false);
-  glUniformMatrix4fv(shader->camera_location, 1, GL_FALSE, camera);
+  glUniformMatrix4fv(shader->uniform.camera, 1, GL_FALSE, camera);
 
   // blend function
   glBlendFuncSeparate(
@@ -190,7 +190,7 @@ static void render_texture(BiContext* context, GLuint texture, BiNodeBase* targe
         t2.texture_unit = 0;
         l.textures[1] = &t2;
       }
-      memcpy(l.shader_attributes, layer->post_process.shader_attributes, sizeof(GLfloat)*4 );
+      memcpy(l.shader_extra_data, layer->post_process.shader_extra_data, sizeof(GLfloat)*16 );
       l.shader = layer->post_process.shader;
       l.blend_factor = layer->post_process.blend_factor;
     }

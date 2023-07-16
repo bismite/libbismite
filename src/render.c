@@ -69,7 +69,7 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   }
 
   // skip: invisible, zero-size node, transparent node
-  if( visible==true && n->visible==true && n->w!=0 && n->h!=0 && n->opacity>0 ) {
+  if( visible==true && n->visible==true && n->w!=0 && n->h!=0 ) {
     array_add_object(context.rendering_queue,n);
   }
 

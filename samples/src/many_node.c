@@ -15,7 +15,7 @@ static BiNode* create_node(BiContext* c)
   bi_node_set_size(node, 2+rand()%20, 2+rand()%20 );
   bi_node_set_angle(node, (rand()%3600)/180.0 * M_PI );
   // color
-  bi_set_color(node->color, rand()%0xff, rand()%0xff, rand()%0xff, 32);
+  bi_set_color(node->color_modulate, rand()%0xff, rand()%0xff, rand()%0xff, 32);
   return node;
 }
 

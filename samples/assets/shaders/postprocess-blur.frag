@@ -1,12 +1,14 @@
 
 in vec2 uv;
 flat in int _texture_index;
-in vec4 color;
+in vec4 _tint;
+in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform vec4 optional_attributes;
-out vec4 output_color;
+uniform float scale;
+uniform mat4 layer_extra_data;
+out vec4 color;
 
 vec4 getTextureColor(int samplerID,vec2 xy) {
   if(samplerID==0){ return texture(sampler[0], xy); }
@@ -44,5 +46,5 @@ void main()
 {
   float power = cos(time*3.0)*0.5 + 0.5;
   vec4 c = getTextureColor(_texture_index, uv) * (1.0-power);
-  output_color = c + blur( _texture_index, vec2(1.0,0.0), power );;
+  color = c + blur( _texture_index, vec2(1.0,0.0), power );;
 }

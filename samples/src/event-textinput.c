@@ -13,23 +13,19 @@ static bool on_textinput(BiContext* context,BiNode* n, char* text)
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, 480, 320, 0, false, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
   print_info(context);
 
   // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
+  BiNode* root = bi_node_init(ALLOC(BiNode));
 
-  // font
+  // font & labels
   BiFontAtlas *font = load_font();
-
-  // labels
   BiNode* labels = malloc(sizeof(BiNode)*3);
   for(int i=0;i<3;i++){
     BiNode *label = &labels[i];
     bi_node_init(label);
-    bi_node_set_scale(label,1,1);
+    bi_set_color(label->color_modulate, 0,0,0,0xff);
     bi_node_set_position( label, 10, context->h - 100 - i * 32 );
     label->userdata = font;
     bi_node_add_node(root,label);

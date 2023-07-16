@@ -1,13 +1,14 @@
 
 in vec2 uv;
 flat in int _texture_index;
-in vec4 color;
+in vec4 _tint;
+in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
 uniform float scale;
-uniform vec4 optional_attributes;
-out vec4 output_color;
+uniform mat4 layer_extra_data;
+out vec4 color;
 
 vec4 getTextureColor(int samplerID,vec2 xy) {
   if(samplerID==0){ return texture(sampler[0], xy); }
@@ -43,8 +44,8 @@ void main()
   );
   if( distance(xy,orbit) < BALL_SIZE ) {
     float offset = cos(uv.x * 10.0 + time*5.0) * AMPLITUDE / resolution.y;
-    output_color = getTextureColor(_texture_index, vec2(uv.x,uv.y+offset) );
+    color = getTextureColor(_texture_index, vec2(uv.x,uv.y+offset) );
   } else {
-    output_color = getTextureColor(_texture_index, uv);
+    color = getTextureColor(_texture_index, uv);
   }
 }

@@ -32,8 +32,7 @@ static void random_move(BiTimer* t,double dt)
 
 static BiNode* create_particle(BiContext* c,BiTexture *tex)
 {
-  BiNode* node = malloc(sizeof(BiNode));
-  bi_node_init(node);
+  BiNode* node = bi_node_init(ALLOC(BiNode));
   bi_node_set_texture(node,tex,0,0,tex->w,tex->h);
   bi_node_set_anchor(node,0.5,0.5);
 
@@ -44,7 +43,7 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
   bi_node_set_scale(node,scale,scale);
 
   // color
-  bi_set_color(node->color, rand()%0xff, rand()%0xff, rand()%0xff, 0xff);
+  bi_set_color(node->color_tint, rand()%0xff, rand()%0xff, rand()%0xff, 0xff);
 
   // on update callback
   onupdate(node,random_move);
@@ -63,16 +62,14 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
 int main(int argc, char* argv[])
 {
   srand( bi_get_now() );
-  BiContext* context = malloc(sizeof(BiContext));
-  bi_init_context(context, WIDTH, HEIGHT, 0, true, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), WIDTH, HEIGHT, 0, true, __FILE__);
   print_info(context);
 
   // texture
   BiTexture* ball_texture = MAKE_TEXTURE("assets/ball.png");
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);;
   bi_add_layer(context,layer);
   layer->textures[0] = layer->root->texture;

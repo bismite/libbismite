@@ -9,12 +9,12 @@ int main(int argc, char* argv[])
   // Sprite
   BiNode* sprite = make_sprite_with_anchor("assets/tester.png",0,0);
   BiNode* face = make_sprite("assets/face01.png");
-  face->opacity = 0.5;
+  bi_node_set_opacity(face, 128);
   bi_node_add_node(sprite,face);
   bi_node_set_position(sprite,10,10);
   bi_node_set_position(face,sprite->w/2.0,sprite->h/2.0);
   bi_node_set_degree(face,45);
-  bi_set_color(face->color,0,0xff,0,0x99);
+  bi_set_color(face->color_tint,0,0xff,0,0x99);
 
   // Canvas
   BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256);

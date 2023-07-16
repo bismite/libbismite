@@ -49,9 +49,8 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->attribute.vertex = glGetAttribLocation(program_id, "vertex");
   shader->attribute.texture_uv = glGetAttribLocation(program_id, "texture_uv");
   shader->attribute.texture_index = glGetAttribLocation(program_id, "texture_index");
-  shader->attribute.opacity = glGetAttribLocation(program_id, "opacity");
-  shader->attribute.color[0] = glGetAttribLocation(program_id, "color0");
-  shader->attribute.color[1] = glGetAttribLocation(program_id, "color1");
+  shader->attribute.tint = glGetAttribLocation(program_id, "tint");
+  shader->attribute.modulate = glGetAttribLocation(program_id, "modulate");
   shader->attribute.transform = glGetAttribLocation(program_id, "transform");
   shader->attribute.node_extra_data = glGetAttribLocation(program_id, "node_extra_data");
 
@@ -78,9 +77,8 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   // create vbo
   glGenBuffers(1, &shader->buffer.uv);
   glGenBuffers(1, &shader->buffer.texture_index);
-  glGenBuffers(1, &shader->buffer.opacity);
-  glGenBuffers(1, &shader->buffer.color[0]);
-  glGenBuffers(1, &shader->buffer.color[1]);
+  glGenBuffers(1, &shader->buffer.tint);
+  glGenBuffers(1, &shader->buffer.modulate);
   glGenBuffers(1, &shader->buffer.transform);
   glGenBuffers(1, &shader->buffer.node_extra_data);
 
@@ -111,17 +109,14 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
     glEnableVertexAttribArray(shader->attribute.texture_index );
     glVertexAttribIPointer(shader->attribute.texture_index,1,GL_BYTE,0,NULL);
 
-    // opacity
-    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.opacity);
-    glEnableVertexAttribArray(shader->attribute.opacity);
-    glVertexAttribPointer(shader->attribute.opacity,1,GL_FLOAT,GL_FALSE,0,NULL);
-
-    // color
-    for(int i=0; i<2; i++){
-      glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.color[i]);
-      glEnableVertexAttribArray(shader->attribute.color[i]);
-      glVertexAttribPointer(shader->attribute.color[i],4,GL_FLOAT,GL_FALSE,0,NULL);
-    }
+    // tint
+    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.tint);
+    glEnableVertexAttribArray(shader->attribute.tint);
+    glVertexAttribPointer(shader->attribute.tint,4,GL_FLOAT,GL_FALSE,0,NULL);
+    // modulate
+    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.modulate);
+    glEnableVertexAttribArray(shader->attribute.modulate);
+    glVertexAttribPointer(shader->attribute.modulate,4,GL_FLOAT,GL_FALSE,0,NULL);
 
     // transform
     for(int i=0;i<4;i++){
@@ -145,9 +140,8 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
     glVertexAttribDivisor(shader->attribute.vertex, 0);
     glVertexAttribDivisor(shader->attribute.texture_uv, 1);
     glVertexAttribDivisor(shader->attribute.texture_index, 1);
-    glVertexAttribDivisor(shader->attribute.opacity, 1);
-    glVertexAttribDivisor(shader->attribute.color[0], 1);
-    glVertexAttribDivisor(shader->attribute.color[1], 1);
+    glVertexAttribDivisor(shader->attribute.tint, 1);
+    glVertexAttribDivisor(shader->attribute.modulate, 1);
     for(int i=0;i<4;i++){
       glVertexAttribDivisor(shader->attribute.transform+i, 1);
       glVertexAttribDivisor(shader->attribute.node_extra_data+i, 1);
@@ -172,8 +166,8 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   static GLfloat *transforms = NULL;
   static GLfloat *uv = NULL; // [ left, top, right, bottom ]
   static char *texture_index = NULL;
-  static GLfloat* opacity = NULL;
-  static GLfloat* color[2] = {NULL};
+  static GLfloat* tint = NULL;
+  static GLfloat* modulate = NULL;
   static GLfloat *extra_data = NULL;
 
   if(len>len_max){
@@ -181,9 +175,8 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     transforms = realloc( transforms, sizeof(GLfloat)*len*16 );
     uv = realloc( uv, sizeof(GLfloat)*len*4 );
     texture_index = realloc( texture_index, sizeof(char)*len );
-    opacity = realloc( opacity, sizeof(GLfloat)*len );
-    color[0] = realloc( color[0], sizeof(GLfloat)*4*len );
-    color[1] = realloc( color[1], sizeof(GLfloat)*4*len );
+    tint = realloc( tint, sizeof(GLfloat)*4*len );
+    modulate = realloc( modulate, sizeof(GLfloat)*4*len );
     extra_data = realloc( extra_data, sizeof(GLfloat)*len*16 );
   }
 
@@ -211,16 +204,9 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     }else{
       texture_index[i] = -1; // no-texture
     }
-    // opacity, color, color2
-    opacity[i] = node->opacity;
-    color[0][i*4+0] = node->color[0];
-    color[0][i*4+1] = node->color[1];
-    color[0][i*4+2] = node->color[2];
-    color[0][i*4+3] = node->color[3];
-    color[1][i*4+0] = node->color2[0];
-    color[1][i*4+1] = node->color2[1];
-    color[1][i*4+2] = node->color2[2];
-    color[1][i*4+3] = node->color2[3];
+    // colors
+    for(int j=0;j<4;j++){ tint[i*4+j] = node->color_tint[j]; }
+    for(int j=0;j<4;j++){ modulate[i*4+j] = node->color_modulate[j]; }
     // extra_data
     bi_mat4_copy(&extra_data[i*16], node->shader_extra_data);
   }
@@ -244,18 +230,16 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, uv);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // opacity
-  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.opacity);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * len, NULL, GL_DYNAMIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * len, opacity);
+  // tint
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.tint);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, tint);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  // color
-  for(int i=0;i<2;i++){
-    glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.color[i]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, color[i]);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-  }
+  // modulate
+  glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.modulate);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * len, NULL, GL_DYNAMIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 4 * len, modulate);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   // extra_data
   glBindBuffer(GL_ARRAY_BUFFER, shader->buffer.node_extra_data);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16 * len, NULL, GL_DYNAMIC_DRAW);

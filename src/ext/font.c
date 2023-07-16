@@ -127,7 +127,7 @@ static inline BiNode* get_label_node(BiNode* node)
 }
 
 void bi_label_set_text_with_color(BiNode* node, const BiFontAtlas* font, const char* text,
-                                  uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity)
+                                  uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
   // text
   size_t textlen = strlen(text);
@@ -162,8 +162,7 @@ void bi_label_set_text_with_color(BiNode* node, const BiFontAtlas* font, const c
     n->visible = true;
     // texture and color
     bi_node_set_texture(n,font->texture,glyph->x,glyph->y,glyph->w,glyph->h);
-    bi_set_color( n->color, r,g,b,a );
-    n->opacity = opacity;
+    bi_set_color( n->color_modulate, r,g,b,a );
     //
     x += glyph->advance_x;
     child_index++;
@@ -175,22 +174,21 @@ void bi_label_set_text_with_color(BiNode* node, const BiFontAtlas* font, const c
 
 void bi_label_set_text(BiNode* label, const BiFontAtlas* font, const char* text)
 {
-  bi_label_set_text_with_color(label,font,text,0,0,0,0,1.0);
+  bi_label_set_text_with_color(label,font,text,0xff,0xff,0xff,0xff);
 }
 
-void bi_label_set_color(BiNode* node, uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity )
+void bi_label_set_color(BiNode* node, uint8_t r, uint8_t g, uint8_t b, uint8_t a )
 {
   BiNode* label = get_label_node(node);
   BiNode* n = NULL;
   for(int i=0;i<label->children.size;i++) {
     n = bi_node_child_at(label,i);
-    bi_set_color( n->color, r,g,b,a );
-    n->opacity = opacity;
+    bi_set_color( n->color_modulate, r,g,b,a );
   }
 }
 
 void bi_label_set_color_with_range(BiNode* node, int start, int end,
-                                   uint8_t r, uint8_t g, uint8_t b, uint8_t a, float opacity )
+                                   uint8_t r, uint8_t g, uint8_t b, uint8_t a )
 {
   BiNode* label = get_label_node(node);
   BiNode* n = NULL;
@@ -199,8 +197,7 @@ void bi_label_set_color_with_range(BiNode* node, int start, int end,
   if(start>end) return;
   for(int i=start;i<end;i++) {
     n = bi_node_child_at(label,i);
-    bi_set_color( n->color, r,g,b,a );
-    n->opacity = opacity;
+    bi_set_color( n->color_modulate, r,g,b,a );
   }
 }
 

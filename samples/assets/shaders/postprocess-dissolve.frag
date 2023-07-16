@@ -1,12 +1,14 @@
 
 in vec2 uv;
 flat in int _texture_index;
-in vec4 color;
+in vec4 _tint;
+in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform vec4 optional_attributes;
-out vec4 output_color;
+uniform float scale;
+uniform mat4 layer_extra_data;
+out vec4 color;
 
 vec4 getTextureColor(int samplerID,vec2 xy) {
   if(samplerID==0){ return texture(sampler[0], xy); }
@@ -37,9 +39,9 @@ void main()
 
   if( height > level ){
     if( abs(height-level) < 0.01 && c.a > 0.0 ){
-      output_color = vec4(1.0,0.0,0.0,c.a);
+      color = vec4(1.0,0.0,0.0,c.a);
     }else{
-      output_color = vec4(c.r, c.g, c.b, c.a);
+      color = vec4(c.r, c.g, c.b, c.a);
     }
   }else{
     discard;

@@ -22,18 +22,18 @@ int main(int argc, char* argv[])
 
   // face green
   BiNode* face_green = make_sprite_from_texture(texture);
-  bi_set_color(face_green->color, 0,0xff,0,0xff);
+  bi_set_color(face_green->color_tint, 0,0xff,0,0xff);
   bi_node_set_position(face_green,240,160);
   bi_node_add_node(layer->root,face_green);
   // face red
   BiNode* face_red = make_sprite_from_texture(texture);
-  bi_set_color(face_red->color, 0xff,0,0,0xff);
+  bi_set_color(face_red->color_tint, 0xff,0,0,0xff);
   bi_node_set_position(face_red,120,80);
   bi_node_add_node(layer->root,face_red);
   bi_node_set_scale(face_red,0.5,0.5); // x0.5
   // face blue
   BiNode* face_blue = make_sprite_from_texture(texture);
-  bi_set_color(face_blue->color, 0,0,0xff,0xff);
+  bi_set_color(face_blue->color_tint, 0,0,0xff,0xff);
   bi_node_set_position(face_blue,360,240);
   bi_node_add_node(layer->root,face_blue);
   bi_node_set_scale(face_blue,0.5,0.5); // x0.5

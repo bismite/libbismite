@@ -15,14 +15,14 @@ static BiNode* create_tile(int x, int y,BiTexture *tex)
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = bi_init_context(malloc(sizeof(BiContext)), 480, 320, 0, false, __FILE__);
+  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
   print_info(context);
 
   // texture
-  BiTexture *texture = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),"assets/tester.png",false);
+  BiTexture *texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
 
   // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
   layer->root = make_sprite_with_anchor("assets/map.png",0,0);
   layer->textures[0] = layer->root->texture;

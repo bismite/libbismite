@@ -17,9 +17,8 @@ BiNode* bi_node_init(BiNode* n)
   n->final_visibility = true;
 
   // color
-  n->opacity = 1.0;
-  bi_set_color(n->color,0,0,0,0);
-  bi_set_color(n->color2,0xff,0xff,0xff,0xff);
+  bi_set_color(n->color_tint,0,0,0,0);
+  bi_set_color(n->color_modulate,0xff,0xff,0xff,0xff);
 
   //
   for(int i=0;i<16;i++) {

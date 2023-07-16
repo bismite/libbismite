@@ -10,7 +10,7 @@ EM_BOOL visibilitychange_callback(int eventType,
                                   void *userData)
 {
   printf("visibilitychange_callback\n");
-  if(layer) bi_set_color(layer->root->color, 0xff,0,0xff,64);
+  if(layer) bi_set_color(layer->root->color_tint, 0xff,0,0xff,64);
   return EM_TRUE;
 }
 #endif

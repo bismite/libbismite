@@ -37,7 +37,7 @@ static BiNode* create_fps_label(BiContext* context, BiFontAtlas *font)
     // label
     BiNode* label = bi_node_init(malloc(sizeof(BiNode)));
     label->userdata = font;
-    bi_set_color(label->color, 0,0,0,0xFF);
+    bi_set_color(label->color_modulate, 0,0,0,0xFF);
     bi_label_set_text(label,font, "FPS:00.00");
 
     // timer

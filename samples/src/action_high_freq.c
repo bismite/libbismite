@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   const int repeat = 540;
   // Blue
   BiNode* face_blue = make_sprite_from_texture(t);
-  bi_set_color(face_blue->color,0,0,0xFF,0xFF);
+  bi_set_color(face_blue->color_tint,0,0,0xFF,0xFF);
   bi_node_set_position(face_blue,240,320/3*2);
   bi_node_add_node(layer->root,face_blue);
   {
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   }
   // Red
   BiNode* face_red = make_sprite_from_texture(t);
-  bi_set_color(face_red->color,0xFF,0,0,0xFF);
+  bi_set_color(face_red->color_tint,0xFF,0,0,0xFF);
   bi_node_set_position(face_red,240,320/3*1);
   bi_node_add_node(layer->root,face_red);
   {

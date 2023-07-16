@@ -30,10 +30,9 @@ struct _BiNode {
   bool visible;
   bool final_visibility;
 
-  //
-  float opacity;
-  uint8_t color[4];
-  uint8_t color2[4];
+  // colors
+  uint8_t color_tint[4];
+  uint8_t color_modulate[4];
 
   //
   GLfloat shader_extra_data[16];
@@ -74,6 +73,10 @@ extern void bi_node_add_node(BiNode* node,BiNode* child);
 extern BiNode* bi_node_remove_at(BiNode* node,int index);
 extern BiNode* bi_node_remove_node(BiNode* node,BiNode* child);
 extern BiNode* bi_node_remove_from_parent(BiNode* node);
+
+// color
+static inline void bi_node_set_opacity(BiNode* node,uint8_t opacity) { node->color_modulate[3] = opacity; }
+static inline uint8_t bi_node_get_opacity(BiNode* node) { return node->color_modulate[3]; }
 
 // position
 extern void bi_node_set_position(BiNode* n, int x, int y);

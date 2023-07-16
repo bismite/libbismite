@@ -32,16 +32,14 @@ int main(int argc,char* argv[])
   bi_node_add_node(bg,face);
 
   // shade
-  BiNode* shade = ALLOC(BiNode);
-  bi_node_init(shade);
+  BiNode* shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_anchor(shade,0.5,0.5);
   bi_node_set_size(shade,context->w,context->h);
-  bi_set_color( shade->color, 0,0,0, 128);
+  bi_set_color( shade->color_modulate, 0,0,0, 128);
   bi_node_add_node(bg,shade);
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   layer->root = bg;
   layer->textures[0] = bg->texture;
   layer->textures[1] = face->texture;
@@ -51,16 +49,13 @@ int main(int argc,char* argv[])
   //
   // spotlight layer
   //
-  BiTexture *texture = malloc(sizeof(BiTexture));
-  bi_texture_init_with_filename(texture,"assets/circle256.png",true);
+  BiTexture *texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/circle256.png",true);
   // sprite
   BiNode *spotlight = create_spotlight(texture,context->w/3,context->h/2);
   BiNode *spotlight2 = create_spotlight(texture,context->w/3*2,context->h/2);
   // layer
-  BiLayer *spotlight_layer = malloc(sizeof(BiLayer));
-  bi_layer_init(spotlight_layer);
-  spotlight_layer->root = malloc(sizeof(BiNode));
-  bi_node_init(spotlight_layer->root);
+  BiLayer *spotlight_layer = bi_layer_init(ALLOC(BiLayer));
+  spotlight_layer->root = bi_node_init(ALLOC(BiNode));
   bi_node_add_node(spotlight_layer->root,spotlight);
   bi_node_add_node(spotlight_layer->root,spotlight2);
   // blend setting

@@ -43,7 +43,7 @@ extern void bi_action_set_repeat(BiAction *action,int repeat);
 // Fade In / Fade Out
 typedef struct {
   BiAction action;
-  float from;
+  uint8_t from;
 } BiActionFade;
 extern BiActionFade* bi_action_fade_in_init(BiActionFade* fade,int duration);
 extern BiActionFade* bi_action_fade_out_init(BiActionFade* fade,int duration);

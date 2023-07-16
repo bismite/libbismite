@@ -1,13 +1,14 @@
 
 in vec2 uv;
 flat in int _texture_index;
-in vec4 _tint_color;
-in float _opacity;
+in vec4 _tint;
+in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform vec4 optional_attributes;
-out vec4 output_color;
+uniform float scale;
+uniform mat4 layer_extra_data;
+out vec4 color;
 
 vec4 getTextureColor(int samplerID,vec2 xy) {
   if(samplerID==0){ return texture(sampler[0], xy); }
@@ -37,8 +38,8 @@ void main()
   vec2 xy = gl_FragCoord.xy;
   if( mod(xy.x,GRID) <= SIZE && mod(xy.y,GRID) <= SIZE ) {
     vec4 c = getTextureColor(_texture_index, uv);
-    output_color = vec4(_tint_color.rgb + c.rgb*(1.0-_tint_color.a), c.a * _opacity );
+    color = vec4(_tint.rgb + c.rgb*(1.0-_tint.a), c.a * _modulate.a );
   }else{
-    output_color = vec4(0.0);
+    color = vec4(0.0);
   }
 }

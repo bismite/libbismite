@@ -1,9 +1,8 @@
 
 in vec2 uv;
 flat in int _texture_index;
-in vec4 c0;
-in vec4 c1;
-in float _opacity;
+in vec4 _tint;
+in vec4 _modulate;
 in mat4 _node_extra_data;
 uniform sampler2D sampler[16];
 uniform float time;
@@ -42,10 +41,11 @@ void main()
   vec2 xy = gl_FragCoord.xy / scale;
   xy = floor(xy / S_GRID_SIZE) * S_GRID_SIZE;
   vec2 tmp = fract(xy / GRID_SIZE);
+
   if ( tmp.x + tmp.y > progress * 2.0 ) {
     vec4 c = getTextureColor( _texture_index, uv);
-    c = vec4(c1.r*c.r, c1.g*c.g, c1.b*c.b, c.a);
-    color = vec4( c0.rgb*c0.a*c.a + c.rgb*(1.0-c0.a), c.a ) * _opacity;
+    c = c * _modulate;
+    color = vec4( _tint.rgb*_tint.a*c.a + c.rgb*(1.0-_tint.a), c.a );
   }else{
     discard;
   }

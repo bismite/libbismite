@@ -17,15 +17,13 @@ in vec2 vertex;
 in vec4 texture_uv;
 in mat4 transform;
 in int texture_index;
-in float opacity;
-in vec4 color0;
-in vec4 color1;
+in vec4 tint;
+in vec4 modulate;
 in mat4 node_extra_data;
 out vec2 uv;
 flat out int _texture_index;
-out float _opacity;
-out vec4 c0;
-out vec4 c1;
+out vec4 _tint;
+out vec4 _modulate;
 out mat4 _node_extra_data;
 void main()
 {
@@ -42,9 +40,8 @@ void main()
     uv = vec2(texture_uv.z,texture_uv.w); // right-bottom
   }
   _texture_index = texture_index;
-  c0 = color0 / 255.0;
-  c1 = color1 / 255.0;
-  _opacity = opacity;
+  _tint = tint / 255.0;
+  _modulate = modulate / 255.0;
   _node_extra_data = node_extra_data;
 }
 );
@@ -52,9 +49,8 @@ void main()
 static const char *DEFAULT_FRAGMENT_SHADER = SHADER_VERSION FRAGMENT_SHADER_HEADER D(
 in vec2 uv;
 flat in int _texture_index;
-in float _opacity;
-in vec4 c0;
-in vec4 c1;
+in vec4 _tint;
+in vec4 _modulate;
 in mat4 _node_extra_data;
 uniform float time;
 uniform vec2 resolution;
@@ -83,13 +79,12 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 
 void main()
 {
+  vec4 c = vec4(1.0);
   if( 0 <= _texture_index && _texture_index < 16 ) {
-    vec4 c = getTextureColor( _texture_index, uv);
-    c = vec4(c1.r*c.r, c1.g*c.g, c1.b*c.b, c.a);
-    color = vec4( c0.rgb*c0.a*c.a + c.rgb*(1.0-c0.a), c.a ) * _opacity;
-  }else{
-    color = c0 * _opacity;
+    c = getTextureColor( _texture_index, uv);
   }
+  c = c * _modulate;
+  color = vec4( _tint.rgb*_tint.a*c.a + c.rgb*(1.0-_tint.a), c.a );
 }
 );
 

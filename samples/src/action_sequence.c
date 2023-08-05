@@ -7,7 +7,7 @@ BiAction* seq = NULL;
 
 static void callback(BiAction* action,void* context)
 {
-  bi_set_color(action->node->color_tint, rand()%128+100, rand()%128+100, rand()%128+100, 0xff );
+  action->node->color_tint = RGBA(rand()%128+100, rand()%128+100, rand()%128+100, 0xff);
 }
 
 static void add_action(BiNode *node)

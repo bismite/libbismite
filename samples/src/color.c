@@ -37,7 +37,7 @@ static void magick_color_tint(BiTimer* t,double dt)
   h+=0.02;
   if(h>1.0) h = fmod(h,1.0);
   hsv_to_rgb(h,1,1, &r,&g,&b);
-  bi_set_color(node->color_tint, r,g,b,128);
+  node->color_tint = RGBA(r,g,b,128);
 }
 
 static void magick_color_modulate(BiTimer* t,double dt)
@@ -48,7 +48,7 @@ static void magick_color_modulate(BiTimer* t,double dt)
   h+=0.01;
   if(h>1.0) h = fmod(h,1.0);
   hsv_to_rgb(h,1,1, &r,&g,&b);
-  bi_set_color(node->color_modulate, r,g,b,0xff);
+  node->color_modulate = RGBA(r,g,b,0xff);
 }
 
 static void magick_color_full_tint(BiTimer* t,double dt)
@@ -59,7 +59,7 @@ static void magick_color_full_tint(BiTimer* t,double dt)
   h+=0.01;
   if(h>1.0) h = fmod(h,1.0);
   hsv_to_rgb(h,1,1, &r,&g,&b);
-  bi_set_color(node->color_tint, r,g,b,0xff);
+  node->color_tint = RGBA(r,g,b,0xff);
 }
 
 int main(int argc, char* argv[])
@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
     int x = i%7;
     int y = i/7;
     bi_node_set_position(n,32+14+x*64,96+y*64);
-    bi_set_color(n->color_tint,  a[0], a[1], a[2], a[3]);
-    bi_set_color(n->color_modulate, b[0], b[1], b[2], b[3]);
+    n->color_tint = RGBA(a[0], a[1], a[2], a[3]);
+    n->color_modulate = RGBA(b[0], b[1], b[2], b[3]);
     bi_node_add_node(background,n);
     // Magick color
     if(i==COLOR_MAX-3) { onupdate(n,magick_color_tint); }

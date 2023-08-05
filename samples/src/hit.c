@@ -7,7 +7,7 @@ static BiNode* create_new_node(int x, int y)
   bi_node_set_anchor(node,0.5,0.5);
   bi_node_set_position(node,x,y);
   bi_node_set_size(node,40,80);
-  bi_set_rgb( node->color_tint, rand()%0xff,rand()%0xff,rand()%0xff );
+  node->color_tint = RGBA( rand()%0xff, rand()%0xff, rand()%0xff, 0xff );
   bi_node_set_angle(node,rand()%360/180.0*M_PI);
   return node;
 }
@@ -35,7 +35,7 @@ int main(int argc,char* argv[])
   // root node
   BiNode* root = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(root,480,320);
-  bi_set_rgb(root->color_tint,0x33,0,0);
+  root->color_tint = RGBA(0x33,0,0,0xff);
 
   // hit rect
   for(int x=0;x<5;x++){
@@ -54,8 +54,7 @@ int main(int argc,char* argv[])
   layer->root = root;
 
   // fps layer
-  BiFontAtlas *font = load_font();
-  add_fps_layer(context,font);
+  add_fps_layer(context,load_font());
 
   bi_start_run_loop(context);
   return 0;

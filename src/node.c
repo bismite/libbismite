@@ -17,8 +17,8 @@ BiNode* bi_node_init(BiNode* n)
   n->final_visibility = true;
 
   // color
-  bi_set_color(n->color_tint,0,0,0,0);
-  bi_set_color(n->color_modulate,0xff,0xff,0xff,0xff);
+  n->color_tint = RGBA32(0);
+  n->color_modulate = RGBA32(0xffffffff);
 
   //
   for(int i=0;i<16;i++) {

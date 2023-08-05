@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   BiNode* bounds = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(bounds,WIDTH,320);
   bi_node_set_position(bounds,20,0);
-  bi_set_color(bounds->color_tint,0,0x66,0x66,0xff);
+  bounds->color_tint = RGBA(0,0x66,0x66,0xff);
   bi_node_add_node(layer->root, bounds);
 
   // font
@@ -86,11 +86,11 @@ int main(int argc, char* argv[])
 
   // label
   for(int i=0;i<line_count;i++){
-    BiNode* label = bi_node_init(ALLOC(BiNode));
-    bi_set_color(label->color_tint,0x33,0,0,0xff);
-    bi_node_set_position( label, 20, 320-40-i*20 );
-    bi_label_set_text(label,font,lines[i]);
-    bi_node_add_node(root,label);
+    BiLabel* label = bi_label_init(ALLOC(BiLabel),font);
+    bi_label_set_background_color(label,RGBA(0x33,0,0,0xff));
+    bi_label_set_text(label,lines[i]);
+    bi_node_set_position( (BiNode*)label, 20, 320-40-i*20 );
+    bi_node_add_node(root,(BiNode*)label);
   }
 
   bi_start_run_loop(context);

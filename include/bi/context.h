@@ -10,6 +10,7 @@
 #include <bi/layer.h>
 #include <bi/array.h>
 #include <bi/framebuffer.h>
+#include <bi/color.h>
 
 typedef struct _BiContext BiContext;
 
@@ -22,7 +23,7 @@ struct _BiContext {
   bool highdpi;
 
   // background color
-  uint8_t color[4];
+  BiColor color;
 
   //
   int64_t program_start_at;

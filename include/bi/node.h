@@ -8,6 +8,7 @@
 #include <bi/texture.h>
 #include <bi/util.h>
 #include <bi/array.h>
+#include <bi/color.h>
 
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
@@ -31,8 +32,8 @@ struct _BiNode {
   bool final_visibility;
 
   // colors
-  uint8_t color_tint[4];
-  uint8_t color_modulate[4];
+  BiColor color_tint;
+  BiColor color_modulate;
 
   //
   GLfloat shader_extra_data[16];
@@ -75,8 +76,8 @@ extern BiNode* bi_node_remove_node(BiNode* node,BiNode* child);
 extern BiNode* bi_node_remove_from_parent(BiNode* node);
 
 // color
-static inline void bi_node_set_opacity(BiNode* node,uint8_t opacity) { node->color_modulate[3] = opacity; }
-static inline uint8_t bi_node_get_opacity(BiNode* node) { return node->color_modulate[3]; }
+static inline void bi_node_set_opacity(BiNode* node,uint8_t opacity) { node->color_modulate.a = opacity; }
+static inline uint8_t bi_node_get_opacity(BiNode* node) { return node->color_modulate.a; }
 
 // position
 extern void bi_node_set_position(BiNode* n, int x, int y);

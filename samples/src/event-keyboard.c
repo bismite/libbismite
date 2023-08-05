@@ -1,21 +1,22 @@
 #include "common.h"
 #include <bi/bi_sdl.h>
 
+BiLabel* labels[6];
+
 static bool on_keyinput(BiContext* context,BiNode* node, uint16_t scancode, uint32_t keycode, uint16_t mod, bool pressed)
 {
-  BiNode* labels = node->userdata;
   char buf[256];
   snprintf(buf, 256, "Keycode: %s (%d)", SDL_GetKeyName(keycode), keycode);
-  bi_label_set_text(&labels[1],labels[1].userdata,buf);
+  bi_label_set_text(labels[1],buf);
   snprintf(buf, 256, "KeycodeFromScancode: %s (%d)", SDL_GetKeyName(SDL_GetKeyFromScancode(scancode)),
                                                      SDL_GetKeyFromScancode(scancode) );
-  bi_label_set_text(&labels[2],labels[2].userdata, buf);
+  bi_label_set_text(labels[2],buf);
   snprintf(buf, 256, "Scancode: %s (%d)", SDL_GetScancodeName(scancode), scancode );
-  bi_label_set_text(&labels[3],labels[3].userdata, buf);
+  bi_label_set_text(labels[3],buf);
   snprintf(buf, 256, "MOD: %d", mod );
-  bi_label_set_text(&labels[4],labels[4].userdata, buf);
+  bi_label_set_text(labels[4],buf);
   snprintf(buf, 256, "Pressed: %s", pressed?"DOWN":"UP" );
-  bi_label_set_text(&labels[5],labels[5].userdata, buf);
+  bi_label_set_text(labels[5],buf);
   return false;
 }
 
@@ -28,18 +29,6 @@ int main(int argc,char* argv[])
   BiNode* root = bi_node_init(ALLOC(BiNode));
 
   // font & labels
-  BiFontAtlas *font = load_font();
-  BiNode* labels = malloc(sizeof(BiNode)*6);
-  for(int i=0;i<6;i++){
-    BiNode *label = &labels[i];
-    bi_node_init(label);
-    bi_set_color(label->color_modulate, 0,0,0,0xff);
-    bi_node_set_position( label, 10, context->h - 100 - i * 32 );
-    label->userdata = font;
-    bi_node_add_node(root,label);
-  }
-  root->userdata = labels;
-
   const char* texts[] = {
     "PRESS ANY KEY",
     "Keycode:",
@@ -48,9 +37,16 @@ int main(int argc,char* argv[])
     "MOD:",
     "Pressed:"
   };
+  BiFontAtlas *font = load_font();
   for(int i=0;i<6;i++){
-    bi_label_set_text(&labels[i],font, texts[i]);
+    BiLabel *l = bi_label_init(ALLOC(BiLabel),font);
+    bi_label_set_background_color(l,RGBA(0x33,0,0,0xff));
+    bi_label_set_text(l, texts[i]);
+    labels[i] = l;
+    bi_node_set_position( (BiNode*)l, 10, context->h - 100 - i * 32 );
+    bi_node_add_node(root,(BiNode*)l);
   }
+
   // set callback
   bi_node_set_on_keyinput(root, on_keyinput);
 

@@ -1,5 +1,5 @@
-#ifndef __BI_CORE_TIMER_H__
-#define __BI_CORE_TIMER_H__
+#ifndef __BISMITE_TIMER_H__
+#define __BISMITE_TIMER_H__
 
 #include <stdint.h>
 #include <stddef.h>

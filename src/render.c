@@ -265,10 +265,10 @@ static void render_layer_group(BiContext* context,
 void bi_render(BiContext* context)
 {
   // clear
-  glClearColor(context->color[0]/255.f,
-               context->color[1]/255.f,
-               context->color[2]/255.f,
-               context->color[3]/255.f );
+  glClearColor(context->color.r/255.f,
+               context->color.g/255.f,
+               context->color.b/255.f,
+               context->color.a/255.f );
   glClear(GL_COLOR_BUFFER_BIT);
 
   // reset stats

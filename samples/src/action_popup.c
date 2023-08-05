@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   // shade
   popup_shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(popup_shade,context->w,context->h);
-  bi_set_color(popup_shade->color_modulate, 0, 0, 0, 128);
+  popup_shade->color_modulate = RGBA(0, 0, 0, 128);
   bi_node_add_node(layer->root,popup_shade);
 
   // popup
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   bi_node_set_size(popup,380,240);
   bi_node_set_anchor(popup,0.5,0.5);
   bi_node_set_position(popup,context->w/2,context->h/2);
-  bi_set_color(popup->color_tint, 0, 0, 0x66, 0xFF);
+  popup->color_tint = RGBA(0, 0, 0x66, 0xFF);
   bi_node_add_node(popup_shade,popup);
 
   // content
@@ -76,18 +76,17 @@ int main(int argc, char* argv[])
   // font
   BiTexture *font_texture = ALLOC(BiTexture);
   bi_texture_init_with_filename(font_texture,"assets/font.png",false);
-  BiFontAtlas *fonts[4];
-  fonts[0] = load_font_atlas("assets/font12.dat", font_texture),
-  fonts[1] = load_font_atlas("assets/font12b.dat", font_texture);
-  fonts[2] = load_font_atlas("assets/font14.dat", font_texture);
-  fonts[3] = load_font_atlas("assets/font14b.dat", font_texture);
+  char* fonts[4] = {
+    "assets/font12.dat", "assets/font12b.dat", "assets/font14.dat", "assets/font14b.dat"
+  };
   for(int i=0; i<4; i++){
-    BiNode* label = bi_node_init(ALLOC(BiNode));
-    bi_node_set_anchor(label,0,0);
-    bi_node_set_position( label, -popup->w/2+20, 20+i*14 );
-    bi_set_color(label->color_modulate,0,0,0,0);
-    bi_label_set_text(label,fonts[i], "The quick brown fox jumps over the lazy dog");
-    bi_node_add_node(popup,label);
+    BiFontAtlas* f = load_font_atlas( fonts[i], font_texture );
+    BiLabel* label = bi_label_init(ALLOC(BiLabel), f);
+    bi_label_set_background_color(label,RGBA(0xff,0,0,64));
+    bi_node_set_anchor((BiNode*)label,0,0);
+    bi_node_set_position( (BiNode*)label, -popup->w/2+20, 20+i*14 );
+    bi_label_set_text(label, "The quick brown fox jumps over the lazy dog");
+    bi_node_add_node(popup,(BiNode*)label);
   }
 
   // hide

@@ -205,8 +205,14 @@ void bi_shader_draw(BiShader* shader,Array* queue)
       texture_index[i] = -1; // no-texture
     }
     // colors
-    for(int j=0;j<4;j++){ tint[i*4+j] = node->color_tint[j]; }
-    for(int j=0;j<4;j++){ modulate[i*4+j] = node->color_modulate[j]; }
+    tint[i*4+0] = node->color_tint.r;
+    tint[i*4+1] = node->color_tint.g;
+    tint[i*4+2] = node->color_tint.b;
+    tint[i*4+3] = node->color_tint.a;
+    modulate[i*4+0] = node->color_modulate.r;
+    modulate[i*4+1] = node->color_modulate.g;
+    modulate[i*4+2] = node->color_modulate.b;
+    modulate[i*4+3] = node->color_modulate.a;
     // extra_data
     bi_mat4_copy(&extra_data[i*16], node->shader_extra_data);
   }

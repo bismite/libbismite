@@ -35,7 +35,7 @@ int main(int argc,char* argv[])
   BiNode* shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_anchor(shade,0.5,0.5);
   bi_node_set_size(shade,context->w,context->h);
-  bi_set_color( shade->color_modulate, 0,0,0, 128);
+  shade->color_modulate = RGBA(0,0,0,128);
   bi_node_add_node(bg,shade);
 
   // layer

@@ -3,9 +3,8 @@
 int main(int argc, char* argv[])
 {
   BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
+  context->color = RGBA(0x33,0,0x33,0xff);
   print_info(context);
-
-  bi_set_color(context->color,0x33,0,0x33,0xff);
 
   // root node
   BiNode* root = bi_node_init(ALLOC(BiNode));
@@ -13,8 +12,8 @@ int main(int argc, char* argv[])
   // texture node
   BiNode* face_a = make_sprite("assets/face01.png");
   BiNode* face_b = make_sprite("assets/face01.png");
-  bi_set_color( face_a->color_tint, 0, 0xFF, 0, 0xFF); // Green
-  bi_set_color( face_b->color_tint, 0, 0, 0xFF, 0xFF); // Blue
+  face_a->color_tint = RGBA32(0x00FF00FF); // Green
+  face_b->color_tint = RGBA32(0x0000FFFF); // Blue
   bi_node_set_position(face_a,context->w/2,context->h/2);
   bi_node_set_position(face_b,context->w/2 + 50,context->h/2 + 50);
 

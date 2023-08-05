@@ -43,7 +43,7 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
   bi_node_set_scale(node,scale,scale);
 
   // color
-  bi_set_color(node->color_tint, rand()%0xff, rand()%0xff, rand()%0xff, 0xff);
+  node->color_tint = RGBA(rand()%0xff, rand()%0xff, rand()%0xff, 0xff);
 
   // on update callback
   onupdate(node,random_move);

@@ -63,10 +63,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   context->h = h;
   context->highdpi = highdpi;
 
-  context->color[0] = 0;
-  context->color[1] = 0;
-  context->color[2] = 0;
-  context->color[3] = 0;
+  context->color = RGBA32(0);
 
   // default shader
   bi_shader_init(&context->default_shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);

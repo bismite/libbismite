@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(sprite,10,10);
   bi_node_set_position(face,sprite->w/2.0,sprite->h/2.0);
   bi_node_set_degree(face,45);
-  bi_set_color(face->color_tint,0,0xff,0,0x99);
+  face->color_tint = RGBA(0,0xff,0,0x99);
 
   // Canvas
   BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256);

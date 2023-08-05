@@ -33,7 +33,7 @@ static BiNode* create_tile(int x, int y,BiTexture *tex)
 int main(int argc,char* argv[])
 {
   BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
-  bi_set_color(context->color,32,32,0,0xff);
+  context->color = RGBA(32,32,0,0xff);
   print_info(context);
 
   // texture

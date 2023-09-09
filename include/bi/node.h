@@ -53,7 +53,6 @@ struct _BiNode {
   bool texture_flip_horizontal;
   bool texture_flip_vertical;
 
-  BiNode *parent;
   Array children;
   bool children_order_cached;
 

@@ -30,16 +30,22 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
   return vec4(0);
 }
 
-#define GRID 10.0
-#define SIZE 6.0
+#define AMPLITUDE 40.0
+#define ORBIT_R 160.0
+#define BALL_SIZE 180.0
 
 void main()
 {
-  vec2 xy = gl_FragCoord.xy;
-  if( mod(xy.x,GRID) <= SIZE && mod(xy.y,GRID) <= SIZE ) {
-    vec4 c = getTextureColor(_texture_index, uv);
-    color = vec4(_tint.rgb + c.rgb*(1.0-_tint.a), c.a * _modulate.a );
-  }else{
-    color = vec4(0.0);
+  vec2 xy = gl_FragCoord.xy / scale;
+
+  vec2 orbit = vec2(
+    ORBIT_R * cos(time) + resolution.x * 0.5,
+    ORBIT_R * sin(time) + resolution.y * 0.5
+  );
+  if( distance(xy,orbit) < BALL_SIZE ) {
+    float offset = cos(uv.x * 10.0 + time*5.0) * AMPLITUDE / resolution.y;
+    color = getTextureColor(0, vec2(uv.x,uv.y+offset) );
+  } else {
+    color = getTextureColor(0, uv);
   }
 }

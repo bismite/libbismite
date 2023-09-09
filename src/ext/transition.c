@@ -21,8 +21,8 @@ void bi_transition_init(BiTransition *transition,
   // shader
   transition->shader = shader;
   // layer
-  bi_layer_init(&transition->layer);
-  transition->layer.post_process.shader = transition->shader;
+  bi_layer_init_as_postprocess(&transition->layer);
+  transition->layer.shader = transition->shader;
 }
 
 static void transition_update(BiTimer* timer,double delta_time)
@@ -49,7 +49,7 @@ static void transition_update(BiTimer* timer,double delta_time)
     if( transition->progress >= 1.0 ) {
       transition->done = true;
     }
-    transition->layer.post_process.shader_extra_data[0] =
+    transition->layer.shader_extra_data[0] =
       transition->invert ? 1.0-transition->progress : transition->progress;
   }
 }
@@ -59,7 +59,7 @@ void bi_transition_start(BiContext* context, BiTransition* transition)
   transition->context = context;
   transition->layer_group->interaction_enabled = false;
   bi_layer_group_add_layer(transition->layer_group,&transition->layer);
-  transition->layer.post_process.shader_extra_data[0] = transition->invert ? 1.0 : 0.0;
+  transition->layer.shader_extra_data[0] = transition->invert ? 1.0 : 0.0;
   transition->start_at = UINT64_MAX;
   transition->delay_count = 1;
   transition->progress = 0.0;

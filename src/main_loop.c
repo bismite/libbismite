@@ -11,6 +11,9 @@
 #include <emscripten.h>
 #endif
 
+// render.c
+extern void bi_render(BiContext* context);
+
 static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 {
   bool swallow = false;
@@ -73,20 +76,7 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 
 static void __run_timers__(BiContext* context,BiNodeBase* node,double delta_time)
 {
-  BiTimers* timers = NULL;
-  switch(node->type){
-  case BI_NODE_TYPE_NODE:
-    timers = &((BiNode*)node)->timers;
-    break;
-  case BI_NODE_TYPE_LAYER:
-    timers = &((BiLayer*)node)->timers;
-    break;
-  case BI_NODE_TYPE_LAYER_GROUP:
-    timers = &((BiLayerGroup*)node)->timers;
-    break;
-  default:
-    return;
-  }
+  BiTimers* timers = &node->timers;
   delta_time *= timers->scale;
 
   for(int i=0;i<timers->size;i++){
@@ -150,7 +140,6 @@ static void main_loop( void* arg )
     BiNodeBase *n = context->interaction_queue.objects[i];
     if( n == NULL ) continue;
     // Event Handler
-    if( n->type != BI_NODE_TYPE_NODE ) continue;
     BiNode* node = (BiNode*)n;
     if( node->final_visibility ) {
       for(int i=0;i<event_size;i++) {

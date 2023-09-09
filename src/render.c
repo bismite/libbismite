@@ -7,6 +7,8 @@
 #include <bi/bi_gl.h>
 #include "matrix/matrix.h"
 
+typedef bool (*render_function)(BiContext*, BiLayerBase*, BiFramebuffer*, BiRenderingContext);
+
 static int node_order_compare(const void *_a, const void *_b )
 {
   const BiNode *a = *(BiNode**)_a;
@@ -14,7 +16,7 @@ static int node_order_compare(const void *_a, const void *_b )
   return a->z == b->z ? a->index - b->index : a->z - b->z;
 }
 
-void bi_render_node_sort(BiNode* node)
+static void bi_render_node_sort(BiNode* node)
 {
   if( node->children_order_cached == false ) {
     for( int i=0; i<node->children.size; i++ ){ bi_node_child_at(node,i)->index = i; }
@@ -87,40 +89,39 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   }
 }
 
-void bi_render_activate_textures(BiTexture** textures)
+void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
 {
-  // Textures
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);
-    if( textures[i] == NULL ) {
-      glBindTexture(GL_TEXTURE_2D, 0);
-    }else{
+    if( textures[i] != NULL ) {
       textures[i]->texture_unit = i;
       glBindTexture(GL_TEXTURE_2D, textures[i]->texture_id);
+    }else{
+      glBindTexture(GL_TEXTURE_2D, 0);
     }
   }
 }
 
-static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext render_context)
+static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRenderingContext* rendering_context)
 {
-  if( layer->root == NULL ) {
-    return;
-  }
+  if( layer->root == NULL ) return;
 
-  render_context.time_scale *= layer->time_scale;
+  BiRenderingContext rc = *rendering_context;
+
+  rc.time_scale *= layer->time_scale;
 
   // timer
-  if( render_context.timer_queue && layer->timers.size > 0 ) {
-    array_add_object(render_context.timer_queue, layer);
+  if( rc.timer_queue && layer->timers.size > 0 ) {
+    array_add_object(rc.timer_queue, layer);
   }
 
   // reset rendering queue
-  array_clear(render_context.rendering_queue);
+  array_clear(rc.rendering_queue);
 
   // recursive visit nodes
-  bi_render_queuing(render_context, layer->root);
+  bi_render_queuing(rc, layer->root);
 
-  if(render_context.rendering_queue->size==0) return;
+  if(rc.rendering_queue->size==0) return;
 
   // context->profile.rendering_nodes_queue_size += len;
 
@@ -154,112 +155,87 @@ static void render_layer(BiContext* context,BiLayer* layer, BiRenderingContext r
     layer->blend_factor.alpha_dst
   );
 
-  bi_shader_draw(shader,render_context.rendering_queue);
+  bi_shader_draw(shader,rc.rendering_queue);
 }
 
-static void render_texture(BiContext* context, GLuint texture, BiNodeBase* target)
+static void target_and_clear_framebuffer(BiFramebuffer *fb)
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+  glClearColor(0,0,0,0);
+  glClear(GL_COLOR_BUFFER_BIT);
+}
+
+// draw framebuffer as texture with one large rectangle
+static void _draw_framebuffer_(BiContext* context, BiFramebuffer* fb)
 {
   BiTexture t;
-  t.texture_id = texture;
-  t.w = context->w;
-  t.h = context->h;
-  t.texture_unit = 0;
-
+  bi_texture_init_with_framebuffer(&t,fb);
   BiNode n;
   bi_node_init(&n);
-  bi_node_set_size(&n,t.w,t.h);
-  bi_node_set_texture(&n,&t,0,0,t.w,t.h);
+  bi_node_set_size(&n,context->w,context->h);
+  bi_node_set_texture(&n, &t, 0,0,t.w,t.h);
   n.texture_flip_vertical = true;
-
   BiLayer l;
   bi_layer_init(&l);
   l.root = &n;
   l.textures[0] = &t;
-
-  BiTexture t2;
-  if(target){
-    if(target->type == BI_NODE_TYPE_LAYER_GROUP) {
-      BiLayerGroup *lg = (BiLayerGroup*)target;
-      l.blend_factor = lg->blend_factor;
-    }else if(target->type == BI_NODE_TYPE_LAYER) {
-      BiLayer *layer = (BiLayer*)target;
-      if(layer->post_process.framebuffer_enabled){
-        t2.texture_id = context->layer_framebuffer.texture_id;
-        t2.w = context->w;
-        t2.h = context->h;
-        t2.texture_unit = 0;
-        l.textures[1] = &t2;
-      }
-      memcpy(l.shader_extra_data, layer->post_process.shader_extra_data, sizeof(GLfloat)*16 );
-      l.shader = layer->post_process.shader;
-      l.blend_factor = layer->post_process.blend_factor;
-    }
-  }
-
   BiRenderingContext rcontext;
   bi_rendering_context_init(&rcontext,true,false,0,
                             NULL,
                             NULL,
                             &context->rendering_queue);
-  render_layer(context,&l,rcontext);
+  draw_layer_to_buffer(context,&l,&rcontext);
 }
 
-static void target_and_clear_framebuffer(GLuint framebuffer_id)
-{
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-  glClearColor(0,0,0,0);
-  glClear(GL_COLOR_BUFFER_BIT);
-}
-
-static void render_layer_group(BiContext* context,
-                               BiLayerGroup *lg,
-                               GLuint parent_framebuffer_id,
-                               BiRenderingContext rcontext
+extern void render_postprocess(BiContext* context,
+                               BiLayerBase *layer,
+                               BiFramebuffer *fb,
+                               BiRenderingContext rc
                               )
 {
-  rcontext.interaction_enabled = rcontext.interaction_enabled && lg->interaction_enabled;
-  target_and_clear_framebuffer(lg->framebuffer.framebuffer_id);
+  BiLayer *l = (BiLayer*)layer;
+  // render to Temporary Framebuffer
+  target_and_clear_framebuffer(&context->post_process_framebuffer);
+  draw_layer_to_buffer( context, l, &rc );
+  // Swap (draw temporary framebuffer to previous framebuffer)
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+  _draw_framebuffer_(context,&context->post_process_framebuffer);
+}
 
-  rcontext.time_scale *= lg->time_scale;
+extern void render_layer(BiContext* context,
+                         BiLayerBase *layer,
+                         BiFramebuffer *fb,
+                         BiRenderingContext rc
+                        )
+{
+  draw_layer_to_buffer( context, (BiLayer*)layer, &rc );
+}
 
+extern void render_layer_group(BiContext* context,
+                               BiLayerBase *layer_group,
+                               BiFramebuffer* fb,
+                               BiRenderingContext rc
+                              )
+{
+  BiLayerGroup *lg = (BiLayerGroup*)layer_group;
+  // context
+  rc.interaction_enabled = rc.interaction_enabled && lg->interaction_enabled;
+  rc.time_scale *= lg->time_scale;
   // timer
   if( lg->timers.size > 0 ) {
     array_add_object(&context->timer_queue, lg);
   }
-
   // render
+  target_and_clear_framebuffer(&lg->framebuffer);
   layer_sort(lg);
   for( int i=0; i<lg->layers.size; i++ ) {
-    BiNodeBase* n = lg->layers.objects[i];
-    if( n->type == BI_NODE_TYPE_LAYER_GROUP ) {
-      // Layer Group
-      render_layer_group( context, (BiLayerGroup*)n, lg->framebuffer.framebuffer_id, rcontext );
-    } else if( n->type == BI_NODE_TYPE_LAYER ) {
-      // Layer
-      BiLayer *layer = (BiLayer*)n;
-      if(layer->post_process.framebuffer_enabled){
-        // render to framebuffer
-        target_and_clear_framebuffer(context->layer_framebuffer.framebuffer_id);
-      }
-      render_layer( context, layer, rcontext );
-      if(layer->post_process.shader){
-        // target new framebuffer
-        target_and_clear_framebuffer(context->post_process_framebuffer.framebuffer_id);
-        // render
-        render_texture(context,lg->framebuffer.texture_id,n);
-        // swap framebuffer
-        BiFramebuffer tmp = lg->framebuffer;
-        lg->framebuffer = context->post_process_framebuffer;
-        context->post_process_framebuffer = tmp;
-      }
-      // back
-      glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
-    }
+    BiLayerBase* n = lg->layers.objects[i];
+    render_function f = n->_render_function_;
+    f( context, n, &lg->framebuffer, rc );
   }
-
-  // finalize
-  glBindFramebuffer(GL_FRAMEBUFFER, parent_framebuffer_id);
-  render_texture(context,lg->framebuffer.texture_id,(BiNodeBase*)lg);
+  // draw LayerGroup as FrameBuffer
+  glBindFramebuffer(GL_FRAMEBUFFER, fb==NULL ? 0 : fb->framebuffer_id);
+  _draw_framebuffer_(context,&lg->framebuffer);
 }
 
 void bi_render(BiContext* context)
@@ -281,7 +257,9 @@ void bi_render(BiContext* context)
                             &context->interaction_queue,
                             &context->timer_queue,
                             &context->rendering_queue);
-  render_layer_group(context,&context->layers,0,rendering_context);
+
+  render_function f = context->layers._render_function_;
+  f(context,(BiLayerBase*)&context->layers,NULL,rendering_context);
 
   //
   SDL_GL_SwapWindow(context->window);

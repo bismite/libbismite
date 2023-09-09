@@ -5,7 +5,7 @@
 
 BiNode* bi_node_init(BiNode* n)
 {
-  bi_node_base_init((BiNodeBase*)n,BI_NODE_TYPE_NODE);
+  bi_node_base_init((BiNodeBase*)n);
   bi_timers_init(&n->timers);
   n->x = n->y = n->w = n->h = 0;
   n->angle = 0;
@@ -68,7 +68,7 @@ void bi_node_add_node(BiNode* node,BiNode* child)
 {
   array_add_object(&node->children,child);
   node->children_order_cached = false;
-  child->parent = node;
+  child->parent = (BiNodeBase*)node;
   child->transform_matrix_cached = false;
 }
 
@@ -84,7 +84,7 @@ BiNode* bi_node_remove_node(BiNode* node,BiNode* child)
 
 BiNode* bi_node_remove_from_parent(BiNode* node)
 {
-  if(node && node->parent) return bi_node_remove_node(node->parent,node);
+  if(node && node->parent) return bi_node_remove_node((BiNode*)node->parent,node);
   return NULL;
 }
 
@@ -105,7 +105,7 @@ void bi_node_set_z(BiNode* n, int z)
 {
   n->z = z;
   if( n->parent ) {
-    n->parent->children_order_cached = false;
+    ((BiNode*)n->parent)->children_order_cached = false;
   }
 }
 
@@ -231,7 +231,7 @@ static inline void update_transform_matrix(BiNode* n)
   if(n->parent == NULL){
     bi_mat4_identity( n->transform_matrix );
   }else{
-    bi_mat4_copy( n->transform_matrix, n->parent->transform_matrix );
+    bi_mat4_copy( n->transform_matrix, ((BiNode*)n->parent)->transform_matrix );
   }
 
   GLfloat trans[16] = {

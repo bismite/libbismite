@@ -53,8 +53,7 @@ struct _BiContext {
   //
   SDL_Window *window;
 
-  //
-  BiFramebuffer layer_framebuffer;
+  // for postprocess
   BiFramebuffer post_process_framebuffer;
 
   //

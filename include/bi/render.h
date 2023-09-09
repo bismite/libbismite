@@ -4,13 +4,11 @@
 #include <stdbool.h>
 #include <bi/array.h>
 #include <bi/bi_gl.h>
+#include <bi/layer.h>
 
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
 typedef struct _BiTexture BiTexture;
-
-extern void bi_render(BiContext* context);
-extern void bi_render_node_sort(BiNode* node);
 
 typedef struct _BiRenderingContext{
   bool visible;

@@ -79,7 +79,6 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   // framebuffer
   GLint dims[4] = {0};
   glGetIntegerv(GL_VIEWPORT, dims);
-  bi_framebuffer_init(&context->layer_framebuffer,dims[2],dims[3]);
   bi_framebuffer_init(&context->post_process_framebuffer,dims[2],dims[3]);
 
   return context;

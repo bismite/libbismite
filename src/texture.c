@@ -110,6 +110,15 @@ BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filenam
   return load_texture_from_image( texture, rw, straight_alpha );
 }
 
+BiTexture* bi_texture_init_with_framebuffer(BiTexture* texture, BiFramebuffer* framebuffer)
+{
+  texture->texture_id = framebuffer->texture_id;
+  texture->w = framebuffer->w;
+  texture->h = framebuffer->h;
+  texture->texture_unit = 0;
+  return texture;
+}
+
 void bi_texture_set_anti_alias(BiTexture* texture,bool anti_alias)
 {
   glBindTexture(GL_TEXTURE_2D, texture->texture_id);

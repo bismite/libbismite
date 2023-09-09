@@ -21,12 +21,12 @@ SDL_STATIC_LIBS=$(BUILD_DIR)/lib/libSDL2.a $(BUILD_DIR)/lib/libSDL2_image.a $(BU
 # ----
 
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
-SAMPLE_SOURCES = $(wildcard samples/src/*.c)
+SAMPLE_SOURCES = $(wildcard samples/*.c)
 
 SAMPLE_CFLAGS=$(CFLAGS) -s WASM=1 --embed-file samples/assets@assets -s ALLOW_MEMORY_GROWTH=1 -s SINGLE_FILE=1
 SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite
 SAMPLE_DIR=$(BUILD_DIR)/samples
-SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.html)
+SAMPLE_EXES = $(SAMPLE_SOURCES:samples/%.c=$(SAMPLE_DIR)/%.html)
 
 # ----
 
@@ -69,7 +69,7 @@ $(SAMPLE_DIR):
 	mkdir -p $@
 
 # workaround "-Wl,-u,fileno" : https://github.com/emscripten-core/emscripten/issues/16836
-$(SAMPLE_DIR)/%.html: samples/src/%.c $(TARGET)
+$(SAMPLE_DIR)/%.html: samples/%.c $(TARGET)
 	$(CC) $< -o $@ $(SDL_STATIC_LIBS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2 -Wl,-u,fileno
 
 # ----

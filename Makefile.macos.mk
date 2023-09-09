@@ -17,8 +17,8 @@ SDL_TGZ=build/SDL-$(SDL_TAG).tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
-SAMPLE_SOURCES = $(wildcard samples/src/*.c)
-SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
+SAMPLE_SOURCES = $(wildcard samples/*.c)
+SAMPLE_EXES = $(SAMPLE_SOURCES:samples/%.c=$(SAMPLE_DIR)/%.exe)
 SAMPLE_LDFLAGS =-L$(LIB_DIR) -lSDL2 -lSDL2_image -lSDL2_mixer -framework OpenGL -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
@@ -58,7 +58,7 @@ $(TARGET): $(OBJECTS)
 $(SAMPLE_DIR):
 	mkdir -p $@
 
-$(SAMPLE_DIR)/%.exe: samples/src/%.c $(TARGET)
+$(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET)
 	$(CC) $< -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 	install_name_tool -add_rpath @executable_path/lib $@
 

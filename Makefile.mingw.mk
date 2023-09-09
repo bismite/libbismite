@@ -17,8 +17,8 @@ SDL_TGZ=build/SDL-$(SDL_TAG).tgz
 SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
-SAMPLE_SOURCES = $(wildcard samples/src/*.c)
-SAMPLE_EXES = $(SAMPLE_SOURCES:samples/src/%.c=$(SAMPLE_DIR)/%.exe)
+SAMPLE_SOURCES = $(wildcard samples/*.c)
+SAMPLE_EXES = $(SAMPLE_SOURCES:samples/%.c=$(SAMPLE_DIR)/%.exe)
 SAMPLE_LDFLAGS=-L$(BUILD_DIR)/bin
 SAMPLE_LIBS = $(BUILD_DIR)/lib/libbismite.a -lmingw32 $(BUILD_DIR)/lib/libSDL2main.a -lSDL2 -mwindows -lSDL2_mixer -lSDL2_image -lopengl32
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
@@ -59,7 +59,7 @@ $(TARGET): $(OBJECTS)
 $(SAMPLE_DIR):
 	mkdir -p $@
 
-$(SAMPLE_DIR)/%.exe: samples/src/%.c
+$(SAMPLE_DIR)/%.exe: samples/%.c
 	$(CC) $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) $(SAMPLE_LDFLAGS)
 
 copyassets:

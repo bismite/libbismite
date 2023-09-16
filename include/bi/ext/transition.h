@@ -16,7 +16,6 @@ typedef struct {
   BiCanvas snapshot_canvas;
   BiTexture snapshot_texture;
   BiTimer timer;
-  BiNode root;
 } BiTransitionLayer;
 
 BiTransitionLayer* bi_transition_layer_init(BiTransitionLayer *transition_layer,

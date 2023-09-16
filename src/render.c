@@ -7,7 +7,7 @@
 #include <bi/bi_gl.h>
 #include "matrix/matrix.h"
 
-typedef bool (*render_function)(BiContext*, BiLayerBase*, BiFramebuffer*, BiRenderingContext);
+typedef bool (*render_function)(BiContext*, BiNodeBase*, BiFramebuffer*, BiRenderingContext);
 
 static int node_order_compare(const void *_a, const void *_b )
 {
@@ -104,26 +104,22 @@ void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
 
 static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRenderingContext* rendering_context)
 {
-  if( layer->root == NULL ) return;
-
   BiRenderingContext rc = *rendering_context;
+  BiNode *root = &layer->root;
 
-  rc.time_scale *= layer->time_scale;
+  rc.time_scale *= root->time_scale;
 
   // timer
-  if( rc.timer_queue && layer->timers.size > 0 ) {
+  if( rc.timer_queue && root->timers.size > 0 ) {
     array_add_object(rc.timer_queue, layer);
   }
 
-  // reset rendering queue
+  // queue
   array_clear(rc.rendering_queue);
-
-  // recursive visit nodes
-  bi_render_queuing(rc, layer->root);
-
+  bi_render_queuing(rc, root);
+  printf("rc.rendering_queue->size==%d\n",rc.rendering_queue->size);
+  printf("root %d,%d,%d,%d\n",root->x, root->y, root->w, root->h);
   if(rc.rendering_queue->size==0) return;
-
-  // context->profile.rendering_nodes_queue_size += len;
 
   // shader select
   BiShader* shader = &context->default_shader;
@@ -166,7 +162,7 @@ static void target_and_clear_framebuffer(BiFramebuffer *fb)
 }
 
 extern void render_postprocess(BiContext* context,
-                               BiLayerBase *layer,
+                               BiNodeBase *layer,
                                BiFramebuffer *dst,
                                BiRenderingContext rc
                               )
@@ -185,7 +181,7 @@ extern void render_postprocess(BiContext* context,
 }
 
 extern void render_layer(BiContext* context,
-                         BiLayerBase *layer,
+                         BiNodeBase *layer,
                          BiFramebuffer *fb,
                          BiRenderingContext rc
                         )
@@ -194,7 +190,7 @@ extern void render_layer(BiContext* context,
 }
 
 extern void render_layer_group(BiContext* context,
-                               BiLayerBase *layer_group,
+                               BiNodeBase *layer_group,
                                BiFramebuffer* dst,
                                BiRenderingContext rc
                               )
@@ -211,9 +207,11 @@ extern void render_layer_group(BiContext* context,
   target_and_clear_framebuffer(&lg->framebuffer);
   layer_sort(lg);
   for( int i=0; i<lg->layers.size; i++ ) {
-    BiLayerBase* l = lg->layers.objects[i];
-    render_function f = l->_render_function_;
-    f( context, l, &lg->framebuffer, rc );
+    BiNodeBase* n = lg->layers.objects[i];
+    render_function f = NULL;
+    if( n->class == BI_LAYER ) f = ((BiLayer*)n)->_render_function_;
+    if( n->class == BI_LAYER_GROUP ) f = ((BiLayerGroup*)n)->_render_function_;
+    f( context, n, &lg->framebuffer, rc );
   }
   // draw LayerGroup
   GLuint dst_id = dst ? dst->framebuffer_id : 0;
@@ -221,14 +219,13 @@ extern void render_layer_group(BiContext* context,
   glBindFramebuffer(GL_FRAMEBUFFER, dst_id);
   BiTexture t;
   bi_texture_init_with_framebuffer(&t,src);
-  BiNode n;
-  bi_node_init(&n);
-  bi_node_set_size(&n,context->w,context->h);
-  bi_node_set_texture(&n, &t, 0,0,t.w,t.h);
-  n.texture_flip_vertical = true;
   BiLayer l;
   bi_layer_init(&l);
-  l.root = &n;
+  BiNode *root = &l.root;
+  bi_node_set_size( root, context->w,context->h);
+  bi_node_set_texture(root, &t, 0,0,t.w,t.h);
+  root->color_tint = RGBA32(0xFF00FFFF);
+  root->texture_flip_vertical = true;
   l.textures[0] = &t;
   BiRenderingContext rcontext;
   bi_rendering_context_init(&rcontext,true,false,0,
@@ -259,7 +256,7 @@ void bi_render(BiContext* context)
                             &context->rendering_queue);
 
   render_function f = context->layers._render_function_;
-  f(context,(BiLayerBase*)&context->layers,NULL,rendering_context);
+  f(context,(BiNodeBase*)&context->layers,NULL,rendering_context);
 
   //
   SDL_GL_SwapWindow(context->window);

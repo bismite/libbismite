@@ -22,10 +22,8 @@ BiTransitionLayer* bi_transition_layer_init(BiTransitionLayer *transition_layer,
   layer->shader = postprocess_shader;
   layer->textures[0] = &transition_layer->snapshot_texture;
   layer->textures[1] = &transition_layer->group1_framebuffer_texture;
-  // root
-  bi_node_init( &transition_layer->root );
-  bi_node_set_size( &transition_layer->root,w,h);
-  layer->root = &transition_layer->root;
+  // node size
+  bi_node_set_size(&layer->root,w,h);
   // timer
   bi_timer_init(&transition_layer->timer,callback,0,-1,layer);
   bi_layer_add_timer(layer,&transition_layer->timer);

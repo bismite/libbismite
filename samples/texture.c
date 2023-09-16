@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
   bi_node_add_node(background,n);
 
   // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  layer->root = background;
+  bi_layer_add_node(layer,background);
   layer->textures[0] = background->texture;
   layer->textures[1] = tex;
 

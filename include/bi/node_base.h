@@ -6,7 +6,14 @@
 
 typedef struct _BiNodeBase BiNodeBase;
 
+typedef enum {
+  BI_NODE,
+  BI_LAYER,
+  BI_LAYER_GROUP
+} BiNodeClass;
+
 #define BI_NODE_HEADER \
+  BiNodeClass class; \
   BiNodeBase *parent; \
   int z; \
   int index; \
@@ -19,6 +26,6 @@ struct _BiNodeBase{
   BI_NODE_HEADER
 };
 
-extern void bi_node_base_init(BiNodeBase* node);
+extern void bi_node_base_init(BiNodeBase* node,BiNodeClass class);
 
 #endif

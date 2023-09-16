@@ -51,7 +51,7 @@ int main(int argc,char* argv[])
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  layer->root = root;
+  bi_layer_add_node(layer,root);
 
   // fps layer
   add_fps_layer(context,load_font());

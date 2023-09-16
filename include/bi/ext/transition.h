@@ -1,40 +1,30 @@
-#ifndef __BI_EXT_TRANSITION_H__
-#define __BI_EXT_TRANSITION_H__
+#ifndef __BISMITE_EXT_TRANSITION_H__
+#define __BISMITE_EXT_TRANSITION_H__
 
 #include <stdint.h>
 #include <bi/layer.h>
+#include <bi/texture.h>
 #include <bi/timer.h>
+#include <bi/canvas.h>
+#include <bi/node.h>
 
-typedef struct _BiContext BiContext;
-typedef struct _BiShader BiShader;
-typedef struct _BiTransition BiTransition;
-
-typedef void (*bi_transition_callback)(BiTransition*);
-
-struct _BiTransition {
-  BiContext* context;
-  BiLayerGroup *layer_group;
+typedef struct {
   BiLayer layer;
-  BiShader* shader;
-  double duration;
-  bi_transition_callback callback;
+  BiLayerGroup *group0;
+  BiLayerGroup *group1;
+  BiTexture group1_framebuffer_texture;
+  BiCanvas snapshot_canvas;
+  BiTexture snapshot_texture;
   BiTimer timer;
-  bool invert;
-  int64_t start_at;
-  bool done;
-  void* userdata;
-  int delay_count;
-  double progress;
-};
+  BiNode root;
+} BiTransitionLayer;
 
-extern void bi_transition_init(BiTransition *transition,
-                               BiLayerGroup *layer_group,
-                               double duration,
-                               bi_transition_callback callback,
-                               BiShader* shader,
-                               bool invert
-                              );
-
-extern void bi_transition_start(BiContext* context, BiTransition* transition);
+BiTransitionLayer* bi_transition_layer_init(BiTransitionLayer *transition_layer,
+                                     int w, int h,
+                                     BiShader* postprocess_shader,
+                                     BiLayerGroup* group0,
+                                     BiLayerGroup* group1,
+                                     timer_callback callback
+                                   );
 
 #endif

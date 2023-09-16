@@ -1,68 +1,34 @@
 #include <bi/ext/transition.h>
-#include <bi/context.h>
-#include <bi/layer.h>
+#include <bi/node.h>
 
-void bi_transition_init(BiTransition *transition,
-                        BiLayerGroup *layer_group,
-                        double duration,
-                        bi_transition_callback callback,
-                        BiShader* shader,
-                        bool invert
-                      )
+BiTransitionLayer* bi_transition_layer_init(BiTransitionLayer *transition_layer,
+                                            int w, int h,
+                                            BiShader* postprocess_shader,
+                                            BiLayerGroup* group0,
+                                            BiLayerGroup* group1,
+                                            timer_callback callback
+                                          )
 {
-  transition->start_at = UINT64_MAX;
-  transition->done = false;
-  transition->layer_group = layer_group;
-  transition->duration = duration;
-  transition->callback = callback;
-  transition->invert = invert;
-  transition->userdata = NULL;
-  transition->delay_count = 0;
-  // shader
-  transition->shader = shader;
-  // layer
-  bi_layer_init_as_postprocess(&transition->layer);
-  transition->layer.shader = transition->shader;
-}
-
-static void transition_update(BiTimer* timer,double delta_time)
-{
-  BiTransition *transition = timer->userdata;
-
-  if(transition->delay_count > 0){
-    transition->delay_count -= 1;
-    return;
-  }
-
-  transition->progress += delta_time / transition->duration;
-
-  if(transition->done){
-    // finish
-    bi_layer_group_remove_timer(transition->layer_group,&transition->timer);
-    bi_layer_group_remove_layer(transition->layer_group,&transition->layer);
-    transition->layer_group->interaction_enabled = true;
-    if(transition->callback){
-      transition->callback(transition);
-    }
-  } else {
-    // progress
-    if( transition->progress >= 1.0 ) {
-      transition->done = true;
-    }
-    transition->layer.shader_extra_data[0] =
-      transition->invert ? 1.0-transition->progress : transition->progress;
-  }
-}
-
-void bi_transition_start(BiContext* context, BiTransition* transition)
-{
-  transition->context = context;
-  transition->layer_group->interaction_enabled = false;
-  bi_layer_group_add_layer(transition->layer_group,&transition->layer);
-  transition->layer.shader_extra_data[0] = transition->invert ? 1.0 : 0.0;
-  transition->start_at = UINT64_MAX;
-  transition->delay_count = 1;
-  transition->progress = 0.0;
-  bi_timer_init(&transition->timer,transition_update,0,-1,transition);
-  bi_layer_group_add_timer(transition->layer_group,&transition->timer);
+  BiLayer* layer = (BiLayer*)transition_layer;
+  bi_layer_init_as_postprocess(layer);
+  transition_layer->group0 = group0;
+  transition_layer->group1 = group1;
+  // snapshot source framebuffer
+  BiCanvas* snapshot = &transition_layer->snapshot_canvas;
+  bi_canvas_init_with_framebuffer(snapshot, &group0->framebuffer);
+  bi_texture_init_with_framebuffer(&transition_layer->snapshot_texture,&snapshot->framebuffer);
+  bi_texture_init_with_framebuffer(&transition_layer->group1_framebuffer_texture, &group1->framebuffer);
+  // shader and texture
+  layer->shader = postprocess_shader;
+  layer->textures[0] = &transition_layer->snapshot_texture;
+  layer->textures[1] = &transition_layer->group1_framebuffer_texture;
+  // root
+  bi_node_init( &transition_layer->root );
+  bi_node_set_size( &transition_layer->root,w,h);
+  layer->root = &transition_layer->root;
+  // timer
+  bi_timer_init(&transition_layer->timer,callback,0,-1,layer);
+  bi_layer_add_timer(layer,&transition_layer->timer);
+  //
+  return transition_layer;
 }

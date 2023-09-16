@@ -117,15 +117,10 @@ static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRendering
   // queue
   array_clear(rc.rendering_queue);
   bi_render_queuing(rc, root);
-  printf("rc.rendering_queue->size==%d\n",rc.rendering_queue->size);
-  printf("root %d,%d,%d,%d\n",root->x, root->y, root->w, root->h);
   if(rc.rendering_queue->size==0) return;
 
   // shader select
-  BiShader* shader = &context->default_shader;
-  if( layer->shader != NULL ){
-    shader = layer->shader;
-  }
+  BiShader* shader = layer->shader ? layer->shader : &context->default_shader;
   glUseProgram(shader->program_id);
 
   // uniforms
@@ -181,12 +176,13 @@ extern void render_postprocess(BiContext* context,
 }
 
 extern void render_layer(BiContext* context,
-                         BiNodeBase *layer,
+                         BiNodeBase *n,
                          BiFramebuffer *fb,
                          BiRenderingContext rc
                         )
 {
-  draw_layer_to_buffer( context, (BiLayer*)layer, &rc );
+  BiLayer* layer = (BiLayer*)n;
+  draw_layer_to_buffer( context, layer, &rc );
 }
 
 extern void render_layer_group(BiContext* context,
@@ -209,14 +205,17 @@ extern void render_layer_group(BiContext* context,
   for( int i=0; i<lg->layers.size; i++ ) {
     BiNodeBase* n = lg->layers.objects[i];
     render_function f = NULL;
-    if( n->class == BI_LAYER ) f = ((BiLayer*)n)->_render_function_;
-    if( n->class == BI_LAYER_GROUP ) f = ((BiLayerGroup*)n)->_render_function_;
+    if( n->class == BI_LAYER ){
+      f = ((BiLayer*)n)->_render_function_;
+    }
+    if( n->class == BI_LAYER_GROUP ){
+      f = ((BiLayerGroup*)n)->_render_function_;
+    }
     f( context, n, &lg->framebuffer, rc );
   }
   // draw LayerGroup
-  GLuint dst_id = dst ? dst->framebuffer_id : 0;
+  glBindFramebuffer(GL_FRAMEBUFFER, dst ? dst->framebuffer_id : 0 );
   BiFramebuffer *src = &lg->framebuffer;
-  glBindFramebuffer(GL_FRAMEBUFFER, dst_id);
   BiTexture t;
   bi_texture_init_with_framebuffer(&t,src);
   BiLayer l;
@@ -224,7 +223,6 @@ extern void render_layer_group(BiContext* context,
   BiNode *root = &l.root;
   bi_node_set_size( root, context->w,context->h);
   bi_node_set_texture(root, &t, 0,0,t.w,t.h);
-  root->color_tint = RGBA32(0xFF00FFFF);
   root->texture_flip_vertical = true;
   l.textures[0] = &t;
   BiRenderingContext rcontext;

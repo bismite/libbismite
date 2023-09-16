@@ -227,7 +227,7 @@ static inline void update_transform_matrix(BiNode* n)
   GLfloat sin_v = sin(n->angle);
 
   // matrix chain
-  if(n->parent == NULL){
+  if( n->class==BI_LAYER || n->parent == NULL ){
     bi_mat4_identity( n->transform_matrix );
   }else{
     bi_mat4_copy( n->transform_matrix, ((BiNode*)n->parent)->transform_matrix );

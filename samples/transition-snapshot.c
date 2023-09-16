@@ -29,24 +29,15 @@ static void init_transition(BiContext* context,
                             BiLayerGroup* group0,
                             BiLayerGroup* group1 )
 {
-  BiTexture* tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),&group0->framebuffer);
   TransitionData *dat = ALLOC(TransitionData);
   dat->group0 = group0;
   dat->group1 = group1;
 
   BiCanvas* snapshot = &dat->snapshot_canvas;
-  bi_canvas_init(snapshot, tex->w, tex->h);
-  snapshot->shader = &context->default_shader;
-  snapshot->textures[0] = tex;
-  BiNode n;
-  bi_node_init(&n);
-  bi_node_set_size(&n,tex->w,tex->h);
-  bi_node_set_texture(&n,tex,0,0,tex->w,tex->h);
-  bi_canvas_clear(snapshot,0,0,0,0);
-  bi_canvas_draw(snapshot,&n);
+  bi_canvas_init_with_framebuffer(snapshot, &group0->framebuffer);
   bi_texture_init_with_framebuffer(&dat->snapshot_texture,&snapshot->framebuffer);
   bi_texture_init_with_framebuffer(&dat->group1_framebuffer_texture,&group_1->framebuffer);
-  //
+
   transition_layer->shader = postprocess_shader;
   transition_layer->userdata = dat;
   transition_layer->textures[0] = &dat->snapshot_texture;
@@ -71,9 +62,9 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
   bi_layer_group_remove_layer_group(&context->layers,group_0);
   // add group_1
   bi_layer_group_add_layer_group(&context->layers,group_1);
-  // Transition
-  BiShader* shader = create_shader_with_default_vertex_shader("assets/shaders/transition-stairs.frag");
+  // make Transition
   BiLayer *transition_layer = bi_layer_init_as_postprocess(ALLOC(BiLayer));
+  BiShader* shader = create_shader_with_default_vertex_shader("assets/shaders/transition-stairs.frag");
   init_transition(context,transition_layer,shader,group_0,group_1);
   bi_add_layer(context,transition_layer);
 

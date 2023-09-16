@@ -22,6 +22,7 @@ typedef struct _BiCanvas {
 } BiCanvas;
 
 extern BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h);
+extern BiCanvas* bi_canvas_init_with_framebuffer(BiCanvas* canvas,BiFramebuffer *src);
 extern void bi_canvas_draw(BiCanvas* canvas,BiNode* node);
 extern void bi_canvas_clear(BiCanvas* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a);
 extern BiTexture* bi_canvas_to_texture(BiCanvas* canvas,BiTexture* texture);

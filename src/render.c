@@ -175,14 +175,13 @@ extern void render_postprocess(BiContext* context,
   // render to Temporary Framebuffer
   target_and_clear_framebuffer(&context->post_process_framebuffer);
   draw_layer_to_buffer( context, l, &rc );
+  glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer_id);
   // Blit temporary framebuffer to fb
   glBindFramebuffer(GL_READ_FRAMEBUFFER, context->post_process_framebuffer.framebuffer_id);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->framebuffer_id);
   glBlitFramebuffer(0, 0, dst->w, dst->h,
                     0, 0, dst->w, dst->h,
                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
-  // back
-  glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer_id);
 }
 
 extern void render_layer(BiContext* context,

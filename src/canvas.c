@@ -23,6 +23,21 @@ BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h)
   return canvas;
 }
 
+BiCanvas* bi_canvas_init_with_framebuffer(BiCanvas* canvas,BiFramebuffer *src)
+{
+  bi_canvas_init(canvas,src->w,src->h);
+  glBindFramebuffer(GL_FRAMEBUFFER, canvas->framebuffer.framebuffer_id);
+  glClearColor(0,0,0,0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, src->framebuffer_id);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, canvas->framebuffer.framebuffer_id);
+  glBlitFramebuffer(0, 0, src->w, src->h,
+                    0, 0, src->w, src->h,
+                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  return canvas;
+}
+
 void bi_canvas_draw(BiCanvas* canvas,BiNode* node)
 {
   //

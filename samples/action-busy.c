@@ -1,32 +1,24 @@
 #include "common.h"
 #include <bi/ext/action.h>
 
-// static void end_action(BiAction* action,void* context)
-// {
-//   bi_set_color(action->node->color, rand()%128+100, rand()%128+100, rand()%128+100, 0xff );
-//   printf("end action %s (%p) %lld\n", context?(char*)context:"", action, bi_get_now());
-// }
-
 static void add_action(BiNode *node)
 {
   // rotate action
-  BiActionRotate* rot = bi_action_rotate_by_init(ALLOC(BiActionRotate),500,90);
+  BiActionRotate* rot = bi_action_rotate_by_init(ALLOC(BiActionRotate),5000,180);
   rot->action.on_finish_callback_context = "rot";
   bi_action_set_repeat((BiAction*)rot,-1);
+  bi_add_action(node,(BiAction*)rot);
   bi_action_start((BiAction*)rot);
 
   // move ->
   BiActionMove* move1 = bi_action_move_by_init(ALLOC(BiActionMove),5000,480,0);
-  move1->action.on_finish_callback_context = "move";
 
   // move <-
   BiActionMove* move2 = bi_action_move_by_init(ALLOC(BiActionMove),5000,-480,0);
-  move2->action.on_finish_callback_context = "move2";
 
   // sequence
   BiAction* actions[] = { (BiAction*)move1, (BiAction*)move2 };
   BiActionSequence* seq = bi_action_sequence_init( ALLOC(BiActionSequence),2,actions);
-  seq->action.on_finish_callback_context = "seq";
   bi_action_set_repeat((BiAction*)seq,-1);
   // add action to node
   bi_add_action(node,(BiAction*)seq);
@@ -75,22 +67,13 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(malloc(sizeof(BiContext)), 480, 320, 60, false, __FILE__);
+  BiContext* context = make_context(__FILE__);
   context->max_delta = 5000;
-  print_info(context);
 
   // layer
-  BiLayer *layer = malloc(sizeof(BiLayer));
-  bi_layer_init(layer);
-
-  // root node
-  BiNode* root = malloc(sizeof(BiNode));
-  bi_node_init(root);
-  layer->root = root;
-
-  BiNode* bg = make_sprite("assets/check.png");
-  bi_node_set_position(bg,context->w/2,context->h/2);
-  bi_node_add_node(root,bg);
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* root = set_texture(&layer->root,"assets/check.png");
+  bi_add_layer(context,layer);
 
   // texture node
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
@@ -101,7 +84,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(face2,0,320/3*2);
   bi_node_add_node(root,face2);
 
-  layer->textures[0] = bg->texture;
+  layer->textures[0] = root->texture;
   layer->textures[1] = tex;
 
   // action
@@ -109,9 +92,7 @@ int main(int argc, char* argv[])
   add_action2(face2);
 
   // callback
-  bi_node_set_on_click(face, on_click);
-
-  bi_add_layer(context,layer);
+  bi_node_set_on_click(root, on_click);
 
   bi_start_run_loop(context);
   return 0;

@@ -29,7 +29,7 @@ void hsv_to_rgb(double h, double s, double v, uint8_t *r, uint8_t *g, uint8_t *b
   *r = (uint8_t)(rr*0xff); *g = (uint8_t)(gg*0xff); *b =(uint8_t)(bb*0xff) ;
 }
 
-static void magick_color_tint(BiTimer* t,double dt)
+static void magick_color_half_tint(BiTimer* t,double dt)
 {
   static double h=0;
   uint8_t r=0,g=0,b=0;
@@ -64,16 +64,19 @@ static void magick_color_full_tint(BiTimer* t,double dt)
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
-  // Background
-  BiNode* background = make_sprite_with_anchor("assets/map.png",0,0);
-
-  //
+  // Texture
   BiTexture* tex = MAKE_TEXTURE("assets/mushroom.png");
-  BiNode* n = NULL;
 
+  // layer
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  bi_add_layer(context,layer);
+  BiNode* background = set_texture(&layer->root,"assets/map.png");
+  layer->textures[0] = background->texture;
+  layer->textures[1] = tex;
+
+  // colors
   int colors[COLOR_MAX][2][4] = {
     { {0xff,0,0,128}, {0xff,0xff,0xff,0xff} }, // Tint Red
     { {0,0xff,0,128}, {0xff,0xff,0xff,0xff} }, // Tint Green
@@ -100,7 +103,7 @@ int main(int argc, char* argv[])
   for(int i=0; i<COLOR_MAX; i++) {
     int *a = colors[i][0];
     int *b = colors[i][1];
-    n = make_sprite_from_texture(tex);
+    BiNode* n = make_sprite_from_texture(tex);
     int x = i%7;
     int y = i/7;
     bi_node_set_position(n,32+14+x*64,96+y*64);
@@ -108,17 +111,10 @@ int main(int argc, char* argv[])
     n->color_modulate = RGBA(b[0], b[1], b[2], b[3]);
     bi_node_add_node(background,n);
     // Magick color
-    if(i==COLOR_MAX-3) { onupdate(n,magick_color_tint); }
+    if(i==COLOR_MAX-3) { onupdate(n,magick_color_half_tint); }
     if(i==COLOR_MAX-2) { onupdate(n,magick_color_modulate); }
     if(i==COLOR_MAX-1) { onupdate(n,magick_color_full_tint); }
   }
-
-  // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
-  bi_add_layer(context,layer);
-  layer->root = background;
-  layer->textures[0] = background->texture;
-  layer->textures[1] = tex;
 
   bi_start_run_loop(context);
   return 0;

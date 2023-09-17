@@ -2,15 +2,18 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
   // Background
-  BiNode* background = make_sprite_with_anchor("assets/check.png",0,0);
-
-  //
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   BiNode* n = NULL;
+
+  // layer
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* background = set_texture(&layer->root,"assets/check.png");
+  layer->textures[0] = background->texture;
+  layer->textures[1] = tex;
+  bi_add_layer(context,layer);
 
   // Angle
   n = make_sprite_from_texture(tex);
@@ -38,13 +41,7 @@ int main(int argc, char* argv[])
   bi_node_set_scale(n, 0.8,1.2);
   bi_node_add_node(background,n);
 
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  bi_layer_add_node(layer,background);
-  layer->textures[0] = background->texture;
-  layer->textures[1] = tex;
-
+  //
   bi_start_run_loop(context);
   return 0;
 }

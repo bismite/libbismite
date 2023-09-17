@@ -39,27 +39,22 @@ int copy_utf8_str(char* buf, char* text, int num)
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-
-  // root node
-  BiNode* root = bi_node_init(ALLOC(BiNode));
-  layer->root = root;
+  BiNode* root = &layer->root;
 
   // bounds
   BiNode* bounds = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(bounds,WIDTH,320);
   bi_node_set_position(bounds,20,0);
-  bounds->color_tint = RGBA(0,0x66,0x66,0xff);
-  bi_node_add_node(layer->root, bounds);
+  bounds->color_tint = RGBA32(0x006666ff);
+  bi_node_add_node(&layer->root, bounds);
 
   // font
-  BiTexture *font_texture = ALLOC(BiTexture);
-  bi_texture_init_with_filename(font_texture,"assets/font.png",false);
+  BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
   BiFontAtlas *font = load_font_atlas("assets/font14.dat", font_texture);
   layer->textures[0] = font_texture;
 

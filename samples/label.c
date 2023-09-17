@@ -2,20 +2,13 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
-  print_info(context);
-
+  BiContext* context = make_context(__FILE__);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-
-  // root node
-  BiNode* root = bi_node_init(ALLOC(BiNode));
-  layer->root = root;
-
+  BiNode* root = &layer->root;
   // font
-  BiTexture *font_texture = malloc(sizeof(BiTexture));
-  bi_texture_init_with_filename(font_texture,"assets/font.png",false);
+  BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
   layer->textures[0] = font_texture;
   const char* fonts[4] = {
     "assets/font12.dat", "assets/font12b.dat", "assets/font14.dat", "assets/font14b.dat"
@@ -60,10 +53,7 @@ int main(int argc, char* argv[])
     bi_node_set_position( (BiNode*)label, offset_x, offset_y+(12+i)*line );
     bi_node_add_node(root,(BiNode*)label);
   }
-
-  // fps layer
-  add_fps_layer(context, load_font_atlas(fonts[0],font_texture) );
-
+  // start
   bi_start_run_loop(context);
   return 0;
 }

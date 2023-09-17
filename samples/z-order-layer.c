@@ -2,30 +2,24 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,true,__FILE__);
-
-  // layer 1
-  BiNode* face = make_sprite("assets/face01.png");
-  bi_node_set_position(face,context->w/2,context->h/2);
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  layer->root = face;
-  layer->textures[0] = face->texture;
-
-  // layer 2
-  BiNode* bg = make_sprite("assets/check.png");
-  bi_node_set_position(bg,context->w/2,context->h/2);
-  BiLayer* layer2 = bi_layer_init(ALLOC(BiLayer));
-  layer2->root = bg;
-  layer2->textures[0] = bg->texture;
-
-  //
-  bi_add_layer(context,layer);
-  bi_add_layer(context,layer2);
-
-  // z order
-  layer->z = 1;
-  layer2->z = 0;
-
+  BiContext* context = make_context(__FILE__);
+  // background
+  BiLayer *background_layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* face = set_texture(&background_layer->root, "assets/face01.png");
+  bi_node_set_position(face,W/2,H/2);
+  background_layer->textures[0] = face->texture;
+  // foreground
+  BiLayer* foreground_layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* mushroom = set_texture(&foreground_layer->root,"assets/mushroom.png");
+  bi_node_set_position(mushroom,W/2,H/2);
+  foreground_layer->textures[0] = mushroom->texture;
+  // wrong order
+  bi_add_layer(context,foreground_layer);
+  bi_add_layer(context,background_layer);
+  // fix by z order
+  background_layer->root.z = 0;
+  foreground_layer->root.z = 1;
+  // start
   bi_start_run_loop(context);
   return 0;
 }

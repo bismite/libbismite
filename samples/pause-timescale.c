@@ -18,16 +18,17 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
   return true; // swallow
 }
 
-static BiLayerGroup* init_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
+static BiLayerGroup* make_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
 {
   bi_layer_group_init(lg);
   bi_layer_group_add_layer_group(&context->layers, lg);
-
-  // root node
-  BiNode* root = bi_node_init(ALLOC(BiNode));
-
-  // sprite
+  // layer
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* root = &layer->root;
+  bi_layer_group_add_layer(lg,layer);
+  layer->textures[0] = tex;
+  // sprite
   BiNode* faces[2];
   for(int i=0;i<2;i++){
     BiNode* face = make_sprite_from_texture(tex);
@@ -35,16 +36,6 @@ static BiLayerGroup* init_layer_group(BiContext* context, BiLayerGroup* lg, int 
     bi_node_add_node(root,face);
     faces[i] = face;
   }
-
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  layer->root = root;
-  bi_layer_group_add_layer(lg,layer);
-  layer->textures[0] = tex;
-
-  // pause
-  bi_node_set_on_click(root, on_click);
-
   // rotate by action
   faces[0]->color_tint = RGBA(0xFF,0,0,0xFF);
   BiAction* rot = (BiAction*)bi_action_rotate_by_init(ALLOC(BiActionRotate),0,2);
@@ -54,33 +45,20 @@ static BiLayerGroup* init_layer_group(BiContext* context, BiLayerGroup* lg, int 
   // rotate by timer
   faces[1]->color_tint = RGBA(0,0,0xFF,0xFF);
   bi_node_add_timer(faces[1], bi_timer_init(ALLOC(BiTimer), rotate_on_timer, 0, -1, faces[1]));
-
   return lg;
 }
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 60, false, __FILE__);
-  print_info(context);
-
-  // bg
-  BiNode* bg = make_sprite("assets/check.png");
-  bi_node_set_position(bg,context->w/2,context->h/2);
+  BiContext* context = make_context(__FILE__);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  layer->root = bg;
+  set_texture(&layer->root,"assets/check.png");
+  bi_node_set_on_click(&layer->root, on_click);
   bi_layer_group_add_layer(&context->layers,layer);
-  layer->textures[0] = bg->texture;
-
-  layer_group_a = init_layer_group(context, ALLOC(BiLayerGroup), 320/3*2);
-  layer_group_b = init_layer_group(context, ALLOC(BiLayerGroup), 320/3*1);
-
-  //
-  // fps layer
-  //
-  BiFontAtlas *font = load_font();
-  add_fps_layer(context,font);
-
+  layer->textures[0] = layer->root.texture;
+  layer_group_a = make_layer_group(context, ALLOC(BiLayerGroup), 320/3*2);
+  layer_group_b = make_layer_group(context, ALLOC(BiLayerGroup), 320/3*1);
   // start
   bi_start_run_loop(context);
   return 0;

@@ -3,17 +3,16 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  layer->root = make_sprite_with_anchor("assets/check.png",0,0);
+  BiNode *root = set_texture(&layer->root,"assets/check.png");
   bi_add_layer(context,layer);
 
   // texture
   BiTexture* t = MAKE_TEXTURE("assets/face01.png");
-  layer->textures[0] = layer->root->texture;
+  layer->textures[0] = root->texture;
   layer->textures[1] = t;
 
   // 2degree/4msec x 540 = 1080degree/2160msec
@@ -24,7 +23,7 @@ int main(int argc, char* argv[])
   BiNode* face_blue = make_sprite_from_texture(t);
   face_blue->color_tint = RGBA(0,0,0xFF,0xFF);
   bi_node_set_position(face_blue,240,320/3*2);
-  bi_node_add_node(layer->root,face_blue);
+  bi_node_add_node(root,face_blue);
   {
     BiAction* actions[repeat];
     for(int i=0;i<repeat;i++){
@@ -38,7 +37,7 @@ int main(int argc, char* argv[])
   BiNode* face_red = make_sprite_from_texture(t);
   face_red->color_tint = RGBA(0xFF,0,0,0xFF);
   bi_node_set_position(face_red,240,320/3*1);
-  bi_node_add_node(layer->root,face_red);
+  bi_node_add_node(root,face_red);
   {
     BiAction* rot = (BiAction*)bi_action_rotate_by_init(ALLOC(BiActionRotate),duration,degree);
     bi_action_set_repeat(rot,repeat);

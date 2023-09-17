@@ -47,19 +47,18 @@ static bool open(BiContext* context,BiNode* n, int x, int y, int button, bool pr
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
   // Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  layer->root = make_sprite_with_anchor("assets/check.png",0,0);
+  BiNode *root = set_texture(&layer->root,"assets/check.png");
   bi_add_layer(context,layer);
 
   // shade
   popup_shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(popup_shade,context->w,context->h);
   popup_shade->color_modulate = RGBA(0, 0, 0, 128);
-  bi_node_add_node(layer->root,popup_shade);
+  bi_node_add_node(root,popup_shade);
 
   // popup
   popup = bi_node_init(ALLOC(BiNode));
@@ -93,12 +92,12 @@ int main(int argc, char* argv[])
   popup_shade->visible = false;
 
   // assign textures to layer
-  layer->textures[0] = layer->root->texture;
+  layer->textures[0] = root->texture;
   layer->textures[1] = img->texture;
   layer->textures[2] = font_texture;
 
   //
-  bi_node_set_on_click(layer->root, open);
+  bi_node_set_on_click(root, open);
 
   bi_start_run_loop(context);
   return 0;

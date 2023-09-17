@@ -52,22 +52,17 @@ BiNode* make_glass(const char* name)
 
 int main(int argc, char* argv[])
 {
-  srand(bi_get_now());
-  BiContext* context = bi_init_context(ALLOC(BiContext), W, H, 0, true, __FILE__);
-  print_info(context);
-
+  BiContext* context = make_context(__FILE__);
   // Shaders
   BiShader *pp_shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-frosted-glass.frag");
-
   // Main Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  layer->root = make_sprite("assets/check.png");
-  bi_node_set_position(layer->root,context->w/2,context->h/2);
+  set_texture(&layer->root, "assets/check.png");
   BiNode* face = make_sprite("assets/face01.png");
-  bi_node_add_node(layer->root,face);
-  layer->textures[0] = layer->root->texture;
+  bi_node_set_position(face,context->w/2,context->h/2);
+  bi_node_add_node(&layer->root,face);
+  layer->textures[0] = layer->root.texture;
   layer->textures[1] = face->texture;
-
   // Canvas
   glasses = bi_node_init(ALLOC(BiNode));
   glass_a = make_glass("assets/glass-a.png");
@@ -81,31 +76,21 @@ int main(int argc, char* argv[])
   bi_canvas_clear(canvas, 0,0,0, 0xff);
   bi_canvas_draw(canvas,glasses);
   BiTexture* canvas_tex = bi_canvas_to_texture(canvas, ALLOC(BiTexture));
-
   // PostProcess Layer
   BiLayer *pp_layer = bi_layer_init_as_postprocess(ALLOC(BiLayer));
   BiFramebuffer *fb = &context->layers.framebuffer;
   pp_layer->shader = pp_shader;
-  // main image
-  pp_layer->root = bi_node_init(ALLOC(BiNode));
-  bi_node_set_size(pp_layer->root,context->w,context->h);
+  bi_node_set_size(&pp_layer->root,context->w,context->h);
   BiTexture *fb_tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),fb);
-  bi_node_set_texture(pp_layer->root, fb_tex, 0,0,fb_tex->w,fb_tex->h);
-  pp_layer->root->texture_flip_vertical = true;
-  // assign textures
+  bi_node_set_texture(&pp_layer->root, fb_tex, 0,0,fb_tex->w,fb_tex->h);
+  pp_layer->root.texture_flip_vertical = true;
   pp_layer->textures[0] = fb_tex;
   pp_layer->textures[1] = canvas_tex;
-  // move
-  onupdate(pp_layer->root,random_move);
-
-  // layers
+  // move glasses
+  onupdate(&pp_layer->root,random_move);
+  // add layers
   bi_add_layer(context,layer);
   bi_add_layer(context,pp_layer);
-
-  // fps layer
-  BiFontAtlas *font = load_font();
-  add_fps_layer(context,font);
-
   //
   bi_start_run_loop(context);
   return 0;

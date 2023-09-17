@@ -29,19 +29,16 @@ static void resume_rotate(BiTimer* timer,double dt)
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext),480,320,0,false,__FILE__);
-  print_info(context);
-
+  BiContext* context = make_context(__FILE__);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  layer->root = make_sprite_with_anchor("assets/check.png",0,0);;
+  set_texture(&layer->root,"assets/check.png");
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_set_position(face,context->w/2,context->h/2);
-  bi_node_add_node(layer->root,face);
-  layer->textures[0] = layer->root->texture;
+  bi_node_add_node(&layer->root,face);
+  layer->textures[0] = layer->root.texture;
   layer->textures[1] = face->texture;
-
   // rotate
   BiTimer *rotate_timer = bi_timer_init(ALLOC(BiTimer),rotate,10,-1,face);
   bi_node_add_timer(face,rotate_timer);
@@ -49,11 +46,7 @@ int main(int argc,char* argv[])
   bi_node_add_timer(face,bi_timer_init(ALLOC(BiTimer),pause_rotate,1000,2,rotate_timer));
   // resume rotate
   bi_node_add_timer(face,bi_timer_init(ALLOC(BiTimer),resume_rotate,1500,2,rotate_timer));
-
-  // fps layer
-  BiFontAtlas *font = load_font();
-  add_fps_layer(context,font);
-
+  // start
   bi_start_run_loop(context);
   return 0;
 }

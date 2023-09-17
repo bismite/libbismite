@@ -3,8 +3,7 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
   // Sprite
   BiNode* sprite = make_sprite_with_anchor("assets/tester.png",0,0);
@@ -14,7 +13,6 @@ int main(int argc, char* argv[])
   bi_node_set_position(sprite,10,10);
   bi_node_set_position(face,sprite->w/2.0,sprite->h/2.0);
   bi_node_set_degree(face,45);
-  face->color_tint = RGBA(0,0xff,0,0x99);
 
   // Canvas
   BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),256,256);
@@ -34,13 +32,13 @@ int main(int argc, char* argv[])
   // Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  layer->root = make_sprite_with_anchor("assets/check.png",0,0);
-  layer->textures[0] = layer->root->texture;
+  set_texture(&layer->root, "assets/check.png");
+  layer->textures[0] = layer->root.texture;
   layer->textures[1] = canvas_texture;
   layer->textures[2] = sprite->texture;
   layer->textures[3] = face->texture;
-  bi_node_add_node(layer->root, canvas_sprite); // from Canvas
-  bi_node_add_node(layer->root, sprite); // Original
+  bi_node_add_node(&layer->root, canvas_sprite); // from Canvas
+  bi_node_add_node(&layer->root, sprite); // Original
 
   bi_start_run_loop(context);
   return 0;

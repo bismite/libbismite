@@ -32,35 +32,26 @@ static BiNode* create_tile(int x, int y,BiTexture *tex)
 
 int main(int argc,char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, false, __FILE__);
+  BiContext* context = make_context(__FILE__);
   context->color = RGBA(32,32,0,0xff);
-  print_info(context);
-
   // texture
   BiTexture *tex = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
-
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  layer->root = bi_node_init(ALLOC(BiNode));
-  bi_node_set_scale(layer->root,SCALE,SCALE);
-  layer->root->userdata = layer;
+  BiNode* root = &layer->root;
+  bi_node_set_scale(root,SCALE,SCALE);
   layer->textures[0] = tex;
-
   // tiling
   for(int x=0; x<MAP_SIZE; x++) {
     for(int y=0; y<MAP_SIZE; y++){
-      bi_node_add_node(layer->root,create_tile(x*TILE_SIZE,y*TILE_SIZE,tex));
+      bi_node_add_node(root,create_tile(x*TILE_SIZE,y*TILE_SIZE,tex));
     }
   }
-
   // look around
   layer_camera_position(layer,0);
   bi_layer_add_timer(layer,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,layer));
-
-  // fps layer
-  add_fps_layer(context,load_font());
-
+  // start
   bi_start_run_loop(context);
   return 0;
 }

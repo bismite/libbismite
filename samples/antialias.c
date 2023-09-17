@@ -2,13 +2,12 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
 
   // Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  layer->root = make_sprite_with_anchor("assets/check.png",0,0);
+  BiNode* root = set_texture(&layer->root, "assets/check.png");
 
   // Texture
   BiTexture *texture = MAKE_TEXTURE("assets/tester.png");
@@ -24,8 +23,8 @@ int main(int argc, char* argv[])
   bi_node_set_scale_y(sprite,4.0);
 
   // layer
-  bi_node_add_node(layer->root,sprite);
-  layer->textures[0] = layer->root->texture;
+  bi_node_add_node(root,sprite);
+  layer->textures[0] = root->texture;
   layer->textures[1] = texture;
 
   bi_start_run_loop(context);

@@ -28,15 +28,13 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
 
 int main(int argc,char* argv[])
 {
-  srand( bi_get_now() );
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
-  print_info(context);
-
-  // root node
-  BiNode* root = bi_node_init(ALLOC(BiNode));
-  bi_node_set_size(root,480,320);
-  root->color_tint = RGBA(0x33,0,0,0xff);
-
+  BiContext* context = make_context(__FILE__);
+  // layer
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* root = &layer->root;
+  root->color_tint = RGBA32(0x330000ff);
+  bi_add_layer(context,layer);
+  bi_node_set_size(root,context->w,context->h);
   // hit rect
   for(int x=0;x<5;x++){
     for(int y=0;y<3;y++){
@@ -47,15 +45,7 @@ int main(int argc,char* argv[])
       bi_node_add_node(root,node);
     }
   }
-
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  bi_layer_add_node(layer,root);
-
-  // fps layer
-  add_fps_layer(context,load_font());
-
+  // start
   bi_start_run_loop(context);
   return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <bi/timer.h>
+#include <bi/array.h>
 
 typedef struct _BiNodeBase BiNodeBase;
 
@@ -15,6 +16,7 @@ typedef enum {
 #define BI_NODE_HEADER \
   BiNodeClass class; \
   BiNodeBase *parent; \
+  Array children; \
   int z; \
   int index; \
   bool interaction_enabled; \

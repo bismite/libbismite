@@ -18,10 +18,71 @@ extern void render_layer(BiContext* context,
                          BiRenderingContext rc
                        );
 
+//
+// Layer Group
+//
+
+BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
+{
+  bi_node_base_init((BiNodeBase*)layer_group,BI_LAYER_GROUP);
+  layer_group->_render_function_ = render_layer_group;
+  bi_set_blend_factor(&layer_group->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+
+  GLint dims[4] = {0};
+  glGetIntegerv(GL_VIEWPORT, dims);
+  bi_framebuffer_init(&layer_group->framebuffer,dims[2],dims[3]);
+  //
+  return layer_group;
+}
+
+int bi_layer_group_get_z_order(BiLayerGroup* layer_group)
+{
+  return layer_group->z;
+}
+
+void bi_layer_group_set_z_order(BiLayerGroup* layer_group,int z)
+{
+  layer_group->z = z;
+}
+
+BiLayer* bi_layer_group_add_layer(BiLayerGroup* layer_group, BiLayer* obj)
+{
+  obj->parent = (BiNodeBase*)layer_group;
+  return array_add_object(&layer_group->children,obj);
+}
+
+BiLayer* bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj)
+{
+  if( obj && obj == array_remove_object(&layer_group->children,obj) ){
+    obj->parent = NULL;
+    return obj;
+  }
+  return NULL;
+}
+
+BiLayerGroup* bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
+{
+  obj->parent = (BiNodeBase*)layer_group;
+  return array_add_object(&layer_group->children,obj);
+}
+
+BiLayerGroup* bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
+{
+  if( obj && obj == array_remove_object(&layer_group->children,obj) ){
+    obj->parent = NULL;
+    return obj;
+  }
+  return NULL;
+}
+
+
+//
+// Layer
+//
+
 BiLayer* bi_layer_init(BiLayer* layer)
 {
-  bi_node_init( &layer->root );
-  layer->root.class = BI_LAYER;
+  bi_node_base_init( (BiNodeBase*)layer, BI_LAYER );
   layer->_render_function_ = render_layer;
   bi_set_blend_factor(&layer->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
 
@@ -45,87 +106,31 @@ BiLayer* bi_layer_init_as_postprocess(BiLayer* layer)
   return layer;
 }
 
-void bi_layer_remove_from_parent(BiLayer* layer){
-  bi_layer_group_remove_layer( (BiLayerGroup*)layer->root.parent, layer);
+BiLayer* bi_layer_remove_from_parent(BiLayer* layer)
+{
+  if(layer && layer->parent) return bi_layer_group_remove_layer((BiLayerGroup*)layer->parent,layer);
+  return NULL;
 }
-int bi_layer_get_z_order(BiLayer* layer){ return layer->root.z; }
-void bi_layer_set_z_order(BiLayer* layer,int z){ layer->root.z = z; }
+
+BiNode* bi_layer_add_node(BiLayer *layer,BiNode* node)
+{
+  node->parent = (BiNodeBase*)layer;
+  return array_add_object(&layer->children,node);
+}
+
+BiNode* bi_layer_remove_node(BiLayer *layer,BiNode* node)
+{
+  if( node && node == array_remove_object(&layer->children,node) ){
+    node->parent = NULL;
+    return node;
+  }
+  return NULL;
+}
 
 // Timer
 BiTimer* bi_layer_add_timer(BiLayer* layer,BiTimer* timer){
-  return bi_timers_add( &layer->root.timers,timer);
+  return bi_timers_add( &layer->timers,timer);
 }
 BiTimer* bi_layer_remove_timer(BiLayer* layer,BiTimer* timer){
-  return bi_timers_remove( &layer->root.timers,timer);
-}
-
-
-//
-// Layer Group
-//
-BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
-{
-  bi_node_base_init((BiNodeBase*)layer_group,BI_LAYER_GROUP);
-  layer_group->_render_function_ = render_layer_group;
-  bi_set_blend_factor(&layer_group->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
-
-  array_init(&layer_group->layers);
-
-  GLint dims[4] = {0};
-  glGetIntegerv(GL_VIEWPORT, dims);
-  bi_framebuffer_init(&layer_group->framebuffer,dims[2],dims[3]);
-  //
-  return layer_group;
-}
-
-static int layer_order_compare(const void *_a, const void *_b )
-{
-  const BiNodeBase *a = *(BiNodeBase**)_a;
-  const BiNodeBase *b = *(BiNodeBase**)_b;
-  return a->z == b->z ? a->index - b->index : a->z - b->z;
-}
-
-void bi_layer_group_update_order(BiLayerGroup* layer_group)
-{
-  int size = layer_group->layers.size;
-  BiNodeBase** objects = (BiNodeBase**)layer_group->layers.objects;
-  for( int i=0; i<size; i++ ) { objects[i]->index = i; }
-  qsort( objects, size, sizeof(void*), layer_order_compare );
-  for( int i=0; i<size; i++ ) { objects[i]->index = i; }
-}
-
-int bi_layer_group_get_z_order(BiLayerGroup* layer_group)
-{
-  return layer_group->z;
-}
-
-void bi_layer_group_set_z_order(BiLayerGroup* layer_group,int z)
-{
-  layer_group->z = z;
-}
-
-void bi_layer_group_add_layer(BiLayerGroup* layer_group, BiLayer* obj)
-{
-  obj->root.parent = (BiNodeBase*)layer_group;
-  array_add_object(&layer_group->layers,obj);
-  bi_layer_group_update_order(layer_group);
-}
-
-void bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj)
-{
-  obj->root.parent = NULL;
-  array_remove_object(&layer_group->layers,obj);
-}
-
-void bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
-{
-  obj->parent = (BiNodeBase*)layer_group;
-  array_add_object(&layer_group->layers,obj);
-  bi_layer_group_update_order(layer_group);
-}
-
-void bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
-{
-  obj->parent = NULL;
-  array_remove_object(&layer_group->layers,obj);
+  return bi_timers_remove( &layer->timers,timer);
 }

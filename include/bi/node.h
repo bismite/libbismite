@@ -53,9 +53,6 @@ struct _BiNode {
   bool texture_flip_horizontal;
   bool texture_flip_vertical;
 
-  Array children;
-  bool children_order_cached;
-
   on_click_callback on_click;
   on_move_cursor_callback on_move_cursor;
   on_move_finger_callback on_move_finger;
@@ -68,7 +65,7 @@ struct _BiNode {
 extern BiNode* bi_node_init(BiNode* n);
 
 // scene graph
-static inline BiNode* bi_node_child_at(BiNode* node,int index){ return (BiNode*)node->children.objects[index]; }
+static inline BiNode* bi_node_child_at(BiNode* node,int index){ return (BiNode*)array_object_at(&node->children,index); }
 extern void bi_node_add_node(BiNode* node,BiNode* child);
 extern BiNode* bi_node_remove_at(BiNode* node,int index);
 extern BiNode* bi_node_remove_node(BiNode* node,BiNode* child);

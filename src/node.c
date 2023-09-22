@@ -41,11 +41,6 @@ BiNode* bi_node_init(BiNode* n)
   n->texture_flip_horizontal = false;
   n->texture_flip_vertical = false;
 
-  //
-  array_init(&n->children);
-  n->parent = NULL;
-  n->children_order_cached = true;
-
   // callbacks
   n->on_click = NULL;
   n->on_move_cursor = NULL;
@@ -66,19 +61,26 @@ BiNode* bi_node_init(BiNode* n)
 void bi_node_add_node(BiNode* node,BiNode* child)
 {
   array_add_object(&node->children,child);
-  node->children_order_cached = false;
   child->parent = (BiNodeBase*)node;
   child->transform_matrix_cached = false;
 }
 
 BiNode* bi_node_remove_at(BiNode* node,int index)
 {
-  return array_remove_object_at(&node->children,index);
+  BiNode *tmp = array_remove_object_at(&node->children,index);
+  if(tmp){
+    tmp->parent = NULL;
+    return tmp;
+  }
+  return NULL;
 }
 
 BiNode* bi_node_remove_node(BiNode* node,BiNode* child)
 {
-  return array_remove_object(&node->children,child);
+  if( child == array_remove_object(&node->children,child) ){
+    child->parent = NULL;
+  }
+  return child;
 }
 
 BiNode* bi_node_remove_from_parent(BiNode* node)
@@ -104,7 +106,7 @@ void bi_node_set_z(BiNode* n, int z)
 {
   n->z = z;
   if( n->parent ) {
-    ((BiNode*)n->parent)->children_order_cached = false;
+    ((BiNode*)n->parent)->children.order_cached = false;
   }
 }
 
@@ -227,10 +229,10 @@ static inline void update_transform_matrix(BiNode* n)
   GLfloat sin_v = sin(n->angle);
 
   // matrix chain
-  if( n->class==BI_LAYER || n->parent == NULL ){
-    bi_mat4_identity( n->transform_matrix );
-  }else{
+  if( n->parent && n->parent->class == BI_NODE ){
     bi_mat4_copy( n->transform_matrix, ((BiNode*)n->parent)->transform_matrix );
+  }else{
+    bi_mat4_identity( n->transform_matrix );
   }
 
   GLfloat trans[16] = {

@@ -9,36 +9,6 @@
 
 typedef bool (*render_function)(BiContext*, BiNodeBase*, BiFramebuffer*, BiRenderingContext);
 
-static int node_order_compare(const void *_a, const void *_b )
-{
-  const BiNode *a = *(BiNode**)_a;
-  const BiNode *b = *(BiNode**)_b;
-  return a->z == b->z ? a->index - b->index : a->z - b->z;
-}
-
-static void bi_render_node_sort(BiNode* node)
-{
-  if( node->children_order_cached == false ) {
-    for( int i=0; i<node->children.size; i++ ){ bi_node_child_at(node,i)->index = i; }
-    qsort( node->children.objects, node->children.size, sizeof(BiNode*), node_order_compare);
-    node->children_order_cached = true;
-  }
-}
-
-static int layer_order_compare(const void *_a, const void *_b )
-{
-  const BiNodeBase *a = *(BiNodeBase**)_a;
-  const BiNodeBase *b = *(BiNodeBase**)_b;
-  return a->z == b->z ? a->index - b->index : a->z - b->z;
-}
-
-static void layer_sort(BiLayerGroup* layer_group)
-{
-  Array* a = &layer_group->layers;
-  for( int i=0; i<a->size; i++ ){ ((BiNodeBase*)(a->objects[i]))->index = i; }
-  qsort( a->objects, a->size, sizeof(BiNodeBase*), layer_order_compare);
-}
-
 static bool node_has_event_handler(BiNode* n)
 {
   if(n->on_move_cursor != NULL ||
@@ -69,18 +39,16 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   if( context.timer_queue && n->timers.size > 0 ) {
     array_add_object(context.timer_queue, n);
   }
-
-  // skip: invisible, zero-size node, transparent node
+  // nodes ; skip invisible, zero-size and transparent
   if( visible==true && n->visible==true && n->w!=0 && n->h!=0 ) {
     array_add_object(context.rendering_queue,n);
   }
-
   //
   bool matrix_update_require = bi_node_update_matrix(n);
-
   //
   context.visible = visible && n->visible;
-  bi_render_node_sort(n);
+  // sort and queueing
+  array_sort(&n->children);
   for( int i=0; i<n->children.size; i++ ){
     if( bi_node_child_at(n,i)->transform_matrix_cached == true && matrix_update_require ) {
       bi_node_child_at(n,i)->transform_matrix_cached = false;
@@ -105,18 +73,20 @@ void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
 static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRenderingContext* rendering_context)
 {
   BiRenderingContext rc = *rendering_context;
-  BiNode *root = &layer->root;
 
-  rc.time_scale *= root->time_scale;
+  rc.time_scale *= layer->time_scale;
 
   // timer
-  if( rc.timer_queue && root->timers.size > 0 ) {
+  if( rc.timer_queue && layer->timers.size > 0 ) {
     array_add_object(rc.timer_queue, layer);
   }
 
   // queue
   array_clear(rc.rendering_queue);
-  bi_render_queuing(rc, root);
+  array_sort(&layer->children);
+  for(int i=0;i<layer->children.size;i++){
+    bi_render_queuing(rc, (BiNode*)array_object_at(&layer->children,i) );
+  }
   if(rc.rendering_queue->size==0) return;
 
   // shader select
@@ -201,9 +171,9 @@ extern void render_layer_group(BiContext* context,
   }
   // render
   target_and_clear_framebuffer(&lg->framebuffer);
-  layer_sort(lg);
-  for( int i=0; i<lg->layers.size; i++ ) {
-    BiNodeBase* n = lg->layers.objects[i];
+  array_sort(&lg->children);
+  for( int i=0; i<lg->children.size; i++ ) {
+    BiNodeBase* n = array_object_at(&lg->children, i);
     render_function f = NULL;
     if( n->class == BI_LAYER ){
       f = ((BiLayer*)n)->_render_function_;
@@ -218,12 +188,14 @@ extern void render_layer_group(BiContext* context,
   BiFramebuffer *src = &lg->framebuffer;
   BiTexture t;
   bi_texture_init_with_framebuffer(&t,src);
+  BiNode n;
+  bi_node_init(&n);
+  bi_node_set_size( &n, context->w,context->h);
+  bi_node_set_texture(&n, &t, 0,0,t.w,t.h);
+  n.texture_flip_vertical = true;
   BiLayer l;
   bi_layer_init(&l);
-  BiNode *root = &l.root;
-  bi_node_set_size( root, context->w,context->h);
-  bi_node_set_texture(root, &t, 0,0,t.w,t.h);
-  root->texture_flip_vertical = true;
+  bi_layer_add_node(&l,&n);
   l.textures[0] = &t;
   BiRenderingContext rcontext;
   bi_rendering_context_init(&rcontext,true,false,0,
@@ -231,6 +203,8 @@ extern void render_layer_group(BiContext* context,
                             NULL,
                             &context->rendering_queue);
   draw_layer_to_buffer(context,&l,&rcontext);
+  //
+  array_free(&l.children);
 }
 
 void bi_render(BiContext* context)

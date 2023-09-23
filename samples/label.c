@@ -6,7 +6,8 @@ int main(int argc, char* argv[])
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  BiNode* root = &layer->root;
+  BiNode* root = bi_layer_add_node(layer,make_bg("assets/map.png"));
+  layer->textures[1] = root->texture;
   // font
   BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
   layer->textures[0] = font_texture;

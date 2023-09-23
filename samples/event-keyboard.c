@@ -27,8 +27,8 @@ int main(int argc,char* argv[])
   BiFontAtlas *font = load_font();
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));
   bi_add_layer(context,layer);
-  BiNode* root = &layer->root;
   layer->textures[0] = font->texture;
   // labels
   const char* texts[] = {

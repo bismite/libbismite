@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   BiTexture *texture = MAKE_TEXTURE("assets/face01.png");
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = set_texture(&layer->root,"assets/check.png");
+  BiNode* root = bi_layer_add_node(layer,make_bg("assets/check.png"));
   bi_add_layer(context,layer);
   layer->textures[0] = root->texture;
   layer->textures[1] = texture;

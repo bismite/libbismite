@@ -28,3 +28,8 @@ void bi_node_base_init(BiNodeBase* node,BiNodeClass class)
   node->time_scale = 1.0;
   bi_timers_init(&node->timers);
 }
+
+void bi_node_base_deinit(BiNodeBase* node)
+{
+  array_clear(node->children);
+}

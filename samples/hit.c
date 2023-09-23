@@ -31,10 +31,9 @@ int main(int argc,char* argv[])
   BiContext* context = make_context(__FILE__);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = &layer->root;
-  root->color_tint = RGBA32(0x330000ff);
+  BiNode* bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  layer->textures[0] = bg->texture;
   bi_add_layer(context,layer);
-  bi_node_set_size(root,context->w,context->h);
   // hit rect
   for(int x=0;x<5;x++){
     for(int y=0;y<3;y++){
@@ -42,7 +41,7 @@ int main(int argc,char* argv[])
       int yy = 100 + y*60;
       BiNode* node = create_new_node(xx,yy);
       bi_node_set_on_click(node, on_click);
-      bi_node_add_node(root,node);
+      bi_layer_add_node(layer,node);
     }
   }
   // start

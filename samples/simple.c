@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
   context->color = RGBA32(0x330000FF);
   // layer and root node
   BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
-  BiNode* root = &layer->root;
+  BiNode* root = bi_layer_add_node(layer,bi_node_init(malloc(sizeof(BiNode))));
   bi_node_set_position(root,20,20);
   bi_node_set_size(root,200,200);
   root->color_tint = RGBA32(0x003300FF);

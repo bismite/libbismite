@@ -12,11 +12,6 @@ void array_init(Array *a)
   a->order_cached = true;
 }
 
-void array_free(Array *a)
-{
-  free(a->objects);
-}
-
 void* array_add_object(Array* a, void* object)
 {
   a->order_cached = false;
@@ -74,7 +69,8 @@ void* array_remove_object(Array* a, void* object)
 void array_clear(Array* a)
 {
   a->order_cached = true;
-  a->capacity = ARRAY_INITIAL_CAPACITY;
-  a->objects = realloc( a->objects, sizeof(void*) * a->capacity );
+  a->capacity = 0;
+  free(a->objects);
+  a->objects = NULL;
   a->size = 0;
 }

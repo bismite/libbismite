@@ -16,21 +16,17 @@ static BiNode* create_tile(int x, int y,BiTexture *tex)
 int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // texture
   BiTexture *texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
-  // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  set_texture(&layer->root,"assets/map.png");
-  layer->textures[0] = layer->root.texture;
-  layer->textures[1] = texture;
+  layer->textures[0] = texture;
   // tiling
   const int COL = context->w/TILE_SIZE+1;
   const int ROW = context->h/TILE_SIZE+1;
   for(int i=0; i<COL*ROW; i++){
     int x = i % COL * TILE_SIZE;
     int y = i / COL * TILE_SIZE;
-    bi_node_add_node(&layer->root,create_tile(x,y,texture));
+    bi_layer_add_node(layer,create_tile(x,y,texture));
   }
   // start
   bi_start_run_loop(context);

@@ -10,15 +10,14 @@ int main(int argc, char* argv[])
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  BiNode *root = &layer->root;
   layer->textures[0] = face->texture;
   layer->textures[1] = mushroom->texture;
   // texture node
   bi_node_set_position(mushroom,W/2,H/2);
   bi_node_set_position(face,W/2,H/2);
   // face on mushroom
-  bi_node_add_node(root,mushroom);
-  bi_node_add_node(root,face);
+  bi_layer_add_node(layer,mushroom);
+  bi_layer_add_node(layer,face);
   // mushroom on face
   bi_node_set_z(mushroom,1);
   bi_node_set_z(face,0);

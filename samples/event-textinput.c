@@ -19,6 +19,7 @@ int main(int argc,char* argv[])
   BiFontAtlas *font = load_font();
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));
   bi_add_layer(context,layer);
   layer->textures[0] = font->texture;
   // font & labels
@@ -30,10 +31,10 @@ int main(int argc,char* argv[])
     labels[i] = label;
     bi_node_set_scale((BiNode*)label,2,2);
     bi_node_set_position( (BiNode*)label, 10, context->h - 100 - i * 32 );
-    bi_node_add_node(&layer->root,(BiNode*)label);
+    bi_node_add_node(root,(BiNode*)label);
   }
   // set callbacks
-  bi_node_set_on_textinput(&layer->root, on_textinput);
+  bi_node_set_on_textinput(root, on_textinput);
   // start
   bi_start_run_loop(context);
   return 0;

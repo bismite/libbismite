@@ -77,7 +77,7 @@ __attribute__((unused)) static void add_fps_layer(BiContext* context,BiFontAtlas
   BiNode* label = (BiNode*)create_fps_label(context,font);
   bi_node_set_anchor(label,0,1);
   bi_node_set_position(label,0,context->h);
-  bi_node_add_node( &layer->root, label );
+  bi_layer_add_node( layer, label );
   bi_layer_group_add_layer(layer_group,layer);
   bi_layer_group_add_layer_group(&context->layers,layer_group);
 }
@@ -152,8 +152,8 @@ __attribute__((unused)) static BiNode* make_sprite_from_texture(BiTexture* t)
 {
   BiNode* sprite = bi_node_init(malloc(sizeof(BiNode)));
   bi_node_set_size(sprite, t->w, t->h);
-  bi_node_set_anchor(sprite,0.5,0.5);
   bi_node_set_texture(sprite,t,0,0,t->w,t->h);
+  bi_node_set_anchor(sprite,0.5,0.5);
   return sprite;
 }
 
@@ -173,6 +173,13 @@ __attribute__((unused)) static BiNode* make_sprite_with_anchor(const char* name,
 {
   BiNode *n = make_sprite(name);
   bi_node_set_anchor(n,x,y);
+  return n;
+}
+
+__attribute__((unused)) static BiNode* make_bg(const char* name)
+{
+  BiNode *n = make_sprite(name);
+  bi_node_set_anchor(n,0,0);
   return n;
 }
 

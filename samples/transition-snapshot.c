@@ -45,7 +45,7 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
 static BiLayerGroup* make_group_0(BiContext* context)
 {
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* bg = set_texture(&layer->root,"assets/check.png");
+  BiNode* bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
   BiNode* sprite = make_sprite("assets/face01.png");
   bi_node_set_position(sprite,context->w/2,context->h/2);
   bi_node_add_node(bg,sprite);
@@ -61,7 +61,7 @@ static BiLayerGroup* make_group_0(BiContext* context)
 static BiLayerGroup* make_group_1(BiContext* context)
 {
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* bg = set_texture(&layer->root,"assets/map.png");
+  BiNode* bg = bi_layer_add_node(layer,make_bg("assets/map.png"));
   BiNode* sprite = make_sprite("assets/mushroom.png");
   bi_node_set_position(sprite,context->w/2,context->h/2);
   bi_node_add_node(bg,sprite);

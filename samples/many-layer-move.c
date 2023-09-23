@@ -39,7 +39,7 @@ int main(int argc,char* argv[])
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  BiNode* root = &layer->root;
+  BiNode* root = bi_layer_add_node(layer, bi_node_init(ALLOC(BiNode)));
   bi_node_set_scale(root,SCALE,SCALE);
   layer->textures[0] = tex;
   // tiling

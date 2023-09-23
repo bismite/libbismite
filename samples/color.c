@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  BiNode* background = set_texture(&layer->root,"assets/map.png");
+  BiNode* background = bi_layer_add_node(layer,make_bg("assets/map.png"));
   layer->textures[0] = background->texture;
   layer->textures[1] = tex;
 

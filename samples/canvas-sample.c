@@ -32,13 +32,13 @@ int main(int argc, char* argv[])
   // Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  set_texture(&layer->root, "assets/check.png");
-  layer->textures[0] = layer->root.texture;
+  BiNode* n = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  layer->textures[0] = n->texture;
   layer->textures[1] = canvas_texture;
   layer->textures[2] = sprite->texture;
   layer->textures[3] = face->texture;
-  bi_node_add_node(&layer->root, canvas_sprite); // from Canvas
-  bi_node_add_node(&layer->root, sprite); // Original
+  bi_node_add_node(n, canvas_sprite); // from Canvas
+  bi_node_add_node(n, sprite); // Original
 
   bi_start_run_loop(context);
   return 0;

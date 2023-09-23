@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
 #endif
 
   layer = bi_layer_init(ALLOC(BiLayer));
-  set_texture(&layer->root, "assets/check.png");
-  layer->textures[0] = layer->root.texture;
+  BiNode *bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  layer->textures[0] = bg->texture;
   bi_add_layer(context,layer);
 
   bi_start_run_loop(context);

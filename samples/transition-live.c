@@ -20,10 +20,10 @@ static void on_update_rotate(BiTimer* t,double dt)
 
 static BiLayerGroup* make_group_0(BiContext* context)
 {
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* bg = bi_layer_add_node(layer, make_bg("assets/map.png"));
   BiNode* sprite = make_sprite("assets/face01.png");
   bi_node_set_position(sprite,context->w/2,context->h/2);
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* bg = set_texture(&layer->root, "assets/check.png");
   bi_node_add_node(bg,sprite);
   onupdate(sprite,on_update_rotate);
   layer->textures[1] = bg->texture;
@@ -35,10 +35,10 @@ static BiLayerGroup* make_group_0(BiContext* context)
 
 static BiLayerGroup* make_group_1(BiContext* context)
 {
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* bg = bi_layer_add_node(layer, make_bg("assets/check.png"));
   BiNode* sprite = make_sprite("assets/mushroom.png");
   bi_node_set_position(sprite,context->w/2,context->h/2);
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* bg = set_texture(&layer->root,"assets/map.png");
   bi_node_add_node(bg,sprite);
   onupdate(sprite,on_update_rotate);
   layer->textures[1] = bg->texture;
@@ -61,7 +61,8 @@ int main(int argc, char* argv[])
   transition->shader = create_shader_with_default_vertex_shader("assets/shaders/transition-fade.frag");
   transition->textures[0] = bi_texture_init_with_framebuffer(ALLOC(BiTexture),&group_0->framebuffer);
   transition->textures[1] = bi_texture_init_with_framebuffer(ALLOC(BiTexture),&group_1->framebuffer);
-  bi_node_set_size(&transition->root,context->w,context->h);
+  BiNode* root = bi_layer_add_node(transition,bi_node_init(ALLOC(BiNode)));
+  bi_node_set_size(root,context->w,context->h);
   bi_add_layer(context,transition);
   BiTimer *t = bi_timer_init(ALLOC(BiTimer),on_update_transition,0,-1,transition);
   bi_layer_add_timer(transition,t);

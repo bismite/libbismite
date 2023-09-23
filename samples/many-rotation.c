@@ -24,12 +24,12 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  set_texture(&layer->root, "assets/map.png");
-  layer->textures[0] = layer->root.texture;
+  BiNode *root = bi_layer_add_node(layer,make_bg("assets/map.png"));
+  layer->textures[0] = root->texture;
   bi_add_layer(context,layer);
   // nodes
   BiNode* center = bi_node_init(ALLOC(BiNode));
-  bi_node_add_node(&layer->root, center);
+  bi_node_add_node(root, center);
   bi_node_set_position(center, context->w/2, context->h/2 );
   for(uint64_t i=0; i<NUM_OF_NODES ; i++){ bi_node_add_node(center, create_node(context)); }
   onupdate(center,rotate);

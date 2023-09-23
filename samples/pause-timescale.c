@@ -25,7 +25,7 @@ static BiLayerGroup* make_layer_group(BiContext* context, BiLayerGroup* lg, int 
   // layer
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = &layer->root;
+  BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));
   bi_layer_group_add_layer(lg,layer);
   layer->textures[0] = tex;
   // sprite
@@ -53,10 +53,10 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  set_texture(&layer->root,"assets/check.png");
-  bi_node_set_on_click(&layer->root, on_click);
+  BiNode* root = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  bi_node_set_on_click(root, on_click);
   bi_layer_group_add_layer(&context->layers,layer);
-  layer->textures[0] = layer->root.texture;
+  layer->textures[0] = root->texture;
   layer_group_a = make_layer_group(context, ALLOC(BiLayerGroup), 320/3*2);
   layer_group_b = make_layer_group(context, ALLOC(BiLayerGroup), 320/3*1);
   // start

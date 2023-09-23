@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
   // Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  set_texture(&layer->root, "assets/map.png");
-  layer->textures[0] = layer->root.texture;
+  BiNode* root = bi_layer_add_node(layer,make_bg("assets/map.png"));
+  layer->textures[0] = root->texture;
   // straight blending
   bi_set_blend_factor(&layer->blend_factor,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   BiTexture *canvas_texture = bi_canvas_to_texture(canvas,ALLOC(BiTexture));
   bi_node_set_texture(canvas_sprite,canvas_texture,0,0,canvas_texture->w,canvas_texture->h);
   layer->textures[1] = canvas_texture;
-  bi_node_add_node(&layer->root, canvas_sprite);
+  bi_node_add_node(root, canvas_sprite);
 
   bi_start_run_loop(context);
   return 0;

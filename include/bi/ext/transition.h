@@ -10,6 +10,7 @@
 
 typedef struct {
   BiLayer layer;
+  BiNode node;
   BiLayerGroup *group0;
   BiLayerGroup *group1;
   BiTexture group1_framebuffer_texture;

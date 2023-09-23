@@ -5,12 +5,6 @@ int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
 
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  set_texture(&layer->root, "assets/check.png");
-  layer->textures[0] = layer->root.texture;
-
   // Sprite
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_set_anchor(face,0,0);
@@ -39,10 +33,14 @@ int main(int argc, char* argv[])
   bi_node_set_position(canvas_sprite2,32+canvas->w+32,32);
   bi_node_set_texture(canvas_sprite2,canvas_texture,0,0,128,128);
 
-  // add to layer
-  bi_node_add_node(&layer->root, canvas_sprite);
-  bi_node_add_node(&layer->root, canvas_sprite2);
+  // layer
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  BiNode* root = bi_layer_add_node(layer,make_bg("assets/check.png") );
+  bi_node_add_node(root, canvas_sprite);
+  bi_node_add_node(root, canvas_sprite2);
+  layer->textures[0] = root->texture;
   layer->textures[1] = canvas_texture;
+  bi_add_layer(context,layer);
 
   bi_start_run_loop(context);
   return 0;

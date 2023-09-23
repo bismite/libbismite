@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
   // Layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode *root = set_texture(&layer->root,"assets/check.png");
+  BiNode *root = bi_layer_add_node(layer,make_bg("assets/check.png"));
   bi_add_layer(context,layer);
 
   // shade

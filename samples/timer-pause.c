@@ -33,11 +33,10 @@ int main(int argc,char* argv[])
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_add_layer(context,layer);
-  set_texture(&layer->root,"assets/check.png");
-  BiNode* face = make_sprite("assets/face01.png");
+  BiNode* bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  BiNode* face = bi_layer_add_node(layer, make_sprite("assets/face01.png"));
   bi_node_set_position(face,context->w/2,context->h/2);
-  bi_node_add_node(&layer->root,face);
-  layer->textures[0] = layer->root.texture;
+  layer->textures[0] = bg->texture;
   layer->textures[1] = face->texture;
   // rotate
   BiTimer *rotate_timer = bi_timer_init(ALLOC(BiTimer),rotate,10,-1,face);

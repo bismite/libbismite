@@ -29,6 +29,6 @@ struct _BiNodeBase{
 };
 
 extern void bi_node_base_init(BiNodeBase* node,BiNodeClass class);
-extern void bi_node_base_deinit(BiNodeBase* node,BiNodeClass class);
+extern void bi_node_base_deinit(BiNodeBase* node);
 
 #endif

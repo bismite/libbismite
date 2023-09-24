@@ -5,11 +5,18 @@
 
 void array_init(Array *a)
 {
-  a->size = 0;
-  a->capacity = 0;
   a->objects = NULL;
   a->sort = NULL;
+  array_clear(a);
+}
+
+void array_clear(Array* a)
+{
   a->order_cached = true;
+  a->capacity = 0;
+  free(a->objects);
+  a->objects = NULL;
+  a->size = 0;
 }
 
 void* array_add_object(Array* a, void* object)
@@ -64,13 +71,4 @@ void* array_remove_object(Array* a, void* object)
     return NULL;
   }
   return array_remove_object_at(a,index);
-}
-
-void array_clear(Array* a)
-{
-  a->order_cached = true;
-  a->capacity = 0;
-  free(a->objects);
-  a->objects = NULL;
-  a->size = 0;
 }

@@ -5,7 +5,6 @@
 #include <bi/node_base.h>
 #include <bi/array.h>
 #include <bi/framebuffer.h>
-#include <bi/blend_factor.h>
 
 #define BI_LAYER_MAX_TEXTURES 16
 
@@ -18,7 +17,7 @@ typedef struct _BiLayerGroup BiLayerGroup;
 struct _BiLayer {
   BI_NODE_HEADER;
   void* _render_function_;
-  BiLayerBlendFactor blend_factor;
+  BiBlendFactor blend_factor;
   GLfloat camera_x;
   GLfloat camera_y;
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
@@ -28,8 +27,7 @@ struct _BiLayer {
 
 struct _BiLayerGroup {
   BI_NODE_HEADER;
-  void* _render_function_;
-  BiLayerBlendFactor blend_factor;
+  BiBlendFactor blend_factor;
   BiFramebuffer framebuffer;
 };
 

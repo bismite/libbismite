@@ -12,7 +12,7 @@ BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h)
   canvas->w = w;
   canvas->h = h;
   bi_framebuffer_init(&canvas->framebuffer,w,h);
-  bi_set_blend_factor(&canvas->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+  canvas->blend_factor = BI_BLEND_FACTOR_DEFAULT;
   canvas->shader = NULL;
   for(int i=0;i<4;i++) {
     canvas->shader_attributes[i] = 0;

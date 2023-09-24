@@ -4,7 +4,6 @@
 #include <bi/bi_gl.h>
 #include <stdbool.h>
 #include <bi/framebuffer.h>
-#include <bi/blend_factor.h>
 #include <bi/layer.h>
 
 typedef struct _BiNode BiNode;
@@ -15,7 +14,7 @@ typedef struct _BiCanvas {
   int w;
   int h;
   BiFramebuffer framebuffer;
-  BiLayerBlendFactor blend_factor;
+  BiBlendFactor blend_factor;
   BiShader *shader;
   GLfloat shader_attributes[4];
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];

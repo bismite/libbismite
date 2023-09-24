@@ -1,16 +1,37 @@
-#ifndef __BI_CORE_GL_H__
-#define __BI_CORE_GL_H__
+#ifndef __BISMITE_GL_H__
+#define __BISMITE_GL_H__
 
 #if defined(__EMSCRIPTEN__)
 #include <GLES3/gl3.h>
-
 #elif defined(__APPLE__)
 #include <OpenGL/gl3.h>
-
-#else // !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+#else
 #include <GL/gl.h>
 #include <GL/glext.h>
+#define GL_FUNCTION_LOAD_REQUIRE 1
+#endif
 
+//
+// Blend Factor
+//
+typedef struct  {
+  GLenum src;
+  GLenum dst;
+  GLenum alpha_src;
+  GLenum alpha_dst;
+} BiBlendFactor;
+
+#define BI_BLEND_FACTOR_DEFAULT (BiBlendFactor){GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA}
+#define BI_BLEND_FACTOR_ADDTIVE (BiBlendFactor){GL_SRC_ALPHA,GL_ONE,GL_SRC_ALPHA,GL_ONE}
+
+static inline BiBlendFactor bi_blend_factor(GLenum src, GLenum dst, GLenum alpha_src, GLenum alpha_dst ) {
+  return (BiBlendFactor){src,dst,alpha_src,alpha_dst};
+}
+
+//
+// Functions
+//
+#ifdef GL_FUNCTION_LOAD_REQUIRE
 #if defined(__MINGW32__)
 // GL_VERSION_1_3
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
@@ -57,6 +78,6 @@ extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
 // GL_VERSION_3_3
 extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 
-#endif // !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+#endif // GL_FUNCTION_LOAD_REQUIRE
 
-#endif // __BI_CORE_GL_H__
+#endif // __BISMITE_GL_H__

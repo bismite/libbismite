@@ -147,12 +147,38 @@ extern void render_postprocess(BiContext* context,
 
 extern void render_layer(BiContext* context,
                          BiNodeBase *n,
-                         BiFramebuffer *fb,
+                         BiFramebuffer *dst,
                          BiRenderingContext rc
                         )
 {
   BiLayer* layer = (BiLayer*)n;
   draw_layer_to_buffer( context, layer, &rc );
+}
+
+static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLuint dst)
+{
+  BiFramebuffer *src = &lg->framebuffer;
+  BiTexture t;
+  bi_texture_init_with_framebuffer(&t,src);
+  BiNode n;
+  bi_node_init(&n);
+  bi_node_set_size( &n, context->w,context->h);
+  bi_node_set_texture(&n, &t, 0,0,t.w,t.h);
+  n.texture_flip_vertical = true;
+  BiLayer l;
+  bi_layer_init(&l);
+  bi_layer_add_node(&l,&n);
+  l.textures[0] = &t;
+  BiRenderingContext rcontext;
+  bi_rendering_context_init(&rcontext,true,false,0,
+                            NULL,
+                            NULL,
+                            &context->rendering_queue);
+  // draw
+  glBindFramebuffer(GL_FRAMEBUFFER, dst);
+  draw_layer_to_buffer(context,&l,&rcontext);
+  // dealloc node array
+  bi_node_base_deinit((BiNodeBase*)&l);
 }
 
 extern void render_layer_group(BiContext* context,
@@ -174,37 +200,14 @@ extern void render_layer_group(BiContext* context,
   array_sort(&lg->children);
   for( int i=0; i<lg->children.size; i++ ) {
     BiNodeBase* n = array_object_at(&lg->children, i);
-    render_function f = NULL;
     if( n->class == BI_LAYER ){
-      f = ((BiLayer*)n)->_render_function_;
+      render_function f = ((BiLayer*)n)->_render_function_;
+      f( context, n, &lg->framebuffer, rc );
+    }else{
+      render_layer_group(context,n,&lg->framebuffer,rc);
     }
-    if( n->class == BI_LAYER_GROUP ){
-      f = ((BiLayerGroup*)n)->_render_function_;
-    }
-    f( context, n, &lg->framebuffer, rc );
   }
-  // draw LayerGroup
-  glBindFramebuffer(GL_FRAMEBUFFER, dst ? dst->framebuffer_id : 0 );
-  BiFramebuffer *src = &lg->framebuffer;
-  BiTexture t;
-  bi_texture_init_with_framebuffer(&t,src);
-  BiNode n;
-  bi_node_init(&n);
-  bi_node_set_size( &n, context->w,context->h);
-  bi_node_set_texture(&n, &t, 0,0,t.w,t.h);
-  n.texture_flip_vertical = true;
-  BiLayer l;
-  bi_layer_init(&l);
-  bi_layer_add_node(&l,&n);
-  l.textures[0] = &t;
-  BiRenderingContext rcontext;
-  bi_rendering_context_init(&rcontext,true,false,0,
-                            NULL,
-                            NULL,
-                            &context->rendering_queue);
-  draw_layer_to_buffer(context,&l,&rcontext);
-  //
-  array_free(&l.children);
+  draw_layer_group_to_buffer(context, lg, dst ? dst->framebuffer_id : 0 );
 }
 
 void bi_render(BiContext* context)
@@ -215,21 +218,16 @@ void bi_render(BiContext* context)
                context->color.b/255.f,
                context->color.a/255.f );
   glClear(GL_COLOR_BUFFER_BIT);
-
   // reset stats
   context->profile.matrix_updated = 0;
   context->profile.rendering_nodes_queue_size = 0;
-
   // rendering
   BiRenderingContext rendering_context;
   bi_rendering_context_init(&rendering_context,true,true,1.0,
                             &context->interaction_queue,
                             &context->timer_queue,
                             &context->rendering_queue);
-
-  render_function f = context->layers._render_function_;
-  f(context,(BiNodeBase*)&context->layers,NULL,rendering_context);
-
+  render_layer_group( context, (BiNodeBase*)&context->layers, NULL, rendering_context );
   //
   SDL_GL_SwapWindow(context->window);
 }

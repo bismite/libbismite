@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   layer->textures[0] = root->texture;
   layer->textures[1] = ball_texture;
   // additive blending
-  bi_set_blend_factor(&layer->blend_factor,GL_SRC_ALPHA,GL_ONE,GL_SRC_ALPHA,GL_ONE);
+  layer->blend_factor = BI_BLEND_FACTOR_ADDTIVE;
   // particles
   for(uint64_t i=0; i< NUM_OF_NODES ; i++){
     bi_node_add_node(root, create_particle(context,ball_texture));

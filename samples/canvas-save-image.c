@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   BiCanvas* canvas = bi_canvas_init(ALLOC(BiCanvas),128,128);
   canvas->shader = &context->default_shader;
   canvas->textures[0] = tex;
-  bi_set_blend_factor(&canvas->blend_factor,GL_ONE,GL_ZERO,GL_ONE,GL_ZERO);
+  canvas->blend_factor = bi_blend_factor(GL_ONE,GL_ZERO,GL_ONE,GL_ZERO);
   // draw
   bi_canvas_clear(canvas,0,0,0,0);
   bi_canvas_draw(canvas,sprite);
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   BiNode* root = bi_layer_add_node(layer,make_bg("assets/map.png"));
   layer->textures[0] = root->texture;
   // straight blending
-  bi_set_blend_factor(&layer->blend_factor,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  layer->blend_factor = BI_BLEND_FACTOR_ADDTIVE;
 
   // Sprite from Canvas
   BiNode *canvas_sprite = bi_node_init(ALLOC(BiNode));

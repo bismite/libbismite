@@ -7,11 +7,6 @@ extern void render_postprocess(BiContext* context,
                                BiFramebuffer* fb,
                                BiRenderingContext rc
                              );
-extern void render_layer_group(BiContext* context,
-                               BiNodeBase *layer_group,
-                               BiFramebuffer* fb,
-                               BiRenderingContext rc
-                             );
 extern void render_layer(BiContext* context,
                          BiNodeBase *layer,
                          BiFramebuffer *fb,
@@ -25,9 +20,7 @@ extern void render_layer(BiContext* context,
 BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
 {
   bi_node_base_init((BiNodeBase*)layer_group,BI_LAYER_GROUP);
-  layer_group->_render_function_ = render_layer_group;
-  bi_set_blend_factor(&layer_group->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
-
+  layer_group->blend_factor = BI_BLEND_FACTOR_DEFAULT;
   GLint dims[4] = {0};
   glGetIntegerv(GL_VIEWPORT, dims);
   bi_framebuffer_init(&layer_group->framebuffer,dims[2],dims[3]);
@@ -84,7 +77,7 @@ BiLayer* bi_layer_init(BiLayer* layer)
 {
   bi_node_base_init( (BiNodeBase*)layer, BI_LAYER );
   layer->_render_function_ = render_layer;
-  bi_set_blend_factor(&layer->blend_factor,GL_ONE,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+  layer->blend_factor = BI_BLEND_FACTOR_DEFAULT;
 
   layer->camera_x = 0;
   layer->camera_y = 0;

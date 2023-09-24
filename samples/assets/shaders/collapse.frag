@@ -44,7 +44,7 @@ void main()
   float erase_h = _node_extra_data[0][0];
   float gap = 0.1;
   float margined_y = erase_h + gap;
-  if( erase_h > 0 ) {
+  if( erase_h > 0.0 ) {
     if( y_in_local < erase_h ){
       discard;
       return;

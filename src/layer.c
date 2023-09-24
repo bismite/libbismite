@@ -4,15 +4,14 @@
 
 extern void render_postprocess(BiContext* context,
                                BiNodeBase *layer,
-                               BiFramebuffer* fb,
+                               BiFramebuffer* dst,
                                BiRenderingContext rc
                              );
 extern void render_layer(BiContext* context,
                          BiNodeBase *layer,
-                         BiFramebuffer *fb,
+                         BiFramebuffer *dst,
                          BiRenderingContext rc
                        );
-
 //
 // Layer Group
 //

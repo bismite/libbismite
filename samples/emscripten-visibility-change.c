@@ -1,7 +1,7 @@
 #include "common.h"
 #include <bi/ext/action.h>
 
-BiLayer *layer=NULL;
+BiNode *background=NULL;
 
 #ifdef EMSCRIPTEN
 #include <emscripten/html5.h>
@@ -10,7 +10,9 @@ EM_BOOL visibilitychange_callback(int eventType,
                                   void *userData)
 {
   printf("visibilitychange_callback\n");
-  if(layer) bi_set_color(layer->root->color_tint, 0xff,0,0xff,64);
+  if(background) {
+    background->color_tint = RGBA32(0xff00ff99);
+  }
   return EM_TRUE;
 }
 #endif
@@ -23,9 +25,9 @@ int main(int argc, char* argv[])
   emscripten_set_visibilitychange_callback(context,true,visibilitychange_callback);
 #endif
 
-  layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode *bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  layer->textures[0] = bg->texture;
+  BiLayer* layer = bi_layer_init(ALLOC(BiLayer));
+  background = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  layer->textures[0] = background->texture;
   bi_add_layer(context,layer);
 
   bi_start_run_loop(context);

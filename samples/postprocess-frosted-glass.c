@@ -1,9 +1,6 @@
 #include "common.h"
 #include "bi/canvas.h"
 
-#define W 480
-#define H 320
-
 BiNode* glasses;
 BiNode* glass_a;
 BiNode* glass_b;

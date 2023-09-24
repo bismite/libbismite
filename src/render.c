@@ -7,7 +7,7 @@
 #include <bi/bi_gl.h>
 #include "matrix/matrix.h"
 
-typedef bool (*render_function)(BiContext*, BiNodeBase*, BiFramebuffer*, BiRenderingContext);
+typedef void (*render_function)(BiContext*, BiNodeBase*, BiFramebuffer*, BiRenderingContext);
 
 static bool node_has_event_handler(BiNode* n)
 {
@@ -73,14 +73,11 @@ void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
 static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRenderingContext* rendering_context)
 {
   BiRenderingContext rc = *rendering_context;
-
-  rc.time_scale *= layer->time_scale;
-
   // timer
+  rc.time_scale *= layer->time_scale;
   if( rc.timer_queue && layer->timers.size > 0 ) {
     array_add_object(rc.timer_queue, layer);
   }
-
   // queue
   array_clear(rc.rendering_queue);
   array_sort(&layer->children);
@@ -88,26 +85,21 @@ static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRendering
     bi_render_queuing(rc, (BiNode*)array_object_at(&layer->children,i) );
   }
   if(rc.rendering_queue->size==0) return;
-
   // shader select
   BiShader* shader = layer->shader ? layer->shader : &context->default_shader;
   glUseProgram(shader->program_id);
-
   // uniforms
   double time = (context->program_start_at - context->frame_start_at)/1000.0;
   int drawable_w,drawable_h;
   SDL_GL_GetDrawableSize(context->window, &drawable_w, &drawable_h);
   float scale = (float)drawable_h / context->h;
   bi_shader_set_uniforms(shader,time,context->w,context->h,scale,layer->shader_extra_data);
-
   // textures
   bi_render_activate_textures(layer->textures);
-
   // set projection and view
   GLfloat camera[16];
   bi_camera_matrix(camera,layer->camera_x,layer->camera_y,context->w,context->h,false);
   glUniformMatrix4fv(shader->uniform.camera, 1, GL_FALSE, camera);
-
   // blend function
   glBlendFuncSeparate(
     layer->blend_factor.src,
@@ -115,7 +107,6 @@ static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRendering
     layer->blend_factor.alpha_src,
     layer->blend_factor.alpha_dst
   );
-
   bi_shader_draw(shader,rc.rendering_queue);
 }
 
@@ -146,13 +137,12 @@ extern void render_postprocess(BiContext* context,
 }
 
 extern void render_layer(BiContext* context,
-                         BiNodeBase *n,
+                         BiNodeBase *layer,
                          BiFramebuffer *dst,
                          BiRenderingContext rc
                         )
 {
-  BiLayer* layer = (BiLayer*)n;
-  draw_layer_to_buffer( context, layer, &rc );
+  draw_layer_to_buffer( context, (BiLayer*)layer, &rc );
 }
 
 static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLuint dst)

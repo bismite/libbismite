@@ -20,6 +20,7 @@ static void node_sort(Array* a)
 void bi_node_base_init(BiNodeBase* node,BiNodeClass class)
 {
   node->class = class;
+  node->parent = NULL;
   array_init(&node->children);
   node->children.sort = node_sort;
   node->z = 0;

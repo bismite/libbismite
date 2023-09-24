@@ -1,4 +1,5 @@
 #include "common.h"
+#include <math.h>
 
 #define COLOR_MAX 18
 

@@ -1,4 +1,5 @@
 #include "common.h"
+#include <math.h>
 
 #define TILE_SIZE 64
 #define MAP_SIZE 64

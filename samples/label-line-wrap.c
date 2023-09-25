@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
   // font
   BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
-  BiFontAtlas *font = load_font_atlas("assets/font14.dat", font_texture);
+  BiFont *font = load_font("assets/font14.dat", font_texture);
   layer->textures[0] = font_texture;
 
   // txt

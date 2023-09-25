@@ -14,7 +14,7 @@ static BiGlyphNode* make_glyph_node()
   return n;
 }
 
-static bool __bi_font_init__(SDL_RWops* rwops, BiFontAtlas* font)
+static bool __bi_font_init__(SDL_RWops* rwops, BiFont* font)
 {
   font->pool = NULL;
   for(int i=0;i<0x100;i++) { font->table[i] = NULL; }
@@ -52,7 +52,7 @@ static bool __bi_font_init__(SDL_RWops* rwops, BiFontAtlas* font)
   return true;
 }
 
-BiFontAtlas* bi_font_init(BiFontAtlas* font, const char *buffer, int size)
+BiFont* bi_font_init(BiFont* font, const char *buffer, int size)
 {
   SDL_RWops *rwops = SDL_RWFromConstMem(buffer,size);
   __bi_font_init__(rwops,font);
@@ -60,7 +60,7 @@ BiFontAtlas* bi_font_init(BiFontAtlas* font, const char *buffer, int size)
   return font;
 }
 
-BiFontAtlas* bi_font_init_with_file(BiFontAtlas* font, const char *filename)
+BiFont* bi_font_init_with_file(BiFont* font, const char *filename)
 {
   SDL_RWops *rwops = SDL_RWFromFile(filename,"rb");
   __bi_font_init__(rwops,font);
@@ -68,7 +68,7 @@ BiFontAtlas* bi_font_init_with_file(BiFontAtlas* font, const char *filename)
   return font;
 }
 
-BiGlyphLayout* bi_font_get_glyph_layout(const BiFontAtlas* font,uint32_t codepoint)
+BiGlyphLayout* bi_font_get_glyph_layout(const BiFont* font,uint32_t codepoint)
 {
   // uint8_t d = cp>>24 & 0xff;
   uint8_t c = codepoint>>16 & 0xff;
@@ -79,7 +79,7 @@ BiGlyphLayout* bi_font_get_glyph_layout(const BiFontAtlas* font,uint32_t codepoi
   return font->table[c]->nodes[b]->layouts[a];
 }
 
-int bi_font_line_x_to_index(const BiFontAtlas* font, const char* text, int x)
+int bi_font_line_x_to_index(const BiFont* font, const char* text, int x)
 {
   size_t textlen = strlen(text);
   int cursor = 0;
@@ -98,7 +98,7 @@ int bi_font_line_x_to_index(const BiFontAtlas* font, const char* text, int x)
   return count;
 }
 
-void bi_font_get_label_size(const BiFontAtlas* font, const char* text, int *w, int *h)
+void bi_font_get_label_size(const BiFont* font, const char* text, int *w, int *h)
 {
   size_t textlen = strlen(text);
   int x = 0;

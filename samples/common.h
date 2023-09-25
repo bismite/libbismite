@@ -22,6 +22,16 @@ EM_JS_DEPS(sdl_deps, "$autoResumeAudioContext,$dynCall");
 #define ALLOC(x) malloc(sizeof(x))
 
 //
+// Font
+//
+__attribute__((unused)) static BiFont* load_font(const char* name, BiTexture *font_texture)
+{
+  BiFont *font = bi_font_init_with_file(ALLOC(BiFont),name);
+  font->texture = font_texture;
+  return font;
+}
+
+//
 // FPS Layer
 //
 typedef struct {
@@ -40,18 +50,11 @@ static void label_fps_indicate(BiTimer* timer,double dt)
   bi_label_set_text(label, text);
 }
 
-__attribute__((unused)) static BiFontAtlas* load_font()
+static BiLabel* create_fps_label(BiContext* context)
 {
-  // texture
+  // Font
   BiTexture *font_texture = bi_texture_init_with_filename(malloc(sizeof(BiTexture)),"assets/font.png",false);
-  // layout
-  BiFontAtlas *font = bi_font_init_with_file(malloc(sizeof(BiFontAtlas)),"assets/font12.dat");
-  font->texture = font_texture;
-  return font;
-}
-
-static BiLabel* create_fps_label(BiContext* context, BiFontAtlas *font)
-{
+  BiFont *font = load_font("assets/font12.dat",font_texture);
   // label
   BiLabel* label = bi_label_init(malloc(sizeof(BiLabel)),font);
   bi_label_set_background_color(label, RGBA(0,0,0,128));
@@ -65,19 +68,19 @@ static BiLabel* create_fps_label(BiContext* context, BiFontAtlas *font)
   return label;
 }
 
-__attribute__((unused)) static void add_fps_layer(BiContext* context,BiFontAtlas *font)
+__attribute__((unused)) static void add_fps_layer(BiContext* context)
 {
+  // label
+  BiLabel* label = create_fps_label(context);
+  bi_node_set_anchor((BiNode*)label,0,1);
+  bi_node_set_position((BiNode*)label,0,context->h);
+  // layer
+  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
+  bi_layer_add_node( layer, (BiNode*)label );
+  layer->textures[0] = label->font->texture;;
   // Layer Group
   BiLayerGroup* layer_group = bi_layer_group_init(malloc(sizeof(BiLayerGroup)));
   layer_group->z = 0xff;
-  // layer
-  BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
-  layer->textures[0] = font->texture;;
-  // label
-  BiNode* label = (BiNode*)create_fps_label(context,font);
-  bi_node_set_anchor(label,0,1);
-  bi_node_set_position(label,0,context->h);
-  bi_layer_add_node( layer, label );
   bi_layer_group_add_layer(layer_group,layer);
   bi_layer_group_add_layer_group(&context->layers,layer_group);
 }
@@ -85,13 +88,6 @@ __attribute__((unused)) static void add_fps_layer(BiContext* context,BiFontAtlas
 //
 // Utilities
 //
-
-__attribute__((unused)) static BiFontAtlas* load_font_atlas(const char* name, BiTexture *font_texture)
-{
-  BiFontAtlas *font = bi_font_init_with_file(ALLOC(BiFontAtlas),name);
-  font->texture = font_texture;
-  return font;
-}
 
 __attribute__((unused)) static BiTimer* onupdate(BiNode* n,timer_callback func)
 {
@@ -233,6 +229,6 @@ __attribute__((unused)) static BiContext* make_context(const char* name)
   srand( bi_get_now() );
   BiContext* context = bi_init_context(ALLOC(BiContext),W,H,0,false,name);
   print_info(context);
-  add_fps_layer(context,load_font());
+  add_fps_layer(context);
   return context;
 }

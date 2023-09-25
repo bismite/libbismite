@@ -42,7 +42,7 @@ struct _BiShader {
 };
 
 extern void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source);
-extern void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float* attributes);
+extern void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float extra_data[16]);
 extern void bi_shader_draw(BiShader* shader,Array* queue);
 
 #endif

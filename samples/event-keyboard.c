@@ -24,7 +24,8 @@ int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
   // Font
-  BiFontAtlas *font = load_font();
+  BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
+  BiFont *font = load_font("assets/font12.dat",font_texture);
   // layer
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));

@@ -16,7 +16,7 @@ typedef struct _BiCanvas {
   BiFramebuffer framebuffer;
   BiBlendFactor blend_factor;
   BiShader *shader;
-  GLfloat shader_attributes[4];
+  GLfloat shader_extra_data[16];
   BiTexture* textures[BI_LAYER_MAX_TEXTURES];
 } BiCanvas;
 

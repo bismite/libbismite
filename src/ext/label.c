@@ -21,7 +21,7 @@ static inline BiNode* get_holder_node(BiLabel* label)
   return holder;
 }
 
-BiLabel* bi_label_init(BiLabel* label, BiFontAtlas* font)
+BiLabel* bi_label_init(BiLabel* label, BiFont* font)
 {
   bi_node_init((BiNode*)label);
   label->font = font;
@@ -31,10 +31,25 @@ BiLabel* bi_label_init(BiLabel* label, BiFontAtlas* font)
   return label;
 }
 
+void bi_label_deinit(BiLabel* label)
+{
+  BiNode* holder = get_holder_node(label);
+  BiNode* n;
+  for(int i=0; i<holder->children.size;i++) {
+    n = bi_node_child_at(holder,i);
+    bi_node_base_deinit((BiNodeBase*)n);
+    free(n);
+  }
+  bi_node_base_deinit((BiNodeBase*)holder);
+  free(holder);
+  bi_node_base_deinit((BiNodeBase*)label);
+  label->font = NULL;
+}
+
 BiLabel* bi_label_set_text(BiLabel* label, const char* text)
 {
   BiNode *node = (BiNode*)label;
-  BiFontAtlas *font = label->font;
+  BiFont *font = label->font;
   // text
   size_t textlen = strlen(text);
   int x = 0;

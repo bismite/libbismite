@@ -14,8 +14,8 @@ BiCanvas* bi_canvas_init(BiCanvas* canvas,int w,int h)
   bi_framebuffer_init(&canvas->framebuffer,w,h);
   canvas->blend_factor = BI_BLEND_FACTOR_DEFAULT;
   canvas->shader = NULL;
-  for(int i=0;i<4;i++) {
-    canvas->shader_attributes[i] = 0;
+  for(int i=0;i<16;i++) {
+    canvas->shader_extra_data[i] = 0;
   }
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     canvas->textures[i] = NULL;
@@ -60,7 +60,7 @@ void bi_canvas_draw(BiCanvas* canvas,BiNode* node)
   BiShader* shader = canvas->shader;
   glUseProgram(shader->program_id);
   // uniforms
-  bi_shader_set_uniforms(shader,0,canvas->w,canvas->h,1.0,canvas->shader_attributes);
+  bi_shader_set_uniforms(shader,0,canvas->w,canvas->h,1.0,canvas->shader_extra_data);
   // Textures
   bi_render_activate_textures(canvas->textures);
   // set projection and view

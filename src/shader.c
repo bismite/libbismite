@@ -151,12 +151,12 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glBindVertexArray(0);
 }
 
-void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float* attributes)
+void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float extra_data[16])
 {
   glUniform1f( shader->uniform.time, time);
   glUniform2f( shader->uniform.resolution, w, h );
   glUniform1f( shader->uniform.scale, scale );
-  glUniformMatrix4fv(shader->uniform.layer_extra_data, 1, GL_FALSE, attributes );
+  glUniformMatrix4fv(shader->uniform.layer_extra_data, 1, GL_FALSE, extra_data );
 }
 
 void bi_shader_draw(BiShader* shader,Array* queue)

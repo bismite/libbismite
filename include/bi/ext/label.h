@@ -7,14 +7,15 @@
 
 typedef struct BiLabel{
   BiNode node;
-  BiFontAtlas* font;
+  BiFont* font;
   // colors
   BiColor _background;
   BiColor _modulate;
   BiColor _tint;
 } BiLabel;
 
-extern BiLabel* bi_label_init(BiLabel* label, BiFontAtlas* font);
+extern BiLabel* bi_label_init(BiLabel* label, BiFont* font);
+extern void bi_label_deinit(BiLabel* label);
 extern BiLabel* bi_label_set_text(BiLabel* label, const char* text);
 extern BiLabel* bi_label_set_tint_color(BiLabel* label, BiColor color );
 extern BiLabel* bi_label_set_modulate_color(BiLabel* label, BiColor color );

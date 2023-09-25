@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     "assets/font12.dat", "assets/font12b.dat", "assets/font14.dat", "assets/font14b.dat"
   };
   for(int i=0; i<4; i++){
-    BiFontAtlas* f = load_font_atlas( fonts[i], font_texture );
+    BiFont* f = load_font( fonts[i], font_texture );
     BiLabel* label = bi_label_init(ALLOC(BiLabel), f);
     bi_label_set_background_color(label,RGBA(0xff,0,0,64));
     bi_node_set_anchor((BiNode*)label,0,0);

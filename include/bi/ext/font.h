@@ -43,11 +43,11 @@ typedef struct {
   int font_size;
   int base_line;
   BiGlyphLayout *pool;
-} BiFontAtlas;
+} BiFont;
 
-extern BiFontAtlas* bi_font_init(BiFontAtlas* font, const char *buffer, int size);
-extern BiFontAtlas* bi_font_init_with_file(BiFontAtlas* font, const char *filename);
-extern int bi_font_line_x_to_index(const BiFontAtlas* font, const char* text, int x);
-extern BiGlyphLayout* bi_font_get_glyph_layout(const BiFontAtlas* font,uint32_t codepoint);
+extern BiFont* bi_font_init(BiFont* font, const char *buffer, int size);
+extern BiFont* bi_font_init_with_file(BiFont* font, const char *filename);
+extern int bi_font_line_x_to_index(const BiFont* font, const char* text, int x);
+extern BiGlyphLayout* bi_font_get_glyph_layout(const BiFont* font,uint32_t codepoint);
 
 #endif

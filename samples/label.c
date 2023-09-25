@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
   int offset_y = 10;
   int line=18;
   for(int i=0; i<4; i++){
-    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font_atlas(fonts[i],font_texture) );
+    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
     bi_label_set_background_color( label, RGBA(0xff,0xff,0xff,0xff) );
     bi_label_set_modulate_color(label, RGBA(0,0,0,0xff) );
     bi_label_set_text(label, "The quick brown fox jumps over the lazy dog" );
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     bi_node_add_node(root,(BiNode*)label);
   }
   for(int i=0; i<4; i++){
-    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font_atlas(fonts[i],font_texture) );
+    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
     bi_label_set_background_color( label, RGBA(0,0xff,0,0xff) );
     bi_label_set_modulate_color(label, RGBA(0x64,0x64,0x64,0xFF) );
     bi_label_set_text(label, "いろはにほへと　ちりぬるを　わかよたれそ　つねならむ" );
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     bi_node_add_node(root,(BiNode*)label);
   }
   for(int i=0; i<4; i++){
-    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font_atlas(fonts[i],font_texture) );
+    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
     bi_label_set_background_color( label, RGBA(32,32,32,0xff) );
     bi_label_set_tint_color(label, RGBA(0,0xff,0xff,0xFF) );
     bi_label_set_text(label, "カタカナと、Alphabetと、ひらがな。" );
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     bi_node_add_node(root,(BiNode*)label);
   }
   for(int i=0; i<4; i++){
-    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font_atlas(fonts[i],font_texture) );
+    BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
     bi_label_set_background_color( label, RGBA(0x33,0,0,0xff) );
     bi_label_set_tint_color(label, RGBA(0xff,0,0xff,0xFF) );
     bi_label_set_text(label, "0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" );

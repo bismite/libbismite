@@ -12,7 +12,7 @@ static void layer_camera_position(BiLayer*l, float angle)
   l->camera_y = r - 320/2 + r*sin(angle);
 }
 
-static void lookaround(BiTimer* timer,double dt)
+static void lookaround(BiContext* ctx,BiTimer* timer,double dt)
 {
   BiLayer* layer = timer->userdata;
   static float angle = 0;

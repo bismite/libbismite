@@ -26,7 +26,7 @@ void bi_action_start(BiAction *action)
   action->start(action);
 }
 
-static void do_actions(BiTimer* timer,double delta_time)
+static void do_actions(BiContext* context,BiTimer* timer,double delta_time)
 {
   BiAction* a = timer->userdata;
 

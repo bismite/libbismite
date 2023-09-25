@@ -5,7 +5,7 @@
 BiLayerGroup *group_a;
 BiLayerGroup *group_b;
 
-static void on_update_transition(BiTimer* t,double dt)
+static void on_update_transition(BiContext* ctx,BiTimer* t,double dt)
 {
   BiLayer *transition_layer = t->userdata;
   transition_layer->shader_extra_data[0] += dt * TRANSITION_SPEED
@@ -15,7 +15,7 @@ static void on_update_transition(BiTimer* t,double dt)
   }
 }
 
-static void on_update_rotate(BiTimer* t,double dt)
+static void on_update_rotate(BiContext* ctx,BiTimer* t,double dt)
 {
   BiNode* n = t->userdata;
   bi_node_set_angle(n,n->angle+dt*0.01);

@@ -34,17 +34,10 @@ __attribute__((unused)) static BiFont* load_font(const char* name, BiTexture *fo
 //
 // FPS Layer
 //
-typedef struct {
-  BiContext* context;
-  BiNode *node;
-} FPSCallbackData;
 
-static void label_fps_indicate(BiTimer* timer,double dt)
+static void label_fps_indicate(BiContext* context,BiTimer* timer,double dt)
 {
-  FPSCallbackData* dat = timer->userdata;
-  BiNode *node = dat->node;
-  BiLabel *label = (BiLabel*)node;
-  BiContext *context = dat->context;
+  BiLabel *label = timer->userdata;
   char text[1024];
   snprintf(text,1024,"FPS:%.2f", context->profile.stats.fps );
   bi_label_set_text(label, text);
@@ -60,10 +53,7 @@ static BiLabel* create_fps_label(BiContext* context)
   bi_label_set_background_color(label, RGBA(0,0,0,128));
   bi_label_set_text(label, "FPS:00.00");
   // timer
-  FPSCallbackData *dat = malloc(sizeof(FPSCallbackData));
-  dat->context = context;
-  dat->node = (BiNode*)label;
-  BiTimer *timer = bi_timer_init(malloc(sizeof(BiTimer)), label_fps_indicate, 100, -1, dat);
+  BiTimer *timer = bi_timer_init(malloc(sizeof(BiTimer)), label_fps_indicate, 100, -1, label);
   bi_node_add_timer((BiNode*)label,timer);
   return label;
 }

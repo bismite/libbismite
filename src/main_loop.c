@@ -90,7 +90,7 @@ static void __run_timers__(BiContext* context,BiNodeBase* node,double delta_time
     if(t->wait < 0) {
       t->count -= 1;
       t->wait = t->interval;
-      t->callback(t,delta_time);
+      t->callback(context,t,delta_time);
     }
   }
 

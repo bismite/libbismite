@@ -4,7 +4,7 @@
 BiLayerGroup* layer_group_a;
 BiLayerGroup* layer_group_b;
 
-static void rotate_on_timer(BiTimer* timer,double dt)
+static void rotate_on_timer(BiContext* ctx,BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
   bi_node_set_angle(node, node->angle + 2.0*M_PI/180.0);

@@ -1,7 +1,7 @@
 #include "common.h"
 #include <stdlib.h>
 
-static void spin(BiTimer* t,double dt)
+static void spin(BiContext* ctx,BiTimer* t,double dt)
 {
   BiNode *node = t->userdata;
   bi_node_set_angle(node, node->angle + 0.01);

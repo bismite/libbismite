@@ -2,7 +2,7 @@
 
 #define TRANSITION_SPEED 0.002;
 
-static void on_update_transition(BiTimer* t,double dt)
+static void on_update_transition(BiContext* ctx,BiTimer* t,double dt)
 {
   static double time = 0.0;
   time += dt * TRANSITION_SPEED;
@@ -12,7 +12,7 @@ static void on_update_transition(BiTimer* t,double dt)
   if( transition->shader_extra_data[0] > 1.0 ) transition->shader_extra_data[0] = 1.0;
 }
 
-static void on_update_rotate(BiTimer* t,double dt)
+static void on_update_rotate(BiContext* ctx,BiTimer* t,double dt)
 {
   BiNode* n = t->userdata;
   bi_node_set_angle(n,n->angle+dt*0.01);

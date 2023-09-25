@@ -30,7 +30,7 @@ void hsv_to_rgb(double h, double s, double v, uint8_t *r, uint8_t *g, uint8_t *b
   *r = (uint8_t)(rr*0xff); *g = (uint8_t)(gg*0xff); *b =(uint8_t)(bb*0xff) ;
 }
 
-static void magick_color_half_tint(BiTimer* t,double dt)
+static void magick_color_half_tint(BiContext* ctx,BiTimer* t,double dt)
 {
   static double h=0;
   uint8_t r=0,g=0,b=0;
@@ -41,7 +41,7 @@ static void magick_color_half_tint(BiTimer* t,double dt)
   node->color_tint = RGBA(r,g,b,128);
 }
 
-static void magick_color_modulate(BiTimer* t,double dt)
+static void magick_color_modulate(BiContext* ctx,BiTimer* t,double dt)
 {
   static double h=0;
   uint8_t r=0,g=0,b=0;
@@ -52,7 +52,7 @@ static void magick_color_modulate(BiTimer* t,double dt)
   node->color_modulate = RGBA(r,g,b,0xff);
 }
 
-static void magick_color_full_tint(BiTimer* t,double dt)
+static void magick_color_full_tint(BiContext* ctx,BiTimer* t,double dt)
 {
   static double h=0;
   uint8_t r=0,g=0,b=0;

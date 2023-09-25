@@ -3,7 +3,7 @@
 #define FRAG "assets/shaders/collapse.frag"
 #define VERT "assets/shaders/collapse.vert"
 
-static void collapse(BiTimer* timer,double dt)
+static void collapse(BiContext* ctx,BiTimer* timer,double dt)
 {
   static double t = 0;
   t += dt / 1000.0;
@@ -11,7 +11,7 @@ static void collapse(BiTimer* timer,double dt)
   node->shader_extra_data[0] = fabs(sin(t)); // in [0.0-1.0]
 }
 
-static void collapse_slow(BiTimer* timer,double dt)
+static void collapse_slow(BiContext* ctx,BiTimer* timer,double dt)
 {
   static double t = 0;
   t += dt / 1000.0 / 1.5;

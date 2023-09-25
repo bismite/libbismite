@@ -4,9 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+typedef struct _BiContext BiContext;
 typedef struct _BiTimer BiTimer;
 
-typedef void (*timer_callback)(BiTimer*,double);
+typedef void (*timer_callback)(BiContext*,BiTimer*,double);
 
 typedef enum {
   BI_TIMER_STATE_PAUSED,

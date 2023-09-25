@@ -11,7 +11,7 @@ typedef struct {
   int vy;
 } MoveData;
 
-static void random_move(BiTimer* t,double dt)
+static void random_move(BiContext* ctx,BiTimer* t,double dt)
 {
   BiNode* nodes[3] = { glass_a, glass_b, NULL };
   for(int i=0; nodes[i] != NULL; i++ ){

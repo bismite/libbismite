@@ -1,12 +1,12 @@
 #include "common.h"
 
-static void rotate(BiTimer* timer,double dt)
+static void rotate(BiContext* ctx,BiTimer* timer,double dt)
 {
   BiNode *node = timer->userdata;
   bi_node_set_angle(node, node->angle + dt*0.01);
 }
 
-static void pause_rotate(BiTimer* timer,double dt)
+static void pause_rotate(BiContext* ctx,BiTimer* timer,double dt)
 {
   BiTimer* rotate_timer = timer->userdata;
   BiNode* node = rotate_timer->userdata;
@@ -16,7 +16,7 @@ static void pause_rotate(BiTimer* timer,double dt)
     free(timer);
   }
 }
-static void resume_rotate(BiTimer* timer,double dt)
+static void resume_rotate(BiContext* ctx,BiTimer* timer,double dt)
 {
   BiTimer* rotate_timer = timer->userdata;
   BiNode* node = rotate_timer->userdata;

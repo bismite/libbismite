@@ -33,4 +33,5 @@ void bi_node_base_init(BiNodeBase* node,BiNodeClass class)
 void bi_node_base_deinit(BiNodeBase* node)
 {
   array_clear(&node->children);
+  bi_timers_clear(&node->timers);
 }

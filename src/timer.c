@@ -1,6 +1,9 @@
 #include <bi/timer.h>
 #include <bi/context.h>
 
+//
+// Timer
+//
 BiTimer* bi_timer_init(BiTimer* timer,
                        timer_callback callback,
                        int interval,
@@ -26,12 +29,21 @@ void bi_timer_resume(BiTimer* timer)
   timer->state = BI_TIMER_STATE_RUNNING;
 }
 
+//
+// Timers
+//
 BiTimers* bi_timers_init(BiTimers* timers)
 {
-  timers->size = 0;
   timers->timers = NULL;
-  timers->scale = 1.0;
+  bi_timers_clear(timers);
   return timers;
+}
+void bi_timers_clear(BiTimers* timers)
+{
+  free(timers->timers);
+  timers->timers=NULL;
+  timers->size = 0;
+  timers->scale = 1.0;
 }
 
 BiTimer* bi_timers_add(BiTimers* timers, BiTimer* timer)

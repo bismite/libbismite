@@ -38,6 +38,7 @@ extern void bi_timer_pause(BiTimer* timer);
 extern void bi_timer_resume(BiTimer* timer);
 
 extern BiTimers* bi_timers_init(BiTimers* timers);
+extern void bi_timers_clear(BiTimers* timers);
 extern BiTimer* bi_timers_add(BiTimers* timers,BiTimer* timer);
 extern BiTimer* bi_timers_remove(BiTimers* timers,BiTimer* timer);
 

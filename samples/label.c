@@ -20,37 +20,37 @@ int main(int argc, char* argv[])
   int line=18;
   for(int i=0; i<4; i++){
     BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
-    bi_label_set_background_color( label, RGBA(0xff,0xff,0xff,0xff) );
-    bi_label_set_modulate_color(label, RGBA(0,0,0,0xff) );
     bi_label_set_text(label, "The quick brown fox jumps over the lazy dog" );
-    bi_label_set_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff), RGBA(0xff,0xff,0xff,0xff) );
+    label->node.color_modulate = RGBA(0xff,0xff,0xff,0x33);
+    bi_label_set_modulate_color(label, RGBA(0,0,0,0xff) );
+    bi_label_set_modulate_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff) );
     bi_node_set_position( (BiNode*)label, offset_x, offset_y+i*line );
     bi_node_add_node(root,(BiNode*)label);
   }
   for(int i=0; i<4; i++){
     BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
+    bi_label_set_text(label, "いろはにほへと　ちりぬるを　わかよたれそ　つねならむ" );
     bi_label_set_background_color( label, RGBA(0,0xff,0,0xff) );
     bi_label_set_modulate_color(label, RGBA(0x64,0x64,0x64,0xFF) );
-    bi_label_set_text(label, "いろはにほへと　ちりぬるを　わかよたれそ　つねならむ" );
-    bi_label_set_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff), RGBA(0xff,0xff,0xff,0xff) );
+    bi_label_set_modulate_color_with_range( label, 1,4, RGBA(0,0,0,0xff) );
     bi_node_set_position( (BiNode*)label, offset_x, offset_y+(4+i)*line );
     bi_node_add_node(root,(BiNode*)label);
   }
   for(int i=0; i<4; i++){
     BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
+    bi_label_set_text(label, "カタカナと、Alphabetと、ひらがな。" );
     bi_label_set_background_color( label, RGBA(32,32,32,0xff) );
     bi_label_set_tint_color(label, RGBA(0,0xff,0xff,0xFF) );
-    bi_label_set_text(label, "カタカナと、Alphabetと、ひらがな。" );
-    bi_label_set_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff), RGBA(0xff,0xff,0xff,0xff) );
+    bi_label_set_tint_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff) );
     bi_node_set_position( (BiNode*)label, offset_x, offset_y+(8+i)*line );
     bi_node_add_node(root,(BiNode*)label);
   }
   for(int i=0; i<4; i++){
     BiLabel* label = bi_label_init( ALLOC(BiLabel), load_font(fonts[i],font_texture) );
+    bi_label_set_text(label, "0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" );
     bi_label_set_background_color( label, RGBA(0x33,0,0,0xff) );
     bi_label_set_tint_color(label, RGBA(0xff,0,0xff,0xFF) );
-    bi_label_set_text(label, "0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" );
-    bi_label_set_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff), RGBA(0xff,0xff,0xff,0xff) );
+    bi_label_set_tint_color_with_range( label, 1,4, RGBA(0,0,0,0xff) );
     bi_node_set_position( (BiNode*)label, offset_x, offset_y+(12+i)*line );
     bi_node_add_node(root,(BiNode*)label);
   }

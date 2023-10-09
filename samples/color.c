@@ -1,8 +1,6 @@
 #include "common.h"
 #include <math.h>
 
-#define COLOR_MAX 18
-
 // h:[0-1] s:[0-1] v:[0-1]
 void hsv_to_rgb(double h, double s, double v, uint8_t *r, uint8_t *g, uint8_t *b)
 {
@@ -78,7 +76,15 @@ int main(int argc, char* argv[])
   layer->textures[1] = tex;
 
   // colors
-  int colors[COLOR_MAX][2][4] = {
+  int colors[21][2][4] = {
+    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Magick
+    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Magick2
+    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Magick3
+    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Normal
+    { {0,0,0,0}, {0xff,0xff,0xff,128} }, // 1/2 Transparent
+    { {0,0,0,0}, {0xff,0xff,0xff, 64} }, // 3/4 Transparent
+    { {0,0,0,0}, {0xff,0xff,0xff,  0} }, // Transparent
+
     { {0xff,0,0,128}, {0xff,0xff,0xff,0xff} }, // Tint Red
     { {0,0xff,0,128}, {0xff,0xff,0xff,0xff} }, // Tint Green
     { {0,0,0xff,128}, {0xff,0xff,0xff,0xff} }, // Tint Blue
@@ -94,14 +100,9 @@ int main(int argc, char* argv[])
     { {0,0,0,0}, {128,128,128,0xff} },  // Modulate 0.5
     { {0,0,0,0}, {64,64,64,0xff} },     // Modulate 0.25
     { {0,0,0,0}, {0,0,0,0xff} },        // Modulate 0
-
-    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Normal
-    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Magick
-    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Magick2
-    { {0,0,0,0}, {0xff,0xff,0xff,0xff} }, // Magick3
   };
 
-  for(int i=0; i<COLOR_MAX; i++) {
+  for(int i=0; i<21; i++) {
     int *a = colors[i][0];
     int *b = colors[i][1];
     BiNode* n = make_sprite_from_texture(tex);
@@ -112,9 +113,9 @@ int main(int argc, char* argv[])
     n->color_modulate = RGBA(b[0], b[1], b[2], b[3]);
     bi_node_add_node(background,n);
     // Magick color
-    if(i==COLOR_MAX-3) { onupdate(n,magick_color_half_tint); }
-    if(i==COLOR_MAX-2) { onupdate(n,magick_color_modulate); }
-    if(i==COLOR_MAX-1) { onupdate(n,magick_color_full_tint); }
+    if(i==0) { onupdate(n,magick_color_half_tint); }
+    if(i==1) { onupdate(n,magick_color_modulate); }
+    if(i==2) { onupdate(n,magick_color_full_tint); }
   }
 
   bi_start_run_loop(context);

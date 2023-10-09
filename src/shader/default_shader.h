@@ -83,7 +83,7 @@ void main()
   if( 0 <= _texture_index && _texture_index < 16 ) {
     c = getTextureColor( _texture_index, uv);
   }
-  c = c * _modulate;
+  c = vec4(c.rgb*_modulate.rgb, c.a) * _modulate.a;
   color = vec4( _tint.rgb*_tint.a*c.a + c.rgb*(1.0-_tint.a), c.a );
 }
 );

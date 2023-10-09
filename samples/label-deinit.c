@@ -17,7 +17,6 @@ int main(int argc, char* argv[])
   bi_label_set_background_color( label, RGBA(0xff,0xff,0xff,0xff) );
   bi_label_set_modulate_color(label, RGBA(0,0,0,0xff) );
   bi_label_set_text(label, "The quick brown fox jumps over the lazy dog" );
-  bi_label_set_color_with_range( label, 1,4, RGBA(0xff,0,0,0xff), RGBA(0xff,0xff,0xff,0xff) );
   bi_node_set_position( (BiNode*)label, 100, 100 );
   bi_node_add_node(root,(BiNode*)label);
   // remove and deinit

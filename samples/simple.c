@@ -10,8 +10,8 @@ int main(int argc, char* argv[])
   BiNode* rect = bi_layer_add_node(layer,bi_node_init(malloc(sizeof(BiNode))));
   bi_node_set_position(rect,20,20);
   bi_node_set_size(rect,200,200);
-  rect->color_modulate = RGBA(0xff,0xff,0,128);
-  printf("%d,%d,%d,%d\n",rect->color_modulate.r, rect->color_modulate.g, rect->color_modulate.b, rect->color_modulate.a);
+  rect->color = RGBA(0xff,0xff,0,128);
+  printf("%d,%d,%d,%d\n",rect->color.r, rect->color.g, rect->color.b, rect->color.a);
   bi_add_layer(context,layer);
   // start
   bi_start_run_loop(context);

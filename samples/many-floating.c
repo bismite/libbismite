@@ -33,7 +33,7 @@ static BiNode* create_particle(BiContext* c,BiTexture *tex)
   bi_node_set_size(node,tex->w,tex->h);
   float scale = 0.1 + rand()%200 / 100.0;
   bi_node_set_scale(node,scale,scale);
-  node->color_modulate = RGBA(rand()%0xff, rand()%0xff, rand()%0xff, 64);
+  node->color = RGBA(rand()%0xff, rand()%0xff, rand()%0xff, 64);
   // on update callback
   onupdate(node,random_move);
   // velocity

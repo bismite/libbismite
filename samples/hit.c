@@ -7,7 +7,7 @@ static BiNode* create_new_node(int x, int y)
   bi_node_set_anchor(node,0.5,0.5);
   bi_node_set_position(node,x,y);
   bi_node_set_size(node,40,80);
-  node->color_tint = RGBA( rand()%0xff, rand()%0xff, rand()%0xff, 0xff );
+  node->tint = RGBA( rand()%0xff, rand()%0xff, rand()%0xff, 0xff );
   bi_node_set_angle(node,rand()%360/180.0*M_PI);
   return node;
 }

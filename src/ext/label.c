@@ -22,8 +22,8 @@ BiLabel* bi_label_init(BiLabel* label, BiFont* font)
   bi_node_init((BiNode*)label);
   label->font = font;
   label->_holder = NULL;
-  label->_modulate = RGBA32(0xFFFFFFFF);
-  label->_tint = RGBA32(0);
+  label->color = RGBA32(0xFFFFFFFF);
+  label->tint = RGBA32(0);
   bi_label_set_background_color(label,RGBA(0,0,0,0));
   return label;
 }
@@ -81,8 +81,8 @@ void bi_label_set_text(BiLabel* label, const char* text)
     n->visible = true;
     // texture and color
     bi_node_set_texture(n,font->texture,glyph->x,glyph->y,glyph->w,glyph->h);
-    n->color_modulate = label->_modulate;
-    n->color_tint = label->_tint;
+    n->color = label->color;
+    n->tint = label->tint;
     //
     x += glyph->advance_x;
     child_index++;
@@ -92,29 +92,29 @@ void bi_label_set_text(BiLabel* label, const char* text)
   bi_label_anchor_reposition(label);
 }
 
-void bi_label_set_tint_color(BiLabel* label, BiColor color )
+void bi_label_set_tint(BiLabel* label, BiColor color )
 {
-  label->_tint = color;
+  label->tint = color;
   BiNode* holder = get_holder_node(label);
   BiNode* n = NULL;
   for(int i=0;i<holder->children.size;i++) {
     n = bi_node_child_at(holder,i);
-    n->color_tint = color;
+    n->tint = color;
   }
 }
 
-void bi_label_set_modulate_color(BiLabel* label, BiColor color )
+void bi_label_set_color(BiLabel* label, BiColor color )
 {
-  label->_modulate = color;
+  label->color = color;
   BiNode* holder = get_holder_node(label);
   BiNode* n = NULL;
   for(int i=0;i<holder->children.size;i++) {
     n = bi_node_child_at(holder,i);
-    n->color_modulate = color;
+    n->color = color;
   }
 }
 
-void bi_label_set_tint_color_with_range(BiLabel* label, int start, int end, BiColor color)
+void bi_label_set_tint_with_range(BiLabel* label, int start, int end, BiColor color)
 {
   BiNode* holder = get_holder_node(label);
   BiNode* n = NULL;
@@ -123,11 +123,11 @@ void bi_label_set_tint_color_with_range(BiLabel* label, int start, int end, BiCo
   if(start>end) return;
   for(int i=start;i<end;i++) {
     n = bi_node_child_at(holder,i);
-    n->color_tint = color;
+    n->tint = color;
   }
 }
 
-void bi_label_set_modulate_color_with_range(BiLabel* label, int start, int end, BiColor color)
+void bi_label_set_color_with_range(BiLabel* label, int start, int end, BiColor color)
 {
   BiNode* holder = get_holder_node(label);
   BiNode* n = NULL;
@@ -136,7 +136,7 @@ void bi_label_set_modulate_color_with_range(BiLabel* label, int start, int end, 
   if(start>end) return;
   for(int i=start;i<end;i++) {
     n = bi_node_child_at(holder,i);
-    n->color_modulate = color;
+    n->color = color;
   }
 }
 

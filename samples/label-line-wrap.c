@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   BiNode* bounds = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(bounds,WIDTH,320);
   bi_node_set_position(bounds,20,0);
-  bounds->color_tint = RGBA32(0x006666ff);
+  bounds->tint = RGBA32(0x006666ff);
   bi_node_add_node(root, bounds);
 
   // font

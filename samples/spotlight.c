@@ -32,7 +32,7 @@ int main(int argc,char* argv[])
   // shade
   BiNode* shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(shade,context->w,context->h);
-  shade->color_modulate = RGBA(0,0,0,128);
+  shade->color = RGBA(0,0,0,128);
   bi_node_add_node(bg,shade);
   // set textures
   layer->textures[0] = bg->texture;

@@ -37,13 +37,13 @@ static BiLayerGroup* make_layer_group(BiContext* context, BiLayerGroup* lg, int 
     faces[i] = face;
   }
   // rotate by action
-  faces[0]->color_tint = RGBA(0xFF,0,0,0xFF);
+  faces[0]->tint = RGBA(0xFF,0,0,0xFF);
   BiAction* rot = (BiAction*)bi_action_rotate_by_init(ALLOC(BiActionRotate),0,2);
   bi_action_set_repeat(rot,-1);
   bi_add_action(faces[0],rot);
   bi_action_start(rot);
   // rotate by timer
-  faces[1]->color_tint = RGBA(0,0,0xFF,0xFF);
+  faces[1]->tint = RGBA(0,0,0xFF,0xFF);
   bi_node_add_timer(faces[1], bi_timer_init(ALLOC(BiTimer), rotate_on_timer, 0, -1, faces[1]));
   return lg;
 }

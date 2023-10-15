@@ -16,17 +16,15 @@ BiNode* bi_node_init(BiNode* n)
   n->final_visibility = true;
 
   // color
-  n->color_tint = RGBA32(0);
-  n->color_modulate = RGBA32(0xffffffff);
+  n->color = RGBA32(0xffffffff);
+  n->tint = RGBA32(0);
 
-  //
+  // shader
   for(int i=0;i<16;i++) {
     n->shader_extra_data[i] = 0;
   }
-
   bi_mat4_identity(n->transform_matrix);
   bi_mat4_identity(n->draw_matrix);
-
   n->transform_matrix_cached = false;
 
   // Texture

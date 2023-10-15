@@ -11,7 +11,7 @@ EM_BOOL visibilitychange_callback(int eventType,
 {
   printf("visibilitychange_callback\n");
   if(background) {
-    background->color_tint = RGBA32(0xff00ff99);
+    background->tint = RGBA32(0xff00ff99);
   }
   return EM_TRUE;
 }

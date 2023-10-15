@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
   layer_a->textures[1] = tester->texture;
   // Rectangle A
   BiNode* rect_a = bi_node_init(ALLOC(BiNode));
-  rect_a->color_modulate = RGBA(0xff,0,0,128);
+  rect_a->color = RGBA(0xff,0,0,128);
   bi_node_set_size(rect_a,100,100);
   bi_node_set_position(rect_a,480/4,50);
   bi_node_add_node(bg,rect_a);
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(tester2,480/4*3,320*3/4);
   // Rectangle B
   BiNode* rect_b = bi_node_init(ALLOC(BiNode));
-  rect_b->color_modulate = RGBA(0,0xff,0,128);
+  rect_b->color = RGBA(0,0xff,0,128);
   bi_node_set_size(rect_b,100,100);
   bi_node_set_position(rect_b,480/4*3,50);
   bi_layer_add_node(layer_b,rect_b);

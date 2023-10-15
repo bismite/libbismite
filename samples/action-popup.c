@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   // shade
   popup_shade = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(popup_shade,context->w,context->h);
-  popup_shade->color_modulate = RGBA(0, 0, 0, 128);
+  popup_shade->color = RGBA(0, 0, 0, 128);
   bi_node_add_node(root,popup_shade);
 
   // popup
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   bi_node_set_size(popup,380,240);
   bi_node_set_anchor(popup,0.5,0.5);
   bi_node_set_position(popup,context->w/2,context->h/2);
-  popup->color_tint = RGBA(0, 0, 0x66, 0xFF);
+  popup->tint = RGBA(0, 0, 0x66, 0xFF);
   bi_node_add_node(popup_shade,popup);
 
   // content

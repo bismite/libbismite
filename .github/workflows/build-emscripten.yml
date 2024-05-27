@@ -4,7 +4,7 @@ on:
     tags:
       - '*'
 env:
-  EM_VERSION: 3.1.46
+  EM_VERSION: 3.1.59
   EM_CACHE_FOLDER: 'emsdk-cache'
 jobs:
   build:
@@ -17,19 +17,19 @@ jobs:
         with:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
-      - uses: mymindstorm/setup-emsdk@v11
+      - uses: mymindstorm/setup-emsdk@v14
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
       - run: make -f Makefile.emscripten.mk
       - name: Upload library archive
-        uses: svenstaro/upload-release-action@2.4.1
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           file: build/emscripten/libbismite-emscripten.tgz
           asset_name: libbismite-emscripten-${{github.ref_name}}.tgz
           overwrite: true
       - name: Upload samples archive
-        uses: svenstaro/upload-release-action@2.4.1
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           file: build/emscripten/libbismite-emscripten-samples.tgz
           asset_name: libbismite-emscripten-samples-${{github.ref_name}}.tgz

@@ -63,6 +63,19 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->uniform.layer_extra_data = glGetUniformLocation(program_id, "layer_extra_data");
 }
 
+static inline void init_mat4_buffer(GLint location, GLuint buffer)
+{
+  if( location < 0 ) return;
+  for(int i=0;i<4;i++){
+    glBindBuffer(GL_ARRAY_BUFFER,buffer);
+    glEnableVertexAttribArray(location+i );
+    GLsizei stride = sizeof(GLfloat)*4*4;
+    void* position = NULL+sizeof(GLfloat)*4*i;
+    glVertexAttribPointer(location+i,4,GL_FLOAT,GL_FALSE,stride,position);
+    glVertexAttribDivisor(location+i, 1);
+  }
+}
+
 void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source)
 {
   load_shader(shader,vertex_shader_source,fragment_shader_source);
@@ -98,54 +111,37 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
     glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.vertex);
     glEnableVertexAttribArray(shader->attribute.vertex);
     glVertexAttribPointer(shader->attribute.vertex,2,GL_FLOAT,GL_FALSE,0,NULL);
+    glVertexAttribDivisor(shader->attribute.vertex, 0);
 
     // texture_uv
     glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.uv);
     glEnableVertexAttribArray(shader->attribute.texture_uv);
     glVertexAttribPointer(shader->attribute.texture_uv, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribDivisor(shader->attribute.texture_uv, 1);
 
     // texture_index
     glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.texture_index);
     glEnableVertexAttribArray(shader->attribute.texture_index );
     glVertexAttribIPointer(shader->attribute.texture_index,1,GL_BYTE,0,NULL);
+    glVertexAttribDivisor(shader->attribute.texture_index, 1);
 
-    // tint
+    // color tint
     glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.tint);
     glEnableVertexAttribArray(shader->attribute.tint);
     glVertexAttribPointer(shader->attribute.tint,4,GL_FLOAT,GL_FALSE,0,NULL);
-    // modulate
+    glVertexAttribDivisor(shader->attribute.tint, 1);
+
+    // color modulate
     glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.modulate);
     glEnableVertexAttribArray(shader->attribute.modulate);
     glVertexAttribPointer(shader->attribute.modulate,4,GL_FLOAT,GL_FALSE,0,NULL);
+    glVertexAttribDivisor(shader->attribute.modulate, 1);
 
     // transform
-    for(int i=0;i<4;i++){
-      glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.transform);
-      glEnableVertexAttribArray(shader->attribute.transform+i );
-      GLsizei stride = sizeof(GLfloat)*4*4;
-      void* position = NULL+sizeof(GLfloat)*4*i;
-      glVertexAttribPointer(shader->attribute.transform+i,4,GL_FLOAT,GL_FALSE,stride,position);
-    }
+    init_mat4_buffer(shader->attribute.transform, shader->buffer.transform);
 
     // extra data (node)
-    for(int i=0;i<4;i++){
-      glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.node_extra_data);
-      glEnableVertexAttribArray(shader->attribute.node_extra_data+i );
-      GLsizei stride = sizeof(GLfloat)*4*4;
-      void* position = NULL+sizeof(GLfloat)*4*i;
-      glVertexAttribPointer(shader->attribute.node_extra_data+i,4,GL_FLOAT,GL_FALSE,stride,position);
-    }
-
-    // for instancing
-    glVertexAttribDivisor(shader->attribute.vertex, 0);
-    glVertexAttribDivisor(shader->attribute.texture_uv, 1);
-    glVertexAttribDivisor(shader->attribute.texture_index, 1);
-    glVertexAttribDivisor(shader->attribute.tint, 1);
-    glVertexAttribDivisor(shader->attribute.modulate, 1);
-    for(int i=0;i<4;i++){
-      glVertexAttribDivisor(shader->attribute.transform+i, 1);
-      glVertexAttribDivisor(shader->attribute.node_extra_data+i, 1);
-    }
+    init_mat4_buffer(shader->attribute.node_extra_data, shader->buffer.node_extra_data);
 
   // unbind vao
   glBindVertexArray(0);

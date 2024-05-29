@@ -2,7 +2,7 @@ BUILD_DIR=build/x86_64-w64-mingw32
 
 CC=x86_64-w64-mingw32-gcc
 AR=x86_64-w64-mingw32-ar
-CFLAGS=-Wall -std=c11 -O3 -flto -Dmain=SDL_main
+CFLAGS=-Wall -std=c11 -O2 -Dmain=SDL_main
 INCLUDE_PATHS= -Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib
@@ -30,7 +30,7 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32-samples.tgz
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 libs: $(OBJ_DIR) $(LIB_DIR) $(LIBSDL2) $(TARGET)
-samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets copysdl
+samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copy_assets copy_libs
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -62,9 +62,9 @@ $(SAMPLE_DIR):
 $(SAMPLE_DIR)/%.exe: samples/%.c
 	$(CC) $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) $(SAMPLE_LDFLAGS)
 
-copyassets:
+copy_assets:
 	cp -R samples/assets $(SAMPLE_DIR)
-copysdl:
+copy_libs:
 	cp -R $(BUILD_DIR)/bin/*.dll $(SAMPLE_DIR)
 
 # ----

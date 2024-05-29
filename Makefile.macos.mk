@@ -2,7 +2,7 @@ ARCH=arm64
 BUILD_DIR=build/macos
 CC=clang
 AR=ar
-CFLAGS=-std=c11 -Wall -O3 -fPIC -flto -arch $(ARCH) -Wno-deprecated-declarations
+CFLAGS=-std=c11 -Wall -O2 -arch $(ARCH) -Wno-deprecated-declarations
 INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib
@@ -29,7 +29,7 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-macos-samples.tgz
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 libs: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
-samples: libs $(SAMPLE_DIR) copyassets copysdl $(SAMPLE_EXES)
+samples: libs $(SAMPLE_DIR) copy_assets copy_libs $(SAMPLE_EXES)
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -62,9 +62,10 @@ $(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET)
 	$(CC) $< -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 	install_name_tool -add_rpath @executable_path/lib $@
 
-copyassets:
+copy_assets:
 	cp -R samples/assets $(SAMPLE_DIR)
-copysdl:
+
+copy_libs:
 	mkdir -p $(SAMPLE_DIR)/lib
 	cp -R $(BUILD_DIR)/lib/*.dylib $(SAMPLE_DIR)/lib
 

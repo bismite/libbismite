@@ -2,7 +2,7 @@ BUILD_DIR=build/linux
 
 CC=clang
 AR=ar
-CFLAGS=-Wall -std=c11 -O3 -flto -fPIC -D_REENTRANT
+CFLAGS=-Wall -std=c11 -O2 -D_REENTRANT
 INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib
@@ -19,7 +19,7 @@ SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)
 SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/*.c)
 SAMPLE_EXES = $(SAMPLE_SOURCES:samples/%.c=$(SAMPLE_DIR)/%.exe)
-SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite -lSDL2 -lSDL2_image -lSDL2_mixer -lm -lGL '-Wl,-rpath=$$ORIGIN/../lib'
+SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite -lSDL2 -lSDL2_image -lSDL2_mixer -lm -lGL '-Wl,-rpath=$$ORIGIN/lib'
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
 ARCHIVE=$(BUILD_DIR)/libbismite-linux.tgz
@@ -29,7 +29,7 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-linux-samples.tgz
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 lib: $(OBJ_DIR) $(LIB_DIR) $(TARGET)
-samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES) copyassets
+samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES) copy_assets copy_libs
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -61,8 +61,12 @@ $(SAMPLE_DIR):
 $(SAMPLE_DIR)/%.exe: samples/%.c
 	$(CC) $< -o $@ $(CFLAGS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 
-copyassets:
+copy_assets:
 	cp -R samples/assets $(SAMPLE_DIR)
+
+copy_libs:
+	mkdir -p $(SAMPLE_DIR)/lib
+	cp build/linux/lib/*.so $(SAMPLE_DIR)/lib/
 
 # ----
 

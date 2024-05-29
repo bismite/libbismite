@@ -35,11 +35,9 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-emscripten-samples.tgz
 
 # ----
 
-all: samples samples-nosimd $(ARCHIVE) $(ARCHIVE_SAMPLES)
+all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
 lib: $(LIB_DIR) $(OBJ_DIR) $(TARGET)
-lib-nosimd: $(LIB_DIR)
 samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES)
-samples-nosimd: lib-nosimd $(SAMPLE_DIR_NOSIMD)
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -68,9 +66,8 @@ $(TARGET): $(OBJECTS)
 $(SAMPLE_DIR):
 	mkdir -p $@
 
-# workaround "-Wl,-u,fileno" : https://github.com/emscripten-core/emscripten/issues/16836
 $(SAMPLE_DIR)/%.html: samples/%.c $(TARGET)
-	$(CC) $< -o $@ $(SDL_STATIC_LIBS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2 -Wl,-u,fileno
+	$(CC) $< -o $@ $(SDL_STATIC_LIBS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2
 
 # ----
 

@@ -1,9 +1,29 @@
 # libbismite
 
 # Change Log
-## 9.0.0 - 2023/07/07
-- remove emscripten-nosimd.
-- update emscripten 3.1.42.
+## 10.0.0 - 2024/05/29
+- Framework
+  - update SDL2 2.30.3, SDL2_image 2.8.2, SDL2_mixer 2.8.0.
+  - update emscripten 3.1.59.
+  - remove emscripten-nosimd and macos-x86_64.
+- Node
+  - node: color system update, node#color and node#tint available.
+  - ext/TransitionLayer removed.
+  - BiNodeBase has children array.
+  - layer class inherit BiNodeBase, and no longer has root node.
+- Label
+  - BiFontAtlas renamed to BiFont.
+  - remake BiLabel.
+  - add bi_label_deinit().
+- remake Postprocesssing feature.
+  - add bi_layer_init_as_postprocess().
+  - src/render.c : postprocess use glBlitFramebuffer
+- misc
+  - canvas: add bi_canvas_init_with_framebuffer().
+  - add BiColor.
+  - timer callback receives context
+  - canvas: 4x4 matrix extra data.
+
 ## 8.0.2 - 2023/04/10
 - BiActionRepeat is no longer available. add repeat flag to actions.
 - Fix ScaleBy action and ScaleTo aciton

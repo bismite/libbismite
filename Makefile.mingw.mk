@@ -1,4 +1,4 @@
-BUILD_DIR=build/x86_64-w64-mingw32
+BUILD_DIR=build/mingw
 
 CC=x86_64-w64-mingw32-gcc
 AR=x86_64-w64-mingw32-ar
@@ -23,8 +23,8 @@ SAMPLE_LDFLAGS=-L$(BUILD_DIR)/bin
 SAMPLE_LIBS = $(BUILD_DIR)/lib/libbismite.a -lmingw32 $(BUILD_DIR)/lib/libSDL2main.a -lSDL2 -mwindows -lSDL2_mixer -lSDL2_image -lopengl32
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
-ARCHIVE=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32.tgz
-ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-x86_64-w64-mingw32-samples.tgz
+ARCHIVE=$(BUILD_DIR)/libbismite-mingw.tgz
+ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-mingw-samples.tgz
 
 # ----
 

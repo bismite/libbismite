@@ -1,4 +1,4 @@
-Copyright (C) 2018-2023 kbys <work4kbys@gmail.com>
+Copyright (C) 2018-2024 kbys <work4kbys@gmail.com>
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages

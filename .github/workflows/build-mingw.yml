@@ -10,19 +10,19 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install mingw-w64
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - run: make -f Makefile.mingw.mk
       - name: Upload library
         uses: svenstaro/upload-release-action@2.9.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/x86_64-w64-mingw32/libbismite-x86_64-w64-mingw32.tgz
-          asset_name: libbismite-x86_64-w64-mingw32-${{github.ref_name}}.tgz
+          file: build/mingw/libbismite-mingw.tgz
+          asset_name: libbismite-mingw-${{github.ref_name}}.tgz
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload samples
         uses: svenstaro/upload-release-action@2.9.0
         with:
-          file: build/x86_64-w64-mingw32/libbismite-x86_64-w64-mingw32-samples.tgz
-          asset_name: libbismite-x86_64-w64-mingw32-samples-${{github.ref_name}}.tgz
+          file: build/mingw/libbismite-mingw-samples.tgz
+          asset_name: libbismite-mingw-samples-${{github.ref_name}}.tgz
           overwrite: true

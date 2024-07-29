@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 10.0.1 - 2024/07/30
+- update emscripten 3.1.64
 ## 10.0.0 - 2024/05/29
 - Framework
   - update SDL2 2.30.3, SDL2_image 2.8.2, SDL2_mixer 2.8.0.
@@ -100,6 +102,6 @@
 - Shader receives display scale as uniform attribute.
 
 # License
-Copyright 2018-2023 kbys <work4kbys@gmail.com>
+Copyright 2018-2024 kbys <work4kbys@gmail.com>
 
 zlib license

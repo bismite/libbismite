@@ -2,13 +2,13 @@ name: Build Emscripten
 on:
   push:
     tags:
-      - '*'
+      - "*"
 env:
-  EM_VERSION: 3.1.59
-  EM_CACHE_FOLDER: 'emsdk-cache'
+  EM_VERSION: 3.1.64
+  EM_CACHE_FOLDER: "emsdk-cache"
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup cache

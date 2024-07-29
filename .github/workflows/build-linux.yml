@@ -2,10 +2,10 @@ name: Build Linux
 on:
   push:
     tags:
-      - '*'
+      - "*"
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Install dependencies
         run: |

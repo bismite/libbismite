@@ -12,9 +12,8 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/ext/*.c)
 OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 LIBSDL2=$(BUILD_DIR)/lib/libSDL2.dylib
-SDL_TAG=macos-1.0.10
-SDL_TGZ=build/SDL-$(SDL_TAG).tgz
-SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/$(SDL_TAG)/SDL-$(SDL_TAG).tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/20240804-4/macos-20240804-4-SDL2-2.30.5-SDL2_image-2.8.2-SDL2_mixer-2.8.0.tgz
+SDL_TGZ=build/$(shell basename $(SDL_TGZ_URL))
 
 SAMPLE_DIR=$(BUILD_DIR)/samples
 SAMPLE_SOURCES = $(wildcard samples/*.c)
@@ -41,7 +40,7 @@ $(OBJ_DIR):
 	mkdir -p $@/ext
 
 $(SDL_TGZ):
-	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
+	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $@)
 
 $(LIBSDL2): $(SDL_TGZ)
 	mkdir -p $(BUILD_DIR)

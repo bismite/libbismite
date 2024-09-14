@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 10.0.3 - 2024/09/14
+- fix Makefile.linux.mk(add -fPIC)
 ## 10.0.2 - 2024/07/30
 - update emscripten 3.1.64
 ## 10.0.0 - 2024/05/29

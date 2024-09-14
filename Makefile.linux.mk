@@ -2,7 +2,7 @@ BUILD_DIR=build/linux
 
 CC=clang
 AR=ar
-CFLAGS=-Wall -std=c11 -O2 -D_REENTRANT
+CFLAGS=-Wall -std=c11 -O2 -fPIC -D_REENTRANT
 INCLUDE_PATHS=-Iinclude -I$(BUILD_DIR)/include -I$(BUILD_DIR)/include/SDL2
 
 LIB_DIR=$(BUILD_DIR)/lib

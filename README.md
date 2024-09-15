@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 10.1.0 - 2024/09/16
+- add on_mainloop_end_callback
+- add bi_stop_run_loop()
 ## 10.0.3 - 2024/09/14
 - fix Makefile.linux.mk(add -fPIC)
 ## 10.0.2 - 2024/07/30

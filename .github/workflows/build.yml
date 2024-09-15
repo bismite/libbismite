@@ -42,7 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: libbismite-${{matrix.target}}-samples-${{github.sha}}.tgz
-          path: build/emscripten/libbismite-${{matrix.target}}-samples.tgz
+          path: build/${{matrix.target}}/libbismite-${{matrix.target}}-samples.tgz
       - uses: svenstaro/upload-release-action@2.9.0
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
@@ -52,6 +52,6 @@ jobs:
       - uses: svenstaro/upload-release-action@2.9.0
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
-          file: build/emscripten/libbismite-${{matrix.target}}-samples.tgz
+          file: build/${{matrix.target}}/libbismite-${{matrix.target}}-samples.tgz
           asset_name: libbismite-${{matrix.target}}-samples-${{github.ref_name}}.tgz
           overwrite: true

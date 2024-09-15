@@ -14,6 +14,8 @@
 
 typedef struct _BiContext BiContext;
 
+typedef void (*on_mainloop_end_callback)(BiContext*);
+
 struct _BiContext {
   bool running;
 
@@ -55,6 +57,9 @@ struct _BiContext {
 
   // for postprocess
   BiFramebuffer post_process_framebuffer;
+
+  // callback
+  on_mainloop_end_callback on_mainloop_end;
 
   //
   void* userdata;

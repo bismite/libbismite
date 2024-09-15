@@ -176,6 +176,9 @@ static void main_loop( void* arg )
   //
   context->profile.time_spent_on_callback = phase2 - context->frame_start_at;
   context->profile.time_spent_on_rendering = phase3 - phase2;
+
+  //
+  if(context->on_mainloop_end) context->on_mainloop_end(context);
 }
 
 void bi_start_run_loop(BiContext* context)

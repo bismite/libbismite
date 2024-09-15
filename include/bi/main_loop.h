@@ -4,5 +4,6 @@
 typedef struct _BiContext BiContext;
 
 extern void bi_start_run_loop(BiContext* context);
+extern void bi_stop_run_loop();
 
 #endif

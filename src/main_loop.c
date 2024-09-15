@@ -181,6 +181,15 @@ static void main_loop( void* arg )
   if(context->on_mainloop_end) context->on_mainloop_end(context);
 }
 
+void bi_stop_run_loop()
+{
+#ifdef __EMSCRIPTEN__
+  emscripten_cancel_main_loop();
+#else
+  // nop
+#endif
+}
+
 void bi_start_run_loop(BiContext* context)
 {
 #ifdef __EMSCRIPTEN__

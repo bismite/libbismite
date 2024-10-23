@@ -3,7 +3,9 @@
 #include <bi/texture.h>
 #include <bi/camera.h>
 #include <bi/bi_gl.h>
-#include "shader/texconv_shader.h"
+
+extern const char *SHADER_TEXCONV_FRAG;
+extern const char *SHADER_TEXCONV_VERT;
 
 typedef struct {
   GLuint program_id;
@@ -29,14 +31,12 @@ static void print_shader_log(const char* name, GLuint shader_id)
 
 static void load_texconv_shader(TexconvShader* shader)
 {
-  const char* v_shader_src = TEXCONV_VERTEX_SHADER;
-  const char* f_shader_src = TEXCONV_FRAGMENT_SHADER;
   GLuint vid = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vid, 1, &v_shader_src, NULL);
+  glShaderSource(vid, 1, &SHADER_TEXCONV_VERT, NULL);
   glCompileShader(vid);
   print_shader_log("Vertex Shader Log",vid);
   GLuint fid = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fid, 1, &f_shader_src, NULL);
+  glShaderSource(fid, 1, &SHADER_TEXCONV_FRAG, NULL);
   glCompileShader(fid);
   print_shader_log("Fragment Shader Log",fid);
   //

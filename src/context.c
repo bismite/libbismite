@@ -4,15 +4,16 @@
 #include <bi/layer.h>
 #include <bi/logger.h>
 #include <stdlib.h>
-#include "shader/default_shader.h"
 
+extern const char *SHADER_DEFAULT_VERT;
+extern const char *SHADER_DEFAULT_FRAG;
 extern void enable_gl_extensions();
 
 BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
   if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
-      LOG("SDL_Init fail.");
-      return NULL;
+    LOG("SDL_Init fail.");
+    return NULL;
   }
 
   SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
@@ -66,7 +67,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   context->color = RGBA32(0);
 
   // default shader
-  bi_shader_init(&context->default_shader, DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
+  bi_shader_init(&context->default_shader, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
   // default texture
 #ifdef __APPLE__
@@ -104,10 +105,10 @@ void bi_remove_layer(BiContext* context, BiLayer* layer) { bi_layer_group_remove
 //
 const char* bi_default_vertex_shader()
 {
-  return DEFAULT_VERTEX_SHADER;
+  return SHADER_DEFAULT_VERT;
 }
 
 const char* bi_default_fragment_shader()
 {
-  return DEFAULT_FRAGMENT_SHADER;
+  return SHADER_DEFAULT_FRAG;
 }

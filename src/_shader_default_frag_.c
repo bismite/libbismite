@@ -11,6 +11,7 @@ in vec2 local_xy;
 flat in int _texture_index;
 in vec4 _tint;
 in vec4 _modulate;
+in vec2 _node_size;
 in mat4 _node_extra_data;
 uniform float time;
 uniform vec2 resolution;

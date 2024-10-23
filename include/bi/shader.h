@@ -15,6 +15,7 @@ struct _BiShader {
     GLuint texture_index;
     GLuint tint;
     GLuint modulate;
+    GLuint node_size;
     GLuint transform;
     GLuint node_extra_data;
   } buffer;
@@ -26,6 +27,7 @@ struct _BiShader {
     GLint texture_index;
     GLuint tint;
     GLuint modulate;
+    GLuint node_size;
     GLint transform;
     GLint node_extra_data;
   } attribute;

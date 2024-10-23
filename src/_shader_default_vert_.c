@@ -21,6 +21,7 @@ flat out int _texture_index;
 out vec4 _tint;
 out vec4 _modulate;
 out mat4 _node_extra_data;
+out vec2 _node_size;
 out vec2 local_xy;
 void main()
 {
@@ -44,6 +45,7 @@ void main()
   _tint = tint / 255.0;
   _modulate = modulate / 255.0;
   _node_extra_data = node_extra_data;
+  _node_size = node_size;
 }
 );
 

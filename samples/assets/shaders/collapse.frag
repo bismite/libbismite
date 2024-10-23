@@ -1,9 +1,10 @@
 
 in vec2 uv;
 flat in int _texture_index;
-in float y_in_local;
+in vec2 local_xy;
 in vec4 _tint;
 in vec4 _modulate;
+in vec2 _node_size;
 in mat4 _node_extra_data;
 uniform float time;
 uniform vec2 resolution;
@@ -31,32 +32,23 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
   return vec4(0);
 }
 
-float rand(vec2 co){
-  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+float rand(vec2 seed){
+  return fract(sin(dot(seed.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
-
-const float GRID_SIZE = 50.0;
-const float S_GRID_SIZE = 5.0;
 
 void main()
 {
-  vec2 xy = gl_FragCoord.xy / scale;
-  float erase_h = _node_extra_data[0][0];
-  float gap = 0.1;
-  float margined_y = erase_h + gap;
-  if( erase_h > 0.0 ) {
-    if( y_in_local < erase_h ){
-      discard;
-      return;
-    }else if( y_in_local < margined_y ) {
-      float gradation = (margined_y - y_in_local) / gap;
-        if( rand(xy) < gradation ){
-          discard;
-          return;
-        }
-    }
+  float margin = 30.0;
+  float yy = _node_size.y*local_xy.y;
+  float erase_y = _node_extra_data[0][0] * _node_size.y;
+  float dither_power = (yy-erase_y) / margin;
+  if( yy < erase_y ) {
+    discard;
+    return;
+  } else if( rand(gl_FragCoord.xy) > dither_power ) {
+    discard;
+    return;
   }
-
   vec4 c = vec4(1.0);
   if( 0 <= _texture_index && _texture_index < 16 ) {
     c = getTextureColor( _texture_index, uv);

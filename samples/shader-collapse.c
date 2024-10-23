@@ -6,15 +6,7 @@
 static void collapse(BiContext* ctx,BiTimer* timer,double dt)
 {
   static double t = 0;
-  t += dt / 1000.0;
-  BiNode *node = timer->userdata;
-  node->shader_extra_data[0] = fabs(sin(t)); // in [0.0-1.0]
-}
-
-static void collapse_slow(BiContext* ctx,BiTimer* timer,double dt)
-{
-  static double t = 0;
-  t += dt / 1000.0 / 1.5;
+  t += dt / 2000.0;
   BiNode *node = timer->userdata;
   node->shader_extra_data[0] = fabs(sin(t)); // in [0.0-1.0]
 }
@@ -37,7 +29,7 @@ int main(int argc, char* argv[])
   fg_layer->textures[0] = face->texture;
   fg_layer->textures[1] = mushroom->texture;
   // timer for shader
-  bi_node_add_timer(face, bi_timer_init(ALLOC(BiTimer),collapse_slow,0,-1,face));
+  bi_node_add_timer(face, bi_timer_init(ALLOC(BiTimer),collapse,0,-1,face));
   // timer for shader
   bi_node_add_timer(face, bi_timer_init(ALLOC(BiTimer),collapse,0,-1,mushroom));
   // shader

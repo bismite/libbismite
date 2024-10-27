@@ -1,6 +1,10 @@
 # libbismite
 
 # Change Log
+## 10.2.0 - 2024/10/28
+- vertex shader send local_xy (normalized, 0.0 to 1.0) to fragment shader.
+- send `node_size` for shader
+- update sample `shader-collapse.c`
 ## 10.1.0 - 2024/09/16
 - add on_mainloop_end_callback
 - add bi_stop_run_loop()

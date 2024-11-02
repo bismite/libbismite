@@ -30,6 +30,8 @@ BiNode* bi_node_init(BiNode* n)
   // Texture
   n->texture = NULL;
   n->tx = n->ty = n->tw = n->th = 0;
+  memset( &n->texture_uv, 0, sizeof(GLfloat)*4 );
+  memset( &n->texture_crop_uv, 0, sizeof(GLfloat)*4 );
   n->texture_uv_left = 0;
   n->texture_uv_top = 0;
   n->texture_uv_right = 0;
@@ -292,32 +294,50 @@ void bi_node_set_texture(BiNode* n, BiTexture* t, uint16_t tx, uint16_t ty, uint
   bi_node_set_cropped_texture(n,t,tx,ty,tw,th,0,0,tw,th);
 }
 
-void bi_node_set_cropped_texture(BiNode* n, BiTexture* t,
+void bi_node_set_cropped_texture(BiNode* n, BiTexture* tex,
   uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th,
   uint16_t cx, uint16_t cy, uint16_t ow, uint16_t oh )
 {
-  n->texture = t;
-  n->tx = tx;
-  n->ty = ty;
-  n->tw = tw;
-  n->th = th;
-  // left, top, right, bottom
-  n->texture_uv_left  = (GLfloat)tx      / t->w;
-  n->texture_uv_top   = (GLfloat)(ty+th) / t->h;
-  n->texture_uv_right = (GLfloat)(tx+tw) / t->w;
-  n->texture_uv_bottom= (GLfloat)ty      / t->h;
-  // crop position and original image size
-  n->cx = cx;
-  n->cy = cy;
-  n->ow = ow;
-  n->oh = oh;
-  if(ow>0 && oh>0 && (tw!=ow || th!=oh)) {
-    n->texture_cropped = true;
-    n->draw_matrix_cached = false;
-  } else {
-    if(n->texture_cropped) n->draw_matrix_cached = false;
-    n->texture_cropped = false;
+  // left, bottom, right, top
+  GLfloat l1,b1,r1,t1;
+  GLfloat l2,b2,r2,t2;
+  {
+    l2 = tx;
+    t2 = ty;
+    r2 = tx+tw;
+    b2 = ty+th;
+    l1 = l2 - cx;
+    t1 = t2 - cy;
+    r1 = r2 + (ow-cx-tw);
+    b1 = b2 + (oh-cy-th);;
   }
+  {
+    l1 /= (GLfloat)tex->w;
+    b1 /= (GLfloat)tex->h;
+    r1 /= (GLfloat)tex->w;
+    t1 /= (GLfloat)tex->h;
+    l2  /= (GLfloat)tex->w;
+    b2  /= (GLfloat)tex->h;
+    r2  /= (GLfloat)tex->w;
+    t2  /= (GLfloat)tex->h;
+  }
+  bi_node_set_texture_mapping(n,tex,
+    l1,b1,r1,t1, l2,b2,r2,t2 );
+}
+
+void bi_node_set_texture_mapping(BiNode* n, BiTexture* t,
+  GLfloat l1, GLfloat b1, GLfloat r1, GLfloat t1,
+  GLfloat l2, GLfloat b2, GLfloat r2, GLfloat t2 )
+{
+  n->texture = t;
+  n->texture_uv[0] = l1;
+  n->texture_uv[1] = b1;
+  n->texture_uv[2] = r1;
+  n->texture_uv[3] = t1;
+  n->texture_crop_uv[0] = l2;
+  n->texture_crop_uv[1] = b2;
+  n->texture_crop_uv[2] = r2;
+  n->texture_crop_uv[3] = t2;
 }
 
 void bi_node_unset_texture(BiNode* n)

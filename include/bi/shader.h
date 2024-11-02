@@ -12,6 +12,8 @@ struct _BiShader {
   struct {
     GLuint vertex;
     GLuint uv;
+    GLuint texture_uv;
+    GLuint texture_crop_uv;
     GLuint texture_index;
     GLuint tint;
     GLuint modulate;
@@ -23,11 +25,13 @@ struct _BiShader {
   // attribute locations
   struct {
     GLint vertex;
+    GLint uv;
     GLint texture_uv;
+    GLint texture_crop_uv;
     GLint texture_index;
-    GLuint tint;
-    GLuint modulate;
-    GLuint node_size;
+    GLint tint;
+    GLint modulate;
+    GLint node_size;
     GLint transform;
     GLint node_extra_data;
   } attribute;

@@ -9,8 +9,8 @@ int main(int argc, char* argv[])
   BiLayer *layer = bi_layer_init(malloc(sizeof(BiLayer)));
   BiNode* rect = bi_layer_add_node(layer,bi_node_init(malloc(sizeof(BiNode))));
   bi_node_set_position(rect,20,20);
-  bi_node_set_size(rect,200,200);
-  rect->color = RGBA(0xff,0xff,0,128);
+  bi_node_set_size(rect,100,100);
+  rect->color = RGBA(0xff,0xff,0,0xff);
   printf("%d,%d,%d,%d\n",rect->color.r, rect->color.g, rect->color.b, rect->color.a);
   bi_add_layer(context,layer);
   // start

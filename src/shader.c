@@ -47,7 +47,9 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
 
   // Attribute locations
   shader->attribute.vertex = glGetAttribLocation(program_id, "vertex");
+  shader->attribute.uv = glGetAttribLocation(program_id, "uv"); // XXX: deprecate
   shader->attribute.texture_uv = glGetAttribLocation(program_id, "texture_uv");
+  shader->attribute.texture_crop_uv = glGetAttribLocation(program_id, "texture_crop_uv");
   shader->attribute.texture_index = glGetAttribLocation(program_id, "texture_index");
   shader->attribute.tint = glGetAttribLocation(program_id, "tint");
   shader->attribute.modulate = glGetAttribLocation(program_id, "modulate");
@@ -98,6 +100,8 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
 
   // create vbo
   glGenBuffers(1, &shader->buffer.uv);
+  glGenBuffers(1, &shader->buffer.texture_uv);
+  glGenBuffers(1, &shader->buffer.texture_crop_uv);
   glGenBuffers(1, &shader->buffer.texture_index);
   glGenBuffers(1, &shader->buffer.tint);
   glGenBuffers(1, &shader->buffer.modulate);
@@ -118,12 +122,16 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glBindVertexArray(shader->vao);
     // vertex
     generate_vao(shader->buffer.vertex, shader->attribute.vertex, 2, 0);
+    // uv
+    generate_vao(shader->buffer.uv, shader->attribute.uv, 4, 1);
     // texture_uv
-    generate_vao(shader->buffer.uv, shader->attribute.texture_uv, 4, 1);
+    generate_vao(shader->buffer.texture_uv, shader->attribute.texture_uv, 4, 1);
+    // texture_crop_uv
+    generate_vao(shader->buffer.texture_crop_uv, shader->attribute.texture_crop_uv, 4, 1);
     // texture_index ("I"Pointer)
     glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.texture_index);
     glEnableVertexAttribArray(shader->attribute.texture_index );
-    glVertexAttribIPointer(shader->attribute.texture_index,1,GL_BYTE,0,NULL);
+    glVertexAttribIPointer(shader->attribute.texture_index,1,GL_INT,0,NULL);
     glVertexAttribDivisor(shader->attribute.texture_index, 1);
     // color tint
     generate_vao(shader->buffer.tint, shader->attribute.tint, 4, 1);
@@ -160,7 +168,9 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   static size_t len_max = 0;
   static GLfloat *transforms = NULL;
   static GLfloat *uv = NULL; // [ left, top, right, bottom ]
-  static char *texture_index = NULL;
+  static GLfloat *texture_uv = NULL; // u1,v1,u2,v2
+  static GLfloat *texture_crop_uv = NULL; // cu1,cv1,cu2,cv2
+  static GLint *texture_index = NULL;
   static GLfloat* tint = NULL;
   static GLfloat* modulate = NULL;
   static GLfloat* node_size = NULL;
@@ -170,7 +180,9 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     len_max = len;
     transforms = realloc( transforms, sizeof(GLfloat)*len*16 );
     uv = realloc( uv, sizeof(GLfloat)*len*4 );
-    texture_index = realloc( texture_index, sizeof(char)*len );
+    texture_uv = realloc( texture_uv, sizeof(GLfloat)*len*4 );
+    texture_crop_uv = realloc( texture_crop_uv, sizeof(GLfloat)*len*4 );
+    texture_index = realloc( texture_index, sizeof(GLint)*len );
     tint = realloc( tint, sizeof(GLfloat)*4*len );
     modulate = realloc( modulate, sizeof(GLfloat)*4*len );
     node_size = realloc( node_size, sizeof(GLfloat)*2*len );
@@ -197,6 +209,10 @@ void bi_shader_draw(BiShader* shader,Array* queue)
         uv[i*4+1] = node->texture_uv_top;
         uv[i*4+3] = node->texture_uv_bottom;
       }
+      for(int j=0;j<4;j++){
+        texture_uv[i*4+j] = node->texture_uv[j];
+        texture_crop_uv[i*4+j] = node->texture_crop_uv[j];
+      }
       texture_index[i] = node->texture->texture_unit;
     }else{
       texture_index[i] = -1; // no-texture
@@ -222,8 +238,10 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
   //
   update_vbo(shader->buffer.transform, sizeof(GLfloat)*16*len, transforms);
-  update_vbo(shader->buffer.texture_index, sizeof(char)*1*len, texture_index);
+  update_vbo(shader->buffer.texture_index, sizeof(GLint)*1*len, texture_index);
   update_vbo(shader->buffer.uv, sizeof(GLfloat)*4*len, uv);
+  update_vbo(shader->buffer.texture_uv, sizeof(GLfloat)*4*len, texture_uv);
+  update_vbo(shader->buffer.texture_crop_uv, sizeof(GLfloat)*4*len, texture_crop_uv);
   update_vbo(shader->buffer.tint, sizeof(GLfloat)*4*len, tint);
   update_vbo(shader->buffer.modulate, sizeof(GLfloat)*4*len, modulate);
   update_vbo(shader->buffer.node_size, sizeof(GLfloat)*2*len, node_size);

@@ -47,6 +47,8 @@ struct _BiNode {
   // Texture
   BiTexture *texture;
   int tx,ty,tw,th;
+  GLfloat texture_uv[4]; // left,bottom,right,top
+  GLfloat texture_crop_uv[4]; // left,bottom,right,top
   GLfloat texture_uv_left,texture_uv_top,texture_uv_right,texture_uv_bottom;
   bool texture_cropped;
   int cx,cy,ow,oh;
@@ -105,26 +107,34 @@ extern bool bi_node_update_matrix(BiNode* n);
 
 // Texture
 extern void bi_node_set_texture(BiNode*, BiTexture*, uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th);
+extern void bi_node_unset_texture(BiNode*);
+//  Original Image and Crop   Cropped Texture in Sprite Sheet
+//  0/0 -----------------    0/0 -----------------
+//   |                  |     |                  |  ^
+//   |     cx/cy---- ^  |     |     tx/ty---- ^  |  |
+//   |     |Cropped| th |     |     |Cropped| th | tex.h
+//   |     --------- v  |     |     --------- v  |  |
+//   |     <-- tw-->    |     |     <-- tw-->    |  v
+//   --------------- ow/oh    --------------------
+//                                <- tex.w ->
 extern void bi_node_set_cropped_texture(BiNode*, BiTexture*,
   uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th,
   uint16_t cx, uint16_t cy, uint16_t ow, uint16_t oh );
-extern void bi_node_unset_texture(BiNode*);
-//
-//  Original Image(cropped)   Texture in Sprite Sheet      Sprite Node
-//  0/0 ----------------- ^   0/0 -----------------    -------------------   ^
-//   |        cy        | |    |        ty        |    |                 |   |
-//   |     --------- ^  | |    |     --------- ^  |    |     ---------   |   |
-//   | cx  |Texture| th | oh   |  tx |Texture| th |    |  X  |Texture|   | node_h
-//   |     --------- v  | |    |     --------- v  |    |     ---------   |   |
-//   |     <-- tw ->    | |    |     <-- tw ->    |    |         Y       |   |
-//   -------------------- v    --------------------   0/0 ----------------   v
-//   <-------- ow ------>                              <----- node_w ---->
-//                                                      X = ow/node_w*cx
-// Original Image(non cropped)                          Y = oh/node_h*(oh-th-cy)
-//  cx=0/cy=0-------- ^
-//     |   Texture  | th = oh
-//     -------------- v
-//     <-- tw = ow ->
+//  UV and Crop in Sprite Sheet
+//  -----------------------------1/1   Sprite Node
+//  |     ----------------r1/t1    |    -------------r1/t1
+//  |     |                  |     |    |###############|
+//  |     |   --------r2/t2  |     |    |###---------###|
+//  |     |   | Cropped |    |     | -> |###|Cropped|###|
+//  |     |   l2/b2------    |     |    |###---------###|
+//  |     |                  |     |    |###############|
+//  |     l1/b1---------------     |    l1/b1------------
+//  0/0-----------------------------
+//  Note: Images are loaded into memory ‘upside down’.
+extern void bi_node_set_texture_mapping(BiNode*, BiTexture*,
+  GLfloat l1, GLfloat b1, GLfloat r1, GLfloat t1,
+  GLfloat l2, GLfloat b2, GLfloat r2, GLfloat t2 );
+
 
 // Timer
 static inline BiTimer* bi_node_add_timer(BiNode* node,BiTimer* timer){ return bi_timers_add(&node->timers,timer); }

@@ -29,15 +29,8 @@ BiNode* bi_node_init(BiNode* n)
 
   // Texture
   n->texture = NULL;
-  n->tx = n->ty = n->tw = n->th = 0;
   memset( &n->texture_uv, 0, sizeof(GLfloat)*4 );
   memset( &n->texture_crop_uv, 0, sizeof(GLfloat)*4 );
-  n->texture_uv_left = 0;
-  n->texture_uv_top = 0;
-  n->texture_uv_right = 0;
-  n->texture_uv_bottom = 0;
-  n->texture_cropped = false;
-  n->cx = n->cy = n->ow = n->oh = 0;
   n->texture_flip_horizontal = false;
   n->texture_flip_vertical = false;
 
@@ -184,40 +177,17 @@ bool bi_node_inside(BiNode* node, int x, int y)
 
 static inline void update_draw_matrix(BiNode* n)
 {
-  if(n->texture_cropped) {
-    // offset
-    GLfloat x = n->texture_flip_horizontal ? n->ow-n->cx-n->tw : n->cx;
-    GLfloat y = n->texture_flip_vertical   ? n->cy : n->oh-n->cy-n->th;
-    // normalize
-    x = x * n->w / n->ow;
-    y = y * n->h / n->oh;
-    // add anchor
-    x += - n->anchor_x * n->w;
-    y += - n->anchor_y * n->h;
-    // scale with normalize
-    GLfloat w = (GLfloat)n->tw * n->w / n->ow;
-    GLfloat h = (GLfloat)n->th * n->h / n->oh;
-    // trans & scale
-    GLfloat tmp[16] = {
-      w,  0,  0,  0,
-      0,  h,  0,  0,
-      0,  0,  1,  0,
-      x,  y,  0,  1
-    };
-    bi_mat4_multiply(tmp,n->transform_matrix,n->draw_matrix);
-  }else{
-    GLfloat lx = - n->anchor_x * n->w;
-    GLfloat ly = - n->anchor_y * n->h;
-    GLfloat lw = n->w;
-    GLfloat lh = n->h;
-    GLfloat tmp[16] = {
-      lw,   0,  0,  0,
-       0,  lh,  0,  0,
-       0,   0,  1,  0,
-      lx,  ly,  0,  1
-    };
-    bi_mat4_multiply(tmp, n->transform_matrix, n->draw_matrix);
-  }
+  GLfloat lx = - n->anchor_x * n->w;
+  GLfloat ly = - n->anchor_y * n->h;
+  GLfloat lw = n->w;
+  GLfloat lh = n->h;
+  GLfloat tmp[16] = {
+    lw,   0,  0,  0,
+     0,  lh,  0,  0,
+     0,   0,  1,  0,
+    lx,  ly,  0,  1
+  };
+  bi_mat4_multiply(tmp, n->transform_matrix, n->draw_matrix);
 }
 
 static inline void update_transform_matrix(BiNode* n)
@@ -303,23 +273,23 @@ void bi_node_set_cropped_texture(BiNode* n, BiTexture* tex,
   GLfloat l2,b2,r2,t2;
   {
     l2 = tx;
-    t2 = ty;
-    r2 = tx+tw;
     b2 = ty+th;
+    r2 = tx+tw;
+    t2 = ty;
     l1 = l2 - cx;
-    t1 = t2 - cy;
+    b1 = b2 + (oh-cy-th);
     r1 = r2 + (ow-cx-tw);
-    b1 = b2 + (oh-cy-th);;
+    t1 = t2 - cy;
   }
   {
-    l1 /= (GLfloat)tex->w;
-    b1 /= (GLfloat)tex->h;
-    r1 /= (GLfloat)tex->w;
-    t1 /= (GLfloat)tex->h;
-    l2  /= (GLfloat)tex->w;
-    b2  /= (GLfloat)tex->h;
-    r2  /= (GLfloat)tex->w;
-    t2  /= (GLfloat)tex->h;
+    l1 /= tex->w;
+    b1 /= tex->h;
+    r1 /= tex->w;
+    t1 /= tex->h;
+    l2 /= tex->w;
+    b2 /= tex->h;
+    r2 /= tex->w;
+    t2 /= tex->h;
   }
   bi_node_set_texture_mapping(n,tex,
     l1,b1,r1,t1, l2,b2,r2,t2 );
@@ -344,5 +314,4 @@ void bi_node_unset_texture(BiNode* n)
 {
   n->draw_matrix_cached = false;
   n->texture = NULL;
-  n->texture_cropped = false;
 }

@@ -46,12 +46,8 @@ struct _BiNode {
 
   // Texture
   BiTexture *texture;
-  int tx,ty,tw,th;
   GLfloat texture_uv[4]; // left,bottom,right,top
   GLfloat texture_crop_uv[4]; // left,bottom,right,top
-  GLfloat texture_uv_left,texture_uv_top,texture_uv_right,texture_uv_bottom;
-  bool texture_cropped;
-  int cx,cy,ow,oh;
   bool texture_flip_horizontal;
   bool texture_flip_vertical;
 

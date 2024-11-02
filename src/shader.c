@@ -47,7 +47,6 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
 
   // Attribute locations
   shader->attribute.vertex = glGetAttribLocation(program_id, "vertex");
-  shader->attribute.uv = glGetAttribLocation(program_id, "uv"); // XXX: deprecate
   shader->attribute.texture_uv = glGetAttribLocation(program_id, "texture_uv");
   shader->attribute.texture_crop_uv = glGetAttribLocation(program_id, "texture_crop_uv");
   shader->attribute.texture_index = glGetAttribLocation(program_id, "texture_index");
@@ -86,6 +85,13 @@ static inline void generate_vao(GLuint buf, GLuint attr, GLint size, GLuint div)
   glVertexAttribPointer(attr,size,GL_FLOAT,GL_FALSE,0,NULL);
   glVertexAttribDivisor(attr, div);
 }
+static inline void generate_vao_int(GLuint buf, GLuint attr, GLint size, GLuint div)
+{
+  glBindBuffer(GL_ARRAY_BUFFER,buf);
+  glEnableVertexAttribArray(attr);
+  glVertexAttribIPointer(attr,size,GL_INT,0,NULL);
+  glVertexAttribDivisor(attr, div);
+}
 
 void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source)
 {
@@ -99,7 +105,6 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glUseProgram(0);
 
   // create vbo
-  glGenBuffers(1, &shader->buffer.uv);
   glGenBuffers(1, &shader->buffer.texture_uv);
   glGenBuffers(1, &shader->buffer.texture_crop_uv);
   glGenBuffers(1, &shader->buffer.texture_index);
@@ -120,28 +125,14 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   // generate vao
   glGenVertexArrays(1, &shader->vao);
   glBindVertexArray(shader->vao);
-    // vertex
     generate_vao(shader->buffer.vertex, shader->attribute.vertex, 2, 0);
-    // uv
-    generate_vao(shader->buffer.uv, shader->attribute.uv, 4, 1);
-    // texture_uv
     generate_vao(shader->buffer.texture_uv, shader->attribute.texture_uv, 4, 1);
-    // texture_crop_uv
     generate_vao(shader->buffer.texture_crop_uv, shader->attribute.texture_crop_uv, 4, 1);
-    // texture_index ("I"Pointer)
-    glBindBuffer(GL_ARRAY_BUFFER,shader->buffer.texture_index);
-    glEnableVertexAttribArray(shader->attribute.texture_index );
-    glVertexAttribIPointer(shader->attribute.texture_index,1,GL_INT,0,NULL);
-    glVertexAttribDivisor(shader->attribute.texture_index, 1);
-    // color tint
+    generate_vao_int(shader->buffer.texture_index,shader->attribute.texture_index,1,1);
     generate_vao(shader->buffer.tint, shader->attribute.tint, 4, 1);
-    // color modulate
     generate_vao(shader->buffer.modulate, shader->attribute.modulate, 4, 1);
-    // node size
     generate_vao(shader->buffer.node_size, shader->attribute.node_size, 2, 1);
-    // transform
     init_mat4_buffer(shader->attribute.transform, shader->buffer.transform);
-    // extra data (node)
     init_mat4_buffer(shader->attribute.node_extra_data, shader->buffer.node_extra_data);
   glBindVertexArray(0); // unbind vao
 }
@@ -167,9 +158,8 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   const size_t len = queue->size;
   static size_t len_max = 0;
   static GLfloat *transforms = NULL;
-  static GLfloat *uv = NULL; // [ left, top, right, bottom ]
-  static GLfloat *texture_uv = NULL; // u1,v1,u2,v2
-  static GLfloat *texture_crop_uv = NULL; // cu1,cv1,cu2,cv2
+  static GLfloat *texture_uv = NULL;
+  static GLfloat *texture_crop_uv = NULL;
   static GLint *texture_index = NULL;
   static GLfloat* tint = NULL;
   static GLfloat* modulate = NULL;
@@ -179,7 +169,6 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   if(len>len_max){
     len_max = len;
     transforms = realloc( transforms, sizeof(GLfloat)*len*16 );
-    uv = realloc( uv, sizeof(GLfloat)*len*4 );
     texture_uv = realloc( texture_uv, sizeof(GLfloat)*len*4 );
     texture_crop_uv = realloc( texture_crop_uv, sizeof(GLfloat)*len*4 );
     texture_index = realloc( texture_index, sizeof(GLint)*len );
@@ -195,23 +184,17 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     bi_mat4_copy(&transforms[i*16], node->draw_matrix);
     // Texture
     if(node->texture != NULL) {
-      if(node->texture_flip_horizontal) {
-        uv[i*4+0] = node->texture_uv_right; // Left <-> Right
-        uv[i*4+2] = node->texture_uv_left;
-      }else{
-        uv[i*4+0] = node->texture_uv_left;
-        uv[i*4+2] = node->texture_uv_right;
-      }
-      if( node->texture_flip_vertical == false ) { // XXX: DEFAULT flipped
-        uv[i*4+1] = node->texture_uv_bottom; // Top <-> Bottom
-        uv[i*4+3] = node->texture_uv_top;
-      }else{
-        uv[i*4+1] = node->texture_uv_top;
-        uv[i*4+3] = node->texture_uv_bottom;
-      }
       for(int j=0;j<4;j++){
         texture_uv[i*4+j] = node->texture_uv[j];
         texture_crop_uv[i*4+j] = node->texture_crop_uv[j];
+      }
+      if(node->texture_flip_horizontal) {
+        texture_uv[i*4+0] = node->texture_uv[2]; // left = right
+        texture_uv[i*4+2] = node->texture_uv[0]; // right = left
+      }
+      if( node->texture_flip_vertical) {
+        texture_uv[i*4+1] = node->texture_uv[3]; // bottom = top
+        texture_uv[i*4+3] = node->texture_uv[1]; // top = bottom
       }
       texture_index[i] = node->texture->texture_unit;
     }else{
@@ -239,7 +222,6 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   //
   update_vbo(shader->buffer.transform, sizeof(GLfloat)*16*len, transforms);
   update_vbo(shader->buffer.texture_index, sizeof(GLint)*1*len, texture_index);
-  update_vbo(shader->buffer.uv, sizeof(GLfloat)*4*len, uv);
   update_vbo(shader->buffer.texture_uv, sizeof(GLfloat)*4*len, texture_uv);
   update_vbo(shader->buffer.texture_crop_uv, sizeof(GLfloat)*4*len, texture_crop_uv);
   update_vbo(shader->buffer.tint, sizeof(GLfloat)*4*len, tint);

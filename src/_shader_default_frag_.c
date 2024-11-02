@@ -6,7 +6,7 @@ const char *SHADER_DEFAULT_FRAG =
 SHADER_VERSION
 FRAGMENT_SHADER_HEADER
 D(
-in vec2 _uv;
+in vec2 uv;
 in vec4 crop;
 in vec2 local_xy;
 flat in int _texture_index;
@@ -19,7 +19,17 @@ uniform vec2 resolution;
 uniform mat4 layer_extra_data;
 uniform sampler2D sampler[16];
 out vec4 color;
-vec4 getTextureColor(int index,vec2 xy) {
+
+vec4 getTextureColor(int index,vec2 xy,vec4 crop) {
+  if( index < 0 || 16 <= index ) { return vec4(1.0); }
+  float upper = crop[1] > crop[3] ? crop[1] : crop[3];
+  float lower = crop[1] > crop[3] ? crop[3] : crop[1];
+  if( xy.x < 0.0 || 1.0 < xy.x  ){ return vec4(0.0); }
+  if( xy.y < 0.0 || 1.0 < xy.y  ){ return vec4(0.0); }
+  if( xy.x < crop[0] ){ return vec4(0.0); }
+  if( xy.y < lower ){ return vec4(0.0); }
+  if( xy.x > crop[2] ){ return vec4(0.0); }
+  if( xy.y > upper ){ return vec4(0.0); }
   if(index==0){ return texture(sampler[0], xy); }
   if(index==1){ return texture(sampler[1], xy); }
   if(index==2){ return texture(sampler[2], xy); }
@@ -41,18 +51,7 @@ vec4 getTextureColor(int index,vec2 xy) {
 
 void main()
 {
-  vec4 c = vec4(1.0);
-  float upper = crop[1] > crop[3] ? crop[1] : crop[3];
-  float lower = crop[1] > crop[3] ? crop[3] : crop[1];
-  if( 0 <= _texture_index && _texture_index < 16 ) {
-    if( _uv.x < 0.0 || 1.0 < _uv.x  ){ discard; return; }
-    if( _uv.y < 0.0 || 1.0 < _uv.y  ){ discard; return; }
-    if( _uv.x < crop[0] ){ discard; return; }
-    if( _uv.y < lower ){ discard; return; }
-    if( _uv.x > crop[2] ){ discard; return; }
-    if( _uv.y > upper ){ discard; return; }
-    c = getTextureColor( _texture_index, _uv);
-  }
+  vec4 c = getTextureColor( _texture_index, uv, crop);
   c = vec4(c.rgb*_modulate.rgb, c.a) * _modulate.a;
   color = vec4( _tint.rgb*_tint.a*c.a + c.rgb*(1.0-_tint.a), c.a );
 }

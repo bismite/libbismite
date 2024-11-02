@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
 
   // Texture
-  BiTexture* tex = MAKE_TEXTURE("assets/number.png");
+  BiTexture* tex = MAKE_TEXTURE("assets/tester.png");
   BiNode* background = make_bg("assets/check.png");
 
   // Layer
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   // No Cropping, Green Circle 32x32 in 32x32
   BiNode* n0 = bi_node_init(malloc(sizeof(BiNode)));
   bi_node_set_size(n0, 32,32);
-  bi_node_set_position(n0,200,100);
+  bi_node_set_position(n0,100,200);
   // image is upside-down
   left = 64; bottom = 96; right = 96; top = 64;
   left2 = 64; bottom2 = 96; right2 = 96; top2 = 64;
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   // With Cropping, Green Circle 32x32 in 64x64
   BiNode* n1 = bi_node_init(malloc(sizeof(BiNode)));
   bi_node_set_size(n1, 64,64);
-  bi_node_set_position(n1,100,100);
+  bi_node_set_position(n1,200,120);
   // image is upside-down
   left = 48; bottom = 112; right = 112; top = 48;
   left2 = 64; bottom2 = 96; right2 = 96; top2 = 64;
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   //   Red Circle 32x32 in 64x64
   BiNode* n2 = bi_node_init(malloc(sizeof(BiNode)));
   bi_node_set_size(n2, 64,64);
-  bi_node_set_position(n2,200,200);
+  bi_node_set_position(n2,300,80);
   bi_node_set_cropped_texture(n2, tex,
     32,96,32,32, 16,16, 64,64 );
   bi_layer_add_node(layer,n2);

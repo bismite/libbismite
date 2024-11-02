@@ -1,8 +1,5 @@
 #include "common.h"
 
-#define FRAG "assets/shaders/collapse.frag"
-#define VERT "assets/shaders/collapse.vert"
-
 static void collapse(BiContext* ctx,BiTimer* timer,double dt)
 {
   static double t = 0;
@@ -33,7 +30,7 @@ int main(int argc, char* argv[])
   // timer for shader
   bi_node_add_timer(face, bi_timer_init(ALLOC(BiTimer),collapse,0,-1,mushroom));
   // shader
-  fg_layer->shader = create_shader(VERT,FRAG);
+  fg_layer->shader = create_shader_with_default_vertex_shader("assets/shaders/collapse.frag");
   // add layer groups
   bi_layer_group_add_layer(&context->layers,bg_layer);
   bi_layer_group_add_layer(&context->layers,fg_layer);

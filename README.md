@@ -1,6 +1,11 @@
 # libbismite
 
 # Change Log
+## 11.0.0 - 2024/11/03
+- Update: `node.c` and `shader.c` have been updated. Cropped textures are handled in shaders.
+  - new function: `bi_node_set_texture_mapping` in `node.c`.
+  - samples update: `shader-collapse`, `texture-mapping`
+  - updated sample shaders.
 ## 10.2.0 - 2024/10/28
 - vertex shader send local_xy (normalized, 0.0 to 1.0) to fragment shader.
 - send `node_size` for shader

@@ -1,5 +1,6 @@
 #include <bi/layer.h>
 #include <bi/node.h>
+#include <bi/bi_sdl.h>
 
 BiFramebuffer* bi_framebuffer_init(BiFramebuffer *fb,int w,int h)
 {
@@ -19,4 +20,19 @@ BiFramebuffer* bi_framebuffer_init(BiFramebuffer *fb,int w,int h)
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   return fb;
+}
+
+void bi_framebuffer_save_png_image(BiFramebuffer *fb,const char *filename)
+{
+  const int w = fb->w;
+  const int h = fb->h;
+  const int pitch = 4*w;
+  uint8_t* pixels = malloc(pitch*h);
+  glBindFramebuffer(GL_FRAMEBUFFER,fb->framebuffer_id);
+  glReadPixels(0,0,fb->w,fb->h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
+  SDL_Surface* s = SDL_CreateRGBSurfaceWithFormatFrom(pixels,w,h,32,pitch,SDL_PIXELFORMAT_RGBA32);
+  IMG_SavePNG(s,filename);
+  SDL_FreeSurface(s);
+  free(pixels);
 }

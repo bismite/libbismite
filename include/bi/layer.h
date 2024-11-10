@@ -27,6 +27,8 @@ struct _BiLayer {
 
 struct _BiLayerGroup {
   BI_NODE_HEADER;
+  int w;
+  int h;
   BiBlendFactor blend_factor;
   BiFramebuffer framebuffer;
 };
@@ -35,6 +37,7 @@ struct _BiLayerGroup {
 // layer group
 //
 extern BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group);
+extern BiLayerGroup* bi_layer_group_init_with_size(BiLayerGroup* layer_group,int w, int h);
 extern int bi_layer_group_get_z_order(BiLayerGroup* layer_group);
 extern void bi_layer_group_set_z_order(BiLayerGroup* layer_group,int z);
 // Tree
@@ -45,6 +48,9 @@ extern BiLayerGroup* bi_layer_group_remove_layer_group(BiLayerGroup* layer_group
 // Timer
 static inline BiTimer* bi_layer_group_add_timer(BiLayerGroup* lg,BiTimer* timer){ return bi_timers_add(&lg->timers,timer); }
 static inline BiTimer* bi_layer_group_remove_timer(BiLayerGroup* lg,BiTimer* timer){ return bi_timers_remove(&lg->timers,timer); }
+// Render
+extern void bi_layer_group_clear(BiLayerGroup* layer_group,uint8_t r,uint8_t g,uint8_t b,uint8_t a);
+extern void bi_layer_group_draw(BiLayerGroup* layer_group,BiContext* context);
 
 //
 // layer

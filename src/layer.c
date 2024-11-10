@@ -1,6 +1,7 @@
 #include <bi/layer.h>
 #include <bi/node.h>
 #include <bi/render.h>
+#include <bi/context.h>
 
 extern void render_postprocess(BiContext* context,
                                BiNodeBase *layer,
@@ -16,15 +17,21 @@ extern void render_layer(BiContext* context,
 // Layer Group
 //
 
-BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
+BiLayerGroup* bi_layer_group_init_with_size(BiLayerGroup* layer_group,int w, int h)
 {
   bi_node_base_init((BiNodeBase*)layer_group,BI_LAYER_GROUP);
   layer_group->blend_factor = BI_BLEND_FACTOR_DEFAULT;
+  bi_framebuffer_init(&layer_group->framebuffer,w,h);
+  layer_group->w = w;
+  layer_group->h = h;
+  return layer_group;
+}
+
+BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
+{
   GLint dims[4] = {0};
   glGetIntegerv(GL_VIEWPORT, dims);
-  bi_framebuffer_init(&layer_group->framebuffer,dims[2],dims[3]);
-  //
-  return layer_group;
+  return bi_layer_group_init_with_size(layer_group,dims[2],dims[3]);
 }
 
 int bi_layer_group_get_z_order(BiLayerGroup* layer_group)
@@ -67,6 +74,26 @@ BiLayerGroup* bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLay
   return NULL;
 }
 
+//
+// LayerGroup Draw
+//
+void bi_layer_group_clear(BiLayerGroup* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a)
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, canvas->framebuffer.framebuffer_id);
+  glClearColor(r/255.0, g/255.0, b/255.0, a/255.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void bi_layer_group_draw(BiLayerGroup* canvas, BiContext* context)
+{
+  BiRenderingContext rendering_context;
+  bi_rendering_context_init(&rendering_context,true,true,1.0,
+                            NULL, //&context->interaction_queue,
+                            NULL, // &context->timer_queue,
+                            &context->rendering_queue);
+  bi_render_layer_group( context, (BiNodeBase*)canvas, NULL, rendering_context );
+}
 
 //
 // Layer

@@ -171,7 +171,7 @@ static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLu
   bi_node_base_deinit((BiNodeBase*)&l);
 }
 
-extern void render_layer_group(BiContext* context,
+extern void bi_render_layer_group(BiContext* context,
                                BiNodeBase *layer_group,
                                BiFramebuffer* dst,
                                BiRenderingContext rc
@@ -194,10 +194,10 @@ extern void render_layer_group(BiContext* context,
       render_function f = ((BiLayer*)n)->_render_function_;
       f( context, n, &lg->framebuffer, rc );
     }else{
-      render_layer_group(context,n,&lg->framebuffer,rc);
+      bi_render_layer_group(context,n,&lg->framebuffer,rc);
+      draw_layer_group_to_buffer(context, lg, dst ? dst->framebuffer_id : 0 );
     }
   }
-  draw_layer_group_to_buffer(context, lg, dst ? dst->framebuffer_id : 0 );
 }
 
 void bi_render(BiContext* context)
@@ -217,7 +217,9 @@ void bi_render(BiContext* context)
                             &context->interaction_queue,
                             &context->timer_queue,
                             &context->rendering_queue);
-  render_layer_group( context, (BiNodeBase*)&context->layers, NULL, rendering_context );
+  bi_render_layer_group( context, (BiNodeBase*)&context->layers, NULL, rendering_context );
+  draw_layer_group_to_buffer(context, &context->layers, 0 );
+
   //
   SDL_GL_SwapWindow(context->window);
 }

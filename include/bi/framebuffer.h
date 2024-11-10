@@ -13,5 +13,6 @@ struct _BiFramebuffer {
 };
 
 extern BiFramebuffer* bi_framebuffer_init(BiFramebuffer *fb,int w,int h);
+extern void bi_framebuffer_save_png_image(BiFramebuffer *fb,const char *filename);
 
 #endif

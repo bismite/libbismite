@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 #include <bi/array.h>
-#include <bi/bi_gl.h>
-#include <bi/layer.h>
 
+typedef struct _BiNodeBase BiNodeBase;
+typedef struct _BiFramebuffer BiFramebuffer;
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
 typedef struct _BiTexture BiTexture;
@@ -26,6 +26,13 @@ extern BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context
                                                      Array* interaction_queue,
                                                      Array* timer_queue,
                                                      Array* rendering_queue);
+
+extern void bi_render_layer_group(BiContext* context,
+                                  BiNodeBase *layer_group,
+                                  BiFramebuffer* dst,
+                                  BiRenderingContext rc );
+
+// deprecate
 extern void bi_render_queuing(BiRenderingContext context, BiNode* n);
 extern void bi_render_activate_textures(BiTexture** textures);
 

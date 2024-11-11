@@ -32,8 +32,4 @@ extern void bi_render_layer_group(BiContext* context,
                                   BiFramebuffer* dst,
                                   BiRenderingContext rc );
 
-// deprecate
-extern void bi_render_queuing(BiRenderingContext context, BiNode* n);
-extern void bi_render_activate_textures(BiTexture** textures);
-
 #endif

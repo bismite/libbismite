@@ -23,7 +23,7 @@ static bool node_has_event_handler(BiNode* n)
   return false;
 }
 
-void bi_render_queuing(BiRenderingContext context, BiNode* n)
+static inline void bi_render_queuing(BiRenderingContext context, BiNode* n)
 {
   bool visible = context.visible;
   bool interaction_enabled = context.interaction_enabled && n->interaction_enabled;
@@ -57,7 +57,7 @@ void bi_render_queuing(BiRenderingContext context, BiNode* n)
   }
 }
 
-void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
+static inline void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
 {
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);
@@ -187,6 +187,7 @@ extern void bi_render_layer_group(BiContext* context,
   }
   // render
   target_and_clear_framebuffer(&lg->framebuffer);
+  // children
   array_sort(&lg->children);
   for( int i=0; i<lg->children.size; i++ ) {
     BiNodeBase* n = array_object_at(&lg->children, i);

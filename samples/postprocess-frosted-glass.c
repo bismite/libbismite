@@ -1,10 +1,9 @@
 #include "common.h"
-#include "bi/canvas.h"
 
 BiNode* glasses;
 BiNode* glass_a;
 BiNode* glass_b;
-BiCanvas* canvas;
+BiLayerGroup* canvas;
 
 typedef struct {
   int vx;
@@ -32,9 +31,9 @@ static void random_move(BiContext* ctx,BiTimer* t,double dt)
     bi_node_set_position(n,x,y);
   }
   // redraw
-  bi_canvas_clear(canvas, 0,0,0, 0xff);
-  bi_canvas_draw(canvas,glasses);
+  bi_layer_group_draw(canvas,ctx);
 }
+
 
 BiNode* make_glass(const char* name)
 {
@@ -46,6 +45,27 @@ BiNode* make_glass(const char* name)
   n->userdata = d;
   return n;
 }
+
+BiLayerGroup* make_canvas(BiContext* ctx)
+{
+  canvas = bi_layer_group_init_with_size(ALLOC(BiLayerGroup),W,H);
+  // Nodes
+  glasses = bi_node_init(ALLOC(BiNode));
+  glass_a = make_glass("assets/glass-a.png");
+  glass_b = make_glass("assets/glass-b.png");
+  bi_node_add_node(glasses,glass_a);
+  bi_node_add_node(glasses,glass_b);
+  // Layer
+  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
+  bi_layer_add_node(layer,glasses);
+  layer->textures[0] = glass_a->texture;
+  layer->textures[1] = glass_b->texture;
+  bi_layer_group_add_layer(canvas,layer);
+  // draw
+  bi_layer_group_draw(canvas,ctx);
+  return canvas;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -60,19 +80,12 @@ int main(int argc, char* argv[])
   bi_node_add_node(bg,face);
   layer->textures[0] = bg->texture;
   layer->textures[1] = face->texture;
+
   // Canvas
-  glasses = bi_node_init(ALLOC(BiNode));
-  glass_a = make_glass("assets/glass-a.png");
-  glass_b = make_glass("assets/glass-b.png");
-  bi_node_add_node(glasses,glass_a);
-  bi_node_add_node(glasses,glass_b);
-  canvas = bi_canvas_init(ALLOC(BiCanvas),W,H);
-  canvas->shader = &context->default_shader;
-  canvas->textures[0] = glass_a->texture;
-  canvas->textures[1] = glass_b->texture;
-  bi_canvas_clear(canvas, 0,0,0, 0xff);
-  bi_canvas_draw(canvas,glasses);
-  BiTexture* canvas_tex = bi_canvas_to_texture(canvas, ALLOC(BiTexture));
+  make_canvas(context);
+  BiTexture* canvas_tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),&canvas->framebuffer);
+  // bi_framebuffer_save_png_image(&canvas->framebuffer,"postprocess-frosted-glass.png");
+
   // PostProcess Layer
   BiLayer *pp_layer = bi_layer_init_as_postprocess(ALLOC(BiLayer));
   BiNode *root = bi_layer_add_node(pp_layer,bi_node_init(ALLOC(BiNode)));

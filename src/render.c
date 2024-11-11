@@ -110,13 +110,6 @@ static void draw_layer_to_buffer(BiContext* context, BiLayer* layer, BiRendering
   bi_shader_draw(shader,rc.rendering_queue);
 }
 
-static void target_and_clear_framebuffer(BiFramebuffer *fb)
-{
-  glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
-  glClearColor(0,0,0,0);
-  glClear(GL_COLOR_BUFFER_BIT);
-}
-
 extern void render_postprocess(BiContext* context,
                                BiNodeBase *layer,
                                BiFramebuffer *dst,
@@ -125,15 +118,19 @@ extern void render_postprocess(BiContext* context,
 {
   BiLayer *l = (BiLayer*)layer;
   // render to Temporary Framebuffer
-  target_and_clear_framebuffer(&context->post_process_framebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, context->post_process_framebuffer.framebuffer_id);
+  glClearColor(0,0,0,0);
+  glClear(GL_COLOR_BUFFER_BIT);
   draw_layer_to_buffer( context, l, &rc );
-  glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer_id);
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
   // Blit temporary framebuffer to fb
   glBindFramebuffer(GL_READ_FRAMEBUFFER, context->post_process_framebuffer.framebuffer_id);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->framebuffer_id);
   glBlitFramebuffer(0, 0, dst->w, dst->h,
                     0, 0, dst->w, dst->h,
                     GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
 }
 
 extern void render_layer(BiContext* context,
@@ -185,9 +182,15 @@ extern void bi_render_layer_group(BiContext* context,
   if( lg->timers.size > 0 ) {
     array_add_object(&context->timer_queue, lg);
   }
-  // render
-  target_and_clear_framebuffer(&lg->framebuffer);
-  // children
+  // Store...?
+  // GLint draw_fb = 0, read_fb = 0;
+  // glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &draw_fb);
+  // glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &read_fb);
+  // Target
+  glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
+  glClearColor(0,0,0,0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  // Children
   array_sort(&lg->children);
   for( int i=0; i<lg->children.size; i++ ) {
     BiNodeBase* n = array_object_at(&lg->children, i);
@@ -197,8 +200,15 @@ extern void bi_render_layer_group(BiContext* context,
     }else{
       bi_render_layer_group(context,n,&lg->framebuffer,rc);
       draw_layer_group_to_buffer(context, lg, dst ? dst->framebuffer_id : 0 );
+      // Re-Target
+      glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
     }
   }
+  // Unbind
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
+  // ... or Restore?
+  // glBindFramebuffer(GL_READ_FRAMEBUFFER, read_fb);
+  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
 }
 
 void bi_render(BiContext* context)

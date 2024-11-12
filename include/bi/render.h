@@ -29,7 +29,6 @@ extern BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context
 
 extern void bi_render_layer_group(BiContext* context,
                                   BiNodeBase *layer_group,
-                                  BiFramebuffer* dst,
                                   BiRenderingContext rc );
 
 #endif

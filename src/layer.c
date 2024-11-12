@@ -102,7 +102,7 @@ void bi_layer_group_draw(BiLayerGroup* canvas, BiContext* context)
                             NULL, //&context->interaction_queue,
                             NULL, // &context->timer_queue,
                             &context->rendering_queue);
-  bi_render_layer_group( context, (BiNodeBase*)canvas, NULL, rendering_context );
+  bi_render_layer_group( context, (BiNodeBase*)canvas, rendering_context );
   // restore
   context->w = _w;
   context->h = _h;

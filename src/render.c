@@ -173,7 +173,6 @@ static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLu
 
 extern void bi_render_layer_group(BiContext* context,
                                BiNodeBase *layer_group,
-                               BiFramebuffer* dst,
                                BiRenderingContext rc
                               )
 {
@@ -204,7 +203,7 @@ extern void bi_render_layer_group(BiContext* context,
       break;
     case BI_LAYER_GROUP:
       // render Child Framebuffer
-      bi_render_layer_group(context,n,&lg->framebuffer,rc);
+      bi_render_layer_group(context,n,rc);
       // Draw
       draw_layer_group_to_buffer(context, (BiLayerGroup*)n, lg->framebuffer.framebuffer_id );
       // Re-Target
@@ -233,7 +232,7 @@ void bi_render(BiContext* context)
                             &context->interaction_queue,
                             &context->timer_queue,
                             &context->rendering_queue);
-  bi_render_layer_group( context, (BiNodeBase*)&context->layers, NULL, rendering_context );
+  bi_render_layer_group( context, (BiNodeBase*)&context->layers, rendering_context );
   draw_layer_group_to_buffer(context, &context->layers, 0 );
 
   //

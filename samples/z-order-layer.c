@@ -3,6 +3,7 @@
 int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
+  context->color = RGBA(0x33,0,0x33,0xff);
   // background
   BiLayer *background_layer = bi_layer_init(ALLOC(BiLayer));
   BiNode* face = bi_layer_add_node(background_layer, make_sprite("assets/face01.png"));

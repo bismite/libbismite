@@ -123,7 +123,7 @@ extern void render_postprocess(BiContext* context,
   glClear(GL_COLOR_BUFFER_BIT);
   draw_layer_to_buffer( context, l, &rc );
   glBindFramebuffer(GL_FRAMEBUFFER,0);
-  // Blit temporary framebuffer to fb
+  // Blit temporary framebuffer to Destination FB
   glBindFramebuffer(GL_READ_FRAMEBUFFER, context->post_process_framebuffer.framebuffer_id);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->framebuffer_id);
   glBlitFramebuffer(0, 0, dst->w, dst->h,
@@ -161,11 +161,14 @@ static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLu
                             NULL,
                             NULL,
                             &context->rendering_queue);
-  // draw
+  // bind
   glBindFramebuffer(GL_FRAMEBUFFER, dst);
+  // draw
   draw_layer_to_buffer(context,&l,&rcontext);
   // dealloc node array
   bi_node_base_deinit((BiNodeBase*)&l);
+  // unbind
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
 }
 
 extern void bi_render_layer_group(BiContext* context,
@@ -174,6 +177,7 @@ extern void bi_render_layer_group(BiContext* context,
                                BiRenderingContext rc
                               )
 {
+  render_function f=NULL;
   BiLayerGroup *lg = (BiLayerGroup*)layer_group;
   // context
   rc.interaction_enabled = rc.interaction_enabled && lg->interaction_enabled;
@@ -182,10 +186,6 @@ extern void bi_render_layer_group(BiContext* context,
   if( lg->timers.size > 0 ) {
     array_add_object(&context->timer_queue, lg);
   }
-  // Store...?
-  // GLint draw_fb = 0, read_fb = 0;
-  // glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &draw_fb);
-  // glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &read_fb);
   // Target
   glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
   glClearColor(0,0,0,0);
@@ -194,21 +194,26 @@ extern void bi_render_layer_group(BiContext* context,
   array_sort(&lg->children);
   for( int i=0; i<lg->children.size; i++ ) {
     BiNodeBase* n = array_object_at(&lg->children, i);
-    if( n->class == BI_LAYER ){
-      render_function f = ((BiLayer*)n)->_render_function_;
+    switch(n->class) {
+    case BI_NODE:
+      // nop
+      break;
+    case BI_LAYER:
+      f = ((BiLayer*)n)->_render_function_;
       f( context, n, &lg->framebuffer, rc );
-    }else{
+      break;
+    case BI_LAYER_GROUP:
+      // render Child Framebuffer
       bi_render_layer_group(context,n,&lg->framebuffer,rc);
-      draw_layer_group_to_buffer(context, lg, dst ? dst->framebuffer_id : 0 );
+      // Draw
+      draw_layer_group_to_buffer(context, (BiLayerGroup*)n, lg->framebuffer.framebuffer_id );
       // Re-Target
       glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
+      break;
     }
   }
   // Unbind
   glBindFramebuffer(GL_FRAMEBUFFER,0);
-  // ... or Restore?
-  // glBindFramebuffer(GL_READ_FRAMEBUFFER, read_fb);
-  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
 }
 
 void bi_render(BiContext* context)

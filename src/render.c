@@ -233,7 +233,14 @@ void bi_render(BiContext* context)
                             &context->timer_queue,
                             &context->rendering_queue);
   bi_render_layer_group( context, (BiNodeBase*)&context->layers, rendering_context );
-  draw_layer_group_to_buffer(context, &context->layers, 0 );
+  // Blit Framebuffer
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, context->layers.framebuffer.framebuffer_id);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBlitFramebuffer(0, 0, context->w, context->h,
+                    0, 0, context->w, context->h,
+                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
 
   //
   SDL_GL_SwapWindow(context->window);

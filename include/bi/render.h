@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <bi/array.h>
 
-typedef struct _BiFramebufferNode BiFramebufferNode;
+typedef struct _BiNode BiNode;
 typedef struct _BiContext BiContext;
 typedef struct _BiTexture BiTexture;
 
@@ -26,7 +26,7 @@ extern BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context
                                                      Array* rendering_queue);
 
 extern void bi_render_framebuffer_node(BiContext*,
-                                       BiFramebufferNode*,
+                                       BiNode*,
                                        BiRenderingContext );
 
 #endif

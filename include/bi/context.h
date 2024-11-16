@@ -34,7 +34,8 @@ struct _BiContext {
   bool debug;
 
   // Default Framebuffer
-  BiFramebufferNode default_framebuffer_node;
+  BiFramebuffer default_framebuffer;
+  BiNode default_framebuffer_node;
 
   // queue
   Array rendering_queue;

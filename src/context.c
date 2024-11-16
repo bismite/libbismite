@@ -47,16 +47,17 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
 
-  BiFramebuffer fb;
-  fb.framebuffer_id = 0;
-  fb.texture_id = 0;
-  fb.w = w;
-  fb.h = h;
+  // Framebuffer
+  context->default_framebuffer.framebuffer_id = 0;
+  context->default_framebuffer.texture_id = 0;
+  context->default_framebuffer.w = w;
+  context->default_framebuffer.h = h;
   if( is_high_dpi(context) ){
-    fb.w *= 2;
-    fb.h *= 2;
+    context->default_framebuffer.w *= 2;
+    context->default_framebuffer.h *= 2;
   }
-  bi_framebuffer_node_init_with_framebuffer(&context->default_framebuffer_node,w,h,fb);
+  bi_node_init(&context->default_framebuffer_node);
+  context->default_framebuffer_node.framebuffer = &context->default_framebuffer;
 
   // timers
   context->last_update = 0;
@@ -107,8 +108,8 @@ bool is_high_dpi(BiContext* context)
 //
 // Layer
 //
-void bi_add_shader_node(BiContext* context, BiShaderNode* shader_node) { bi_framebuffer_node_add_shader_node(&context->default_framebuffer_node,shader_node); }
-void bi_remove_shader_node(BiContext* context, BiShaderNode* shader_node) { bi_framebuffer_node_remove_shader_node(&context->default_framebuffer_node,shader_node); }
+void bi_add_shader_node(BiContext* context, BiShaderNode* s) { bi_node_add_node(&context->default_framebuffer_node,s); }
+void bi_remove_shader_node(BiContext* context, BiShaderNode* s) { bi_node_add_node(&context->default_framebuffer_node,s); }
 
 //
 // Shader

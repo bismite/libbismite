@@ -51,6 +51,10 @@ struct _BiNode {
   bool texture_flip_horizontal;
   bool texture_flip_vertical;
 
+  // Framebuffer
+  BiFramebuffer *framebuffer;
+
+  // Event Handlers
   on_click_callback on_click;
   on_move_cursor_callback on_move_cursor;
   on_move_finger_callback on_move_finger;

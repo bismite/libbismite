@@ -21,9 +21,9 @@ BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node)
   return shader_node;
 }
 
-BiShaderNode* bi_shader_node_remove_from_parent(BiShaderNode* shader_node)
+BiShaderNode* bi_shader_node_remove_from_parent(BiShaderNode* s)
 {
-  if(shader_node && shader_node->parent) return bi_framebuffer_node_remove_shader_node((BiFramebufferNode*)shader_node->parent,shader_node);
+  if(s && s->parent) return bi_node_remove_node((BiNode*)s->parent,s);
   return NULL;
 }
 

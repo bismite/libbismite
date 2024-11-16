@@ -3,74 +3,18 @@
 #include <bi/render.h>
 #include <bi/context.h>
 
-BiFramebufferNode* bi_framebuffer_node_init_with_framebuffer(BiFramebufferNode* fbnode,int w, int h,BiFramebuffer fb)
-{
-  bi_node_base_init((BiNodeBase*)fbnode,BI_FRAMEBUFFER_NODE);
-  fbnode->w = w;
-  fbnode->h = h;
-  fbnode->framebuffer = fb;
-  return fbnode;
-}
-
-BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode* fbnode,int w, int h)
-{
-  BiFramebuffer fb;
-  bi_framebuffer_init(&fb,w,h);
-  return bi_framebuffer_node_init_with_framebuffer(fbnode,w,h,fb);
-}
-
-int bi_framebuffer_node_get_z_order(BiFramebufferNode* framebuffer_node)
-{
-  return framebuffer_node->z;
-}
-
-void bi_framebuffer_node_set_z_order(BiFramebufferNode* framebuffer_node,int z)
-{
-  framebuffer_node->z = z;
-}
-
-BiShaderNode* bi_framebuffer_node_add_shader_node(BiFramebufferNode* framebuffer_node, BiShaderNode* obj)
-{
-  obj->parent = (BiNodeBase*)framebuffer_node;
-  return array_add_object(&framebuffer_node->children,obj);
-}
-
-BiShaderNode* bi_framebuffer_node_remove_shader_node(BiFramebufferNode* framebuffer_node, BiShaderNode* obj)
-{
-  if( obj && obj == array_remove_object(&framebuffer_node->children,obj) ){
-    obj->parent = NULL;
-    return obj;
-  }
-  return NULL;
-}
-
-BiFramebufferNode* bi_framebuffer_node_add_framebuffer_node(BiFramebufferNode* framebuffer_node, BiFramebufferNode* obj)
-{
-  obj->parent = (BiNodeBase*)framebuffer_node;
-  return array_add_object(&framebuffer_node->children,obj);
-}
-
-BiFramebufferNode* bi_framebuffer_node_remove_framebuffer_node(BiFramebufferNode* framebuffer_node, BiFramebufferNode* obj)
-{
-  if( obj && obj == array_remove_object(&framebuffer_node->children,obj) ){
-    obj->parent = NULL;
-    return obj;
-  }
-  return NULL;
-}
-
 //
 // LayerGroup Draw
 //
-void bi_framebuffer_node_clear(BiFramebufferNode* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a)
+void bi_framebuffer_node_clear(BiNode* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a)
 {
-  glBindFramebuffer(GL_FRAMEBUFFER, canvas->framebuffer.framebuffer_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, canvas->framebuffer->framebuffer_id);
   glClearColor(r/255.0, g/255.0, b/255.0, a/255.0);
   glClear(GL_COLOR_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void bi_framebuffer_node_draw(BiFramebufferNode* canvas, BiContext* context)
+void bi_framebuffer_node_draw(BiNode* canvas, BiContext* context)
 {
   // viewport setting
   GLint tmp[4];

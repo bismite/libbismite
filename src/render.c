@@ -115,7 +115,7 @@ static inline void render_shader_node_to_buffer(BiContext* context,
 
 
 void bi_render_framebuffer_node(BiContext* context,
-                                BiFramebufferNode *fbnode,
+                                BiNode *fbnode,
                                 BiRenderingContext rc )
 {
   // context
@@ -126,7 +126,7 @@ void bi_render_framebuffer_node(BiContext* context,
     array_add_object(&context->timer_queue, fbnode);
   }
   // Clear
-  glBindFramebuffer(GL_FRAMEBUFFER, fbnode->framebuffer.framebuffer_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbnode->framebuffer->framebuffer_id);
   glClearColor(0,0,0,0);
   glClear(GL_COLOR_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);

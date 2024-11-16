@@ -1,6 +1,6 @@
 #include "common.h"
 
-BiLayerGroup* canvas = NULL;
+BiFramebufferNode* canvas = NULL;
 
 static void save(BiContext* ctx,BiTimer* t,double dt)
 {
@@ -54,9 +54,9 @@ int main(int argc, char* argv[])
   bi_node_set_position(rect_b,480/4*3,50);
   bi_layer_add_node(layer_b,rect_b);
   // Layer Group
-  canvas = bi_layer_group_init(ALLOC(BiLayerGroup));
-  bi_layer_group_add_layer(canvas,layer_b);
-  bi_layer_group_add_layer_group(&context->layers,canvas);
+  canvas = bi_framebuffer_node_init(ALLOC(BiFramebufferNode));
+  bi_framebuffer_node_add_layer(canvas,layer_b);
+  bi_framebuffer_node_add_framebuffer_node(&context->layers,canvas);
   //
   bi_start_run_loop(context);
   return 0;

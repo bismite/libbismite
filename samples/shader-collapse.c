@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
   // shader
   fg_layer->shader = create_shader_with_default_vertex_shader("assets/shaders/collapse.frag");
   // add layer groups
-  bi_layer_group_add_layer(&context->layers,bg_layer);
-  bi_layer_group_add_layer(&context->layers,fg_layer);
+  bi_framebuffer_node_add_layer(&context->layers,bg_layer);
+  bi_framebuffer_node_add_layer(&context->layers,fg_layer);
   //
   bi_start_run_loop(context);
   return 0;

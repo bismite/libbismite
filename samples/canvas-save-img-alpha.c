@@ -1,8 +1,8 @@
 #include "common.h"
 
-BiLayerGroup* draw_canvas(BiContext* context)
+BiFramebufferNode* draw_canvas(BiContext* context)
 {
-  BiLayerGroup* canvas = bi_layer_group_init_with_size(ALLOC(BiLayerGroup),context->w,context->h);
+  BiFramebufferNode* canvas = bi_framebuffer_node_init_with_size(ALLOC(BiFramebufferNode),context->w,context->h);
   // Straight Alpha / Premultiplied Alpha
   BiTexture* tex_s = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/face01.png",true);
   BiTexture* tex_p = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/face01.png",false);
@@ -17,10 +17,10 @@ BiLayerGroup* draw_canvas(BiContext* context)
   bi_layer_add_node(layer, face_p);
   layer->textures[0] = tex_s;
   layer->textures[1] = tex_p;
-  bi_layer_group_add_layer(canvas, layer);
+  bi_framebuffer_node_add_layer(canvas, layer);
   // Draw
-  bi_layer_group_clear(canvas,0,0,0,0);
-  bi_layer_group_draw(canvas,context);
+  bi_framebuffer_node_clear(canvas,0,0,0,0);
+  bi_framebuffer_node_draw(canvas,context);
   return canvas;
 }
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
 
   // Canvas
-  BiLayerGroup* canvas = draw_canvas(context);
+  BiFramebufferNode* canvas = draw_canvas(context);
   // Save Image
   // UPSIDE DOWN, Premultiplied-Alpha Texture are Darked.
   bi_framebuffer_save_png_image(&canvas->framebuffer,"canvas-save-img-alpha.png");

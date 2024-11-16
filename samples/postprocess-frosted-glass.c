@@ -3,7 +3,7 @@
 BiNode* glasses;
 BiNode* glass_a;
 BiNode* glass_b;
-BiLayerGroup* canvas;
+BiFramebufferNode* canvas;
 
 typedef struct {
   int vx;
@@ -31,7 +31,7 @@ static void random_move(BiContext* ctx,BiTimer* t,double dt)
     bi_node_set_position(n,x,y);
   }
   // redraw
-  bi_layer_group_draw(canvas,ctx);
+  bi_framebuffer_node_draw(canvas,ctx);
 }
 
 
@@ -46,9 +46,9 @@ BiNode* make_glass(const char* name)
   return n;
 }
 
-BiLayerGroup* make_canvas(BiContext* ctx)
+BiFramebufferNode* make_canvas(BiContext* ctx)
 {
-  canvas = bi_layer_group_init_with_size(ALLOC(BiLayerGroup),W,H);
+  canvas = bi_framebuffer_node_init_with_size(ALLOC(BiFramebufferNode),W,H);
   // Nodes
   glasses = bi_node_init(ALLOC(BiNode));
   glass_a = make_glass("assets/glass-a.png");
@@ -60,9 +60,9 @@ BiLayerGroup* make_canvas(BiContext* ctx)
   bi_layer_add_node(layer,glasses);
   layer->textures[0] = glass_a->texture;
   layer->textures[1] = glass_b->texture;
-  bi_layer_group_add_layer(canvas,layer);
+  bi_framebuffer_node_add_layer(canvas,layer);
   // draw
-  bi_layer_group_draw(canvas,ctx);
+  bi_framebuffer_node_draw(canvas,ctx);
   return canvas;
 }
 

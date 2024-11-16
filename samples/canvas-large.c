@@ -3,9 +3,9 @@
 static const int CANVAS_W=1024;
 static const int CANVAS_H=1024;
 
-BiLayerGroup* draw_canvas(BiContext* context)
+BiFramebufferNode* draw_canvas(BiContext* context)
 {
-  BiLayerGroup* canvas = bi_layer_group_init_with_size(ALLOC(BiLayerGroup),CANVAS_W,CANVAS_H);
+  BiFramebufferNode* canvas = bi_framebuffer_node_init_with_size(ALLOC(BiFramebufferNode),CANVAS_W,CANVAS_H);
 
   // Sprite
   BiTexture *tex = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/face01.png",false);
@@ -17,9 +17,9 @@ BiLayerGroup* draw_canvas(BiContext* context)
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   bi_layer_add_node(layer, face);
   layer->textures[0] = face->texture;
-  bi_layer_group_add_layer(canvas, layer);
+  bi_framebuffer_node_add_layer(canvas, layer);
   // Draw
-  bi_layer_group_draw(canvas,context);
+  bi_framebuffer_node_draw(canvas,context);
   return canvas;
 }
 
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
 
   // Canvas
-  BiLayerGroup* canvas = draw_canvas(context);
+  BiFramebufferNode* canvas = draw_canvas(context);
   // bi_framebuffer_save_png_image(&canvas->framebuffer,"canvas-large.png");
 
   // Sprite from Canvas

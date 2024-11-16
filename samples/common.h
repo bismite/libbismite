@@ -69,10 +69,10 @@ __attribute__((unused)) static void add_fps_layer(BiContext* context)
   bi_layer_add_node( layer, (BiNode*)label );
   layer->textures[0] = label->font->texture;;
   // Layer Group
-  BiLayerGroup* layer_group = bi_layer_group_init(malloc(sizeof(BiLayerGroup)));
-  layer_group->z = 0xff;
-  bi_layer_group_add_layer(layer_group,layer);
-  bi_layer_group_add_layer_group(&context->layers,layer_group);
+  BiFramebufferNode* framebuffer_node = bi_framebuffer_node_init(malloc(sizeof(BiFramebufferNode)));
+  framebuffer_node->z = 0xff;
+  bi_framebuffer_node_add_layer(framebuffer_node,layer);
+  bi_framebuffer_node_add_framebuffer_node(&context->layers,framebuffer_node);
 }
 
 //

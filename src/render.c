@@ -142,7 +142,7 @@ extern void render_layer(BiContext* context,
   draw_layer_to_buffer( context, (BiLayer*)layer, &rc );
 }
 
-static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLuint dst)
+static void draw_framebuffer_node_to_buffer(BiContext* context, BiFramebufferNode *lg, GLuint dst)
 {
   BiFramebuffer *src = &lg->framebuffer;
   BiTexture t;
@@ -171,13 +171,13 @@ static void draw_layer_group_to_buffer(BiContext* context, BiLayerGroup *lg, GLu
   glBindFramebuffer(GL_FRAMEBUFFER,0);
 }
 
-extern void bi_render_layer_group(BiContext* context,
-                               BiNodeBase *layer_group,
+extern void bi_render_framebuffer_node(BiContext* context,
+                               BiNodeBase *framebuffer_node,
                                BiRenderingContext rc
                               )
 {
   render_function f=NULL;
-  BiLayerGroup *lg = (BiLayerGroup*)layer_group;
+  BiFramebufferNode *lg = (BiFramebufferNode*)framebuffer_node;
   // context
   rc.interaction_enabled = rc.interaction_enabled && lg->interaction_enabled;
   rc.time_scale *= lg->time_scale;
@@ -203,9 +203,9 @@ extern void bi_render_layer_group(BiContext* context,
       break;
     case BI_LAYER_GROUP:
       // render Child Framebuffer
-      bi_render_layer_group(context,n,rc);
+      bi_render_framebuffer_node(context,n,rc);
       // Draw
-      draw_layer_group_to_buffer(context, (BiLayerGroup*)n, lg->framebuffer.framebuffer_id );
+      draw_framebuffer_node_to_buffer(context, (BiFramebufferNode*)n, lg->framebuffer.framebuffer_id );
       // Re-Target
       glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
       break;
@@ -232,7 +232,7 @@ void bi_render(BiContext* context)
                             &context->interaction_queue,
                             &context->timer_queue,
                             &context->rendering_queue);
-  bi_render_layer_group( context, (BiNodeBase*)&context->layers, rendering_context );
+  bi_render_framebuffer_node( context, (BiNodeBase*)&context->layers, rendering_context );
   // Blit Framebuffer
   glBindFramebuffer(GL_READ_FRAMEBUFFER, context->layers.framebuffer.framebuffer_id);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

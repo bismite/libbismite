@@ -1,8 +1,8 @@
 #include "common.h"
 #include <bi/ext/action.h>
 
-BiLayerGroup* layer_group_a;
-BiLayerGroup* layer_group_b;
+BiFramebufferNode* framebuffer_node_a;
+BiFramebufferNode* framebuffer_node_b;
 
 static void rotate_on_timer(BiContext* ctx,BiTimer* timer,double dt)
 {
@@ -13,20 +13,20 @@ static void rotate_on_timer(BiContext* ctx,BiTimer* timer,double dt)
 static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, bool pressed)
 {
   if(pressed){
-    layer_group_a->time_scale = layer_group_a->time_scale == 0 ? 1.0 : 0;
+    framebuffer_node_a->time_scale = framebuffer_node_a->time_scale == 0 ? 1.0 : 0;
   }
   return true; // swallow
 }
 
-static BiLayerGroup* make_layer_group(BiContext* context, BiLayerGroup* lg, int offset_y)
+static BiFramebufferNode* make_framebuffer_node(BiContext* context, BiFramebufferNode* lg, int offset_y)
 {
-  bi_layer_group_init(lg);
-  bi_layer_group_add_layer_group(&context->layers, lg);
+  bi_framebuffer_node_init(lg);
+  bi_framebuffer_node_add_framebuffer_node(&context->layers, lg);
   // layer
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));
-  bi_layer_group_add_layer(lg,layer);
+  bi_framebuffer_node_add_layer(lg,layer);
   layer->textures[0] = tex;
   // sprite
   BiNode* faces[2];
@@ -55,10 +55,10 @@ int main(int argc, char* argv[])
   BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
   BiNode* root = bi_layer_add_node(layer,make_bg("assets/check.png"));
   bi_node_set_on_click(root, on_click);
-  bi_layer_group_add_layer(&context->layers,layer);
+  bi_framebuffer_node_add_layer(&context->layers,layer);
   layer->textures[0] = root->texture;
-  layer_group_a = make_layer_group(context, ALLOC(BiLayerGroup), 320/3*2);
-  layer_group_b = make_layer_group(context, ALLOC(BiLayerGroup), 320/3*1);
+  framebuffer_node_a = make_framebuffer_node(context, ALLOC(BiFramebufferNode), 320/3*2);
+  framebuffer_node_b = make_framebuffer_node(context, ALLOC(BiFramebufferNode), 320/3*1);
   // start
   bi_start_run_loop(context);
   return 0;

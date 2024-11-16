@@ -37,7 +37,7 @@ struct _BiContext {
   bool debug;
 
   // Layers
-  BiLayerGroup layers;
+  BiFramebufferNode layers;
 
   // queue
   Array rendering_queue;

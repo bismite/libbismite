@@ -47,7 +47,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
 
-  bi_layer_group_init(&context->layers);
+  bi_framebuffer_node_init(&context->layers);
 
   // timers
   context->last_update = 0;
@@ -97,8 +97,8 @@ void bi_set_title(BiContext* context, const char* title)
 //
 // Layer
 //
-void bi_add_layer(BiContext* context, BiLayer* layer) { bi_layer_group_add_layer(&context->layers,layer); }
-void bi_remove_layer(BiContext* context, BiLayer* layer) { bi_layer_group_remove_layer(&context->layers,layer); }
+void bi_add_layer(BiContext* context, BiLayer* layer) { bi_framebuffer_node_add_layer(&context->layers,layer); }
+void bi_remove_layer(BiContext* context, BiLayer* layer) { bi_framebuffer_node_remove_layer(&context->layers,layer); }
 
 //
 // Shader

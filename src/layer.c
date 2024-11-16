@@ -17,57 +17,57 @@ extern void render_layer(BiContext* context,
 // Layer Group
 //
 
-BiLayerGroup* bi_layer_group_init_with_size(BiLayerGroup* layer_group,int w, int h)
+BiFramebufferNode* bi_framebuffer_node_init_with_size(BiFramebufferNode* framebuffer_node,int w, int h)
 {
-  bi_node_base_init((BiNodeBase*)layer_group,BI_LAYER_GROUP);
-  layer_group->blend_factor = BI_BLEND_FACTOR_DEFAULT;
-  bi_framebuffer_init(&layer_group->framebuffer,w,h);
-  layer_group->w = w;
-  layer_group->h = h;
-  return layer_group;
+  bi_node_base_init((BiNodeBase*)framebuffer_node,BI_LAYER_GROUP);
+  framebuffer_node->blend_factor = BI_BLEND_FACTOR_DEFAULT;
+  bi_framebuffer_init(&framebuffer_node->framebuffer,w,h);
+  framebuffer_node->w = w;
+  framebuffer_node->h = h;
+  return framebuffer_node;
 }
 
-BiLayerGroup* bi_layer_group_init(BiLayerGroup* layer_group)
+BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode* framebuffer_node)
 {
   GLint dims[4] = {0};
   glGetIntegerv(GL_VIEWPORT, dims);
-  return bi_layer_group_init_with_size(layer_group,dims[2],dims[3]);
+  return bi_framebuffer_node_init_with_size(framebuffer_node,dims[2],dims[3]);
 }
 
-int bi_layer_group_get_z_order(BiLayerGroup* layer_group)
+int bi_framebuffer_node_get_z_order(BiFramebufferNode* framebuffer_node)
 {
-  return layer_group->z;
+  return framebuffer_node->z;
 }
 
-void bi_layer_group_set_z_order(BiLayerGroup* layer_group,int z)
+void bi_framebuffer_node_set_z_order(BiFramebufferNode* framebuffer_node,int z)
 {
-  layer_group->z = z;
+  framebuffer_node->z = z;
 }
 
-BiLayer* bi_layer_group_add_layer(BiLayerGroup* layer_group, BiLayer* obj)
+BiLayer* bi_framebuffer_node_add_layer(BiFramebufferNode* framebuffer_node, BiLayer* obj)
 {
-  obj->parent = (BiNodeBase*)layer_group;
-  return array_add_object(&layer_group->children,obj);
+  obj->parent = (BiNodeBase*)framebuffer_node;
+  return array_add_object(&framebuffer_node->children,obj);
 }
 
-BiLayer* bi_layer_group_remove_layer(BiLayerGroup* layer_group, BiLayer* obj)
+BiLayer* bi_framebuffer_node_remove_layer(BiFramebufferNode* framebuffer_node, BiLayer* obj)
 {
-  if( obj && obj == array_remove_object(&layer_group->children,obj) ){
+  if( obj && obj == array_remove_object(&framebuffer_node->children,obj) ){
     obj->parent = NULL;
     return obj;
   }
   return NULL;
 }
 
-BiLayerGroup* bi_layer_group_add_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
+BiFramebufferNode* bi_framebuffer_node_add_framebuffer_node(BiFramebufferNode* framebuffer_node, BiFramebufferNode* obj)
 {
-  obj->parent = (BiNodeBase*)layer_group;
-  return array_add_object(&layer_group->children,obj);
+  obj->parent = (BiNodeBase*)framebuffer_node;
+  return array_add_object(&framebuffer_node->children,obj);
 }
 
-BiLayerGroup* bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLayerGroup* obj)
+BiFramebufferNode* bi_framebuffer_node_remove_framebuffer_node(BiFramebufferNode* framebuffer_node, BiFramebufferNode* obj)
 {
-  if( obj && obj == array_remove_object(&layer_group->children,obj) ){
+  if( obj && obj == array_remove_object(&framebuffer_node->children,obj) ){
     obj->parent = NULL;
     return obj;
   }
@@ -77,7 +77,7 @@ BiLayerGroup* bi_layer_group_remove_layer_group(BiLayerGroup* layer_group, BiLay
 //
 // LayerGroup Draw
 //
-void bi_layer_group_clear(BiLayerGroup* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a)
+void bi_framebuffer_node_clear(BiFramebufferNode* canvas,uint8_t r,uint8_t g,uint8_t b,uint8_t a)
 {
   glBindFramebuffer(GL_FRAMEBUFFER, canvas->framebuffer.framebuffer_id);
   glClearColor(r/255.0, g/255.0, b/255.0, a/255.0);
@@ -85,7 +85,7 @@ void bi_layer_group_clear(BiLayerGroup* canvas,uint8_t r,uint8_t g,uint8_t b,uin
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void bi_layer_group_draw(BiLayerGroup* canvas, BiContext* context)
+void bi_framebuffer_node_draw(BiFramebufferNode* canvas, BiContext* context)
 {
   // viewport setting
   GLint tmp[4];
@@ -102,7 +102,7 @@ void bi_layer_group_draw(BiLayerGroup* canvas, BiContext* context)
                             NULL, //&context->interaction_queue,
                             NULL, // &context->timer_queue,
                             &context->rendering_queue);
-  bi_render_layer_group( context, (BiNodeBase*)canvas, rendering_context );
+  bi_render_framebuffer_node( context, (BiNodeBase*)canvas, rendering_context );
   // restore
   context->w = _w;
   context->h = _h;
@@ -142,7 +142,7 @@ BiLayer* bi_layer_init_as_postprocess(BiLayer* layer)
 
 BiLayer* bi_layer_remove_from_parent(BiLayer* layer)
 {
-  if(layer && layer->parent) return bi_layer_group_remove_layer((BiLayerGroup*)layer->parent,layer);
+  if(layer && layer->parent) return bi_framebuffer_node_remove_layer((BiFramebufferNode*)layer->parent,layer);
   return NULL;
 }
 

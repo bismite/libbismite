@@ -6,7 +6,7 @@
 #include <bi/bi_sdl.h>
 #include <bi/context.h>
 #include <bi/framebuffer.h>
-#include <bi/layer.h>
+#include <bi/shader_node.h>
 #include <bi/logger.h>
 #include <bi/main_loop.h>
 #include <bi/node.h>

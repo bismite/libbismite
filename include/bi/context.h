@@ -2,15 +2,16 @@
 #define __BI_CORE_CONTEXT_H__
 
 #include <stdbool.h>
+#include <bi/array.h>
+#include <bi/color.h>
 #include <bi/bi_gl.h>
 #include <bi/bi_sdl.h>
-#include <bi/shader.h>
 #include <bi/profile.h>
-#include <bi/node.h>
-#include <bi/layer.h>
-#include <bi/array.h>
 #include <bi/framebuffer.h>
-#include <bi/color.h>
+#include <bi/framebuffer_node.h>
+#include <bi/shader.h>
+#include <bi/shader_node.h>
+#include <bi/node.h>
 
 typedef struct _BiContext BiContext;
 

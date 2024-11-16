@@ -1,7 +1,7 @@
 #include <bi/context.h>
 #include <bi/util.h>
 #include <bi/timer.h>
-#include <bi/layer.h>
+#include <bi/shader_node.h>
 #include <bi/logger.h>
 #include <stdlib.h>
 

@@ -1,4 +1,4 @@
-#include <bi/layer.h>
+#include <bi/shader_node.h>
 #include <bi/node.h>
 #include <bi/render.h>
 #include <bi/context.h>

@@ -2,7 +2,7 @@
 #define __BISMITE_SHADER_H__
 
 #include <bi/bi_gl.h>
-#include <bi/layer.h>
+#include <bi/shader_node.h>
 
 typedef struct _BiShader BiShader;
 struct _BiShader {

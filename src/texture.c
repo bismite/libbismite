@@ -2,7 +2,7 @@
 #include <bi/bi_gl.h>
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
-#include <bi/layer.h>
+#include <bi/framebuffer.h>
 
 extern GLuint bi_texture_convert_to_premultiplied_alpha(GLuint texture_id,GLint tex_format,int w,int h);
 

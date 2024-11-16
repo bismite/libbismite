@@ -3,7 +3,7 @@
 #include <bi/node.h>
 #include <bi/context.h>
 #include <bi/camera.h>
-#include <bi/layer.h>
+#include <bi/shader_node.h>
 #include <bi/bi_gl.h>
 #include "matrix/matrix.h"
 

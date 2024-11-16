@@ -1,4 +1,4 @@
-#include <bi/layer.h>
+#include <bi/framebuffer.h>
 #include <bi/node.h>
 #include <bi/bi_sdl.h>
 

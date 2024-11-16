@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <bi/bi_gl.h>
 #include <bi/node_base.h>
-#include <bi/array.h>
 
 #define BI_LAYER_MAX_TEXTURES 16
 

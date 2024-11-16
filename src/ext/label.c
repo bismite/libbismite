@@ -58,7 +58,7 @@ void bi_label_set_text(BiLabel* label, const char* text)
   BiNode* holder = get_holder_node(label);
   // hide
   for(int i=0;i<holder->children.size;i++) {
-    bi_node_child_at(holder,i)->visible = false;
+    ((BiNode*)bi_node_child_at(holder,i))->visible = false;
   }
   // write
   while (textlen > 0) {

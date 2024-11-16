@@ -106,12 +106,6 @@ bool is_high_dpi(BiContext* context)
 }
 
 //
-// Layer
-//
-void bi_add_shader_node(BiContext* context, BiShaderNode* s) { bi_node_add_node(&context->default_framebuffer_node,s); }
-void bi_remove_shader_node(BiContext* context, BiShaderNode* s) { bi_node_add_node(&context->default_framebuffer_node,s); }
-
-//
 // Shader
 //
 const char* bi_default_vertex_shader()

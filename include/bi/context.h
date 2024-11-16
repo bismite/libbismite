@@ -70,11 +70,6 @@ extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, bool
 extern void bi_set_title(BiContext* context,const char* title);
 extern bool is_high_dpi(BiContext* context);
 
-// Convenient Layer functions
-extern void bi_add_shader_node(BiContext* context, BiShaderNode* shader_node);
-extern void bi_update_shader_node_order(BiContext* context);
-extern void bi_remove_shader_node(BiContext* context, BiShaderNode* shader_node);
-
 //
 extern const char* bi_default_vertex_shader();
 extern const char* bi_default_fragment_shader();

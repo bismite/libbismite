@@ -134,7 +134,7 @@ void bi_render_framebuffer_node(BiContext* context,
   array_sort(&fbnode->children);
   for( int i=0; i<fbnode->children.size; i++ ) {
     BiShaderNode* shader_node = array_object_at(&fbnode->children, i);
-    render_shader_node_to_buffer( context, shader_node, &fbnode->framebuffer, rc );
+    render_shader_node_to_buffer( context, shader_node, fbnode->framebuffer, rc );
   }
 }
 

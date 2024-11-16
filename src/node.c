@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+static inline void _on_add_child(void* parent, void* child){
+  BiNode* n = bi_node_p(child);
+  if(n) n->transform_matrix_cached = false;
+}
+
 BiNode* bi_node_init(BiNode* n)
 {
   bi_node_base_init((BiNodeBase*)n,BI_NODE);
@@ -42,46 +47,13 @@ BiNode* bi_node_init(BiNode* n)
   n->on_keyinput = NULL;
   n->on_textinput = NULL;
 
+  //
   n->userdata = NULL;
 
+  //
+  n->_on_add_child = _on_add_child;
+
   return n;
-}
-
-//
-// scene graph
-//
-
-void bi_node_add_node(BiNode* node,BiNode* child)
-{
-  array_add_object(&node->children,child);
-  child->parent = (BiNodeBase*)node;
-  child->transform_matrix_cached = false;
-}
-
-BiNode* bi_node_remove_at(BiNode* node,int index)
-{
-  BiNode *tmp = array_remove_object_at(&node->children,index);
-  if(tmp){
-    tmp->parent = NULL;
-    return tmp;
-  }
-  return NULL;
-}
-
-BiNode* bi_node_remove_node(BiNode* node,BiNode* child)
-{
-  if( child == array_remove_object(&node->children,child) ){
-    child->parent = NULL;
-  }
-  return child;
-}
-
-BiNode* bi_node_remove_from_parent(BiNode* node)
-{
-  if(node && node->parent) {
-    return bi_node_remove_node((BiNode*)node->parent,node);
-  }
-  return NULL;
 }
 
 //

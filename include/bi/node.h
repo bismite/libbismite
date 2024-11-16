@@ -66,12 +66,11 @@ struct _BiNode {
 
 extern BiNode* bi_node_init(BiNode* n);
 
-// scene graph
-static inline BiNode* bi_node_child_at(BiNode* node,int index){ return (BiNode*)array_object_at(&node->children,index); }
-extern void bi_node_add_node(BiNode* node,BiNode* child);
-extern BiNode* bi_node_remove_at(BiNode* node,int index);
-extern BiNode* bi_node_remove_node(BiNode* node,BiNode* child);
-extern BiNode* bi_node_remove_from_parent(BiNode* node);
+static inline BiNode* bi_node_p(void* n){
+  if(n==NULL) return NULL;
+  if( ((BiNodeBase*)n)->class != BI_NODE ) return NULL;
+  return n;
+}
 
 // color
 static inline void bi_node_set_opacity(BiNode* node,uint8_t opacity) { node->color.a = opacity; }

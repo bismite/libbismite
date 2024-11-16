@@ -11,9 +11,6 @@
 #include <emscripten.h>
 #endif
 
-// render.c
-extern void bi_render(BiContext* context);
-
 static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 {
   bool swallow = false;
@@ -168,7 +165,16 @@ static void main_loop( void* arg )
   //
   // rendering
   //
-  bi_render(context);
+  context->profile.matrix_updated = 0;
+  context->profile.rendering_nodes_queue_size = 0;
+  // rendering
+  BiRenderingContext rendering_context;
+  bi_rendering_context_init(&rendering_context,true,true,1.0,
+                            &context->interaction_queue,
+                            &context->timer_queue,
+                            &context->rendering_queue);
+  bi_render_framebuffer_node( context, &context->default_framebuffer_node, rendering_context );
+  SDL_GL_SwapWindow(context->_window);
 
   //
   int64_t phase3 = bi_get_now();

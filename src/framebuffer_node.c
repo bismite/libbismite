@@ -89,7 +89,7 @@ void bi_framebuffer_node_draw(BiFramebufferNode* canvas, BiContext* context)
                             NULL, //&context->interaction_queue,
                             NULL, // &context->timer_queue,
                             &context->rendering_queue);
-  bi_render_framebuffer_node( context, (BiNodeBase*)canvas, rendering_context );
+  bi_render_framebuffer_node( context, canvas, rendering_context );
   // restore
   context->w = _w;
   context->h = _h;

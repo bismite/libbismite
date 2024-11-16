@@ -115,10 +115,9 @@ static inline void render_shader_node_to_buffer(BiContext* context,
 
 
 extern void bi_render_framebuffer_node(BiContext* context,
-                                       BiNodeBase *framebuffer_node,
+                                       BiFramebufferNode *fbnode,
                                        BiRenderingContext rc )
 {
-  BiFramebufferNode *fbnode = (BiFramebufferNode*)framebuffer_node;
   // context
   rc.interaction_enabled = rc.interaction_enabled && fbnode->interaction_enabled;
   rc.time_scale *= fbnode->time_scale;
@@ -137,22 +136,6 @@ extern void bi_render_framebuffer_node(BiContext* context,
     BiShaderNode* shader_node = array_object_at(&fbnode->children, i);
     render_shader_node_to_buffer( context, shader_node, &fbnode->framebuffer, rc );
   }
-}
-
-void bi_render(BiContext* context)
-{
-  // reset stats
-  context->profile.matrix_updated = 0;
-  context->profile.rendering_nodes_queue_size = 0;
-  // rendering
-  BiRenderingContext rendering_context;
-  bi_rendering_context_init(&rendering_context,true,true,1.0,
-                            &context->interaction_queue,
-                            &context->timer_queue,
-                            &context->rendering_queue);
-  bi_render_framebuffer_node( context, (BiNodeBase*)&context->default_framebuffer_node, rendering_context );
-  //
-  SDL_GL_SwapWindow(context->_window);
 }
 
 BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context,

@@ -4,10 +4,8 @@
 #include <stdbool.h>
 #include <bi/array.h>
 
-typedef struct _BiNodeBase BiNodeBase;
-typedef struct _BiFramebuffer BiFramebuffer;
+typedef struct _BiFramebufferNode BiFramebufferNode;
 typedef struct _BiContext BiContext;
-typedef struct _BiNode BiNode;
 typedef struct _BiTexture BiTexture;
 
 typedef struct _BiRenderingContext{
@@ -27,8 +25,8 @@ extern BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context
                                                      Array* timer_queue,
                                                      Array* rendering_queue);
 
-extern void bi_render_framebuffer_node(BiContext* context,
-                                  BiNodeBase *framebuffer_node,
-                                  BiRenderingContext rc );
+extern void bi_render_framebuffer_node(BiContext*,
+                                       BiFramebufferNode*,
+                                       BiRenderingContext );
 
 #endif

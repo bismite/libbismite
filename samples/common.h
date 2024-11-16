@@ -58,21 +58,19 @@ static BiLabel* create_fps_label(BiContext* context)
   return label;
 }
 
-__attribute__((unused)) static void add_fps_shader_node(BiContext* context)
+__attribute__((unused)) static void add_fps_layer(BiContext* context)
 {
   // label
   BiLabel* label = create_fps_label(context);
   bi_node_set_anchor((BiNode*)label,0,1);
   bi_node_set_position((BiNode*)label,0,context->h);
-  // shader_node
+  // shader
   BiShaderNode *shader_node = bi_shader_node_init(malloc(sizeof(BiShaderNode)));
-  bi_shader_node_add_node( shader_node, (BiNode*)label );
+  bi_node_set_z(shader_node,0xff);
+  bi_node_add_node( shader_node, (BiNode*)label );
   shader_node->textures[0] = label->font->texture;;
-  // Layer Group
-  BiFramebufferNode* framebuffer_node = bi_framebuffer_node_init(malloc(sizeof(BiFramebufferNode)),context->w,context->h);
-  framebuffer_node->z = 0xff;
-  bi_framebuffer_node_add_shader_node(framebuffer_node,shader_node);
-  bi_framebuffer_node_add_framebuffer_node(&context->default_framebuffer_node,framebuffer_node);
+  // add shader
+  bi_node_add_node(&context->default_framebuffer_node, shader_node);
 }
 
 //
@@ -219,6 +217,6 @@ __attribute__((unused)) static BiContext* make_context(const char* name)
   srand( bi_get_now() );
   BiContext* context = bi_init_context(ALLOC(BiContext),W,H,0,false,name);
   print_info(context);
-  // add_fps_shader_node(context);
+  add_fps_layer(context);
   return context;
 }

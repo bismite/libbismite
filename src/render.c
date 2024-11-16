@@ -22,37 +22,39 @@ static bool node_has_event_handler(BiNode* n)
   return false;
 }
 
-static inline void bi_render_queuing(BiRenderingContext context, BiNode* n)
+static inline void bi_render_queuing_node(BiContext* context, BiRenderingContext rc, BiNode* n)
 {
-  bool visible = context.visible;
-  bool interaction_enabled = context.interaction_enabled && n->interaction_enabled;
+  bool visible = rc.visible;
+  bool interaction_enabled = rc.interaction_enabled && n->interaction_enabled;
 
-  context.interaction_enabled = interaction_enabled;
-  n->timers.scale = context.time_scale * n->time_scale;
+  rc.interaction_enabled = interaction_enabled;
+  n->timers.scale = rc.time_scale * n->time_scale;
   n->final_visibility = n->visible && visible;
 
   // event handler and timer
-  if( context.interaction_queue && interaction_enabled && node_has_event_handler(n) ) {
-    array_add_object(context.interaction_queue, n);
+  if( rc.interaction_queue && interaction_enabled && node_has_event_handler(n) ) {
+    array_add_object(rc.interaction_queue, n);
   }
-  if( context.timer_queue && n->timers.size > 0 ) {
-    array_add_object(context.timer_queue, n);
+  if( rc.timer_queue && n->timers.size > 0 ) {
+    array_add_object(rc.timer_queue, n);
   }
   // nodes ; skip invisible, zero-size and transparent
   if( visible==true && n->visible==true && n->w!=0 && n->h!=0 ) {
-    array_add_object(context.rendering_queue,n);
+    array_add_object(rc.rendering_queue,n);
   }
   //
   bool matrix_update_require = bi_node_update_matrix(n);
   //
-  context.visible = visible && n->visible;
-  // sort and queueing
+  rc.visible = visible && n->visible;
+  // sort
   array_sort(&n->children);
+  // queueing
   for( int i=0; i<n->children.size; i++ ){
-    if( bi_node_child_at(n,i)->transform_matrix_cached == true && matrix_update_require ) {
-      bi_node_child_at(n,i)->transform_matrix_cached = false;
+    BiNode* tmp = bi_node_child_at(n,i);
+    if( tmp->transform_matrix_cached == true && matrix_update_require ) {
+      tmp->transform_matrix_cached = false;
     }
-    bi_render_queuing(context, bi_node_child_at(n,i));
+    bi_render_queuing_node(context, rc, tmp);
   }
 }
 
@@ -70,7 +72,7 @@ static inline void render_shader_node_to_buffer(BiContext* context,
   array_clear(rc.rendering_queue);
   array_sort(&shader_node->children);
   for(int i=0;i<shader_node->children.size;i++){
-    bi_render_queuing(rc, (BiNode*)array_object_at(&shader_node->children,i) );
+    bi_render_queuing_node(context, rc, (BiNode*)array_object_at(&shader_node->children,i) );
   }
   if(rc.rendering_queue->size==0) return;
   // shader select
@@ -113,9 +115,8 @@ static inline void render_shader_node_to_buffer(BiContext* context,
 
 
 extern void bi_render_framebuffer_node(BiContext* context,
-                               BiNodeBase *framebuffer_node,
-                               BiRenderingContext rc
-                              )
+                                       BiNodeBase *framebuffer_node,
+                                       BiRenderingContext rc )
 {
   BiFramebufferNode *fbnode = (BiFramebufferNode*)framebuffer_node;
   // context

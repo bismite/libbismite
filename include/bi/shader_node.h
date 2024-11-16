@@ -14,7 +14,6 @@ typedef struct _BiShaderNode BiShaderNode;
 
 struct _BiShaderNode {
   BI_NODE_HEADER;
-  void* _render_function_;
   BiBlendFactor blend_factor;
   GLfloat camera_x;
   GLfloat camera_y;
@@ -24,7 +23,6 @@ struct _BiShaderNode {
 };
 
 extern BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node);
-extern BiShaderNode* bi_shader_node_init_as_postprocess(BiShaderNode* shader_node);
 static inline int bi_shader_node_get_z_order(BiShaderNode* shader_node){ return shader_node->z; }
 static inline void bi_shader_node_set_z_order(BiShaderNode* shader_node,int z){ shader_node->z = z; }
 // Tree

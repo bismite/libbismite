@@ -7,8 +7,6 @@
 #include <bi/bi_gl.h>
 #include "matrix/matrix.h"
 
-typedef void (*render_function)(BiContext*, BiNodeBase*, BiFramebuffer*, BiRenderingContext);
-
 static bool node_has_event_handler(BiNode* n)
 {
   if(n->on_move_cursor != NULL ||
@@ -110,34 +108,10 @@ static void draw_shader_node_to_buffer(BiContext* context, BiShaderNode* shader_
   bi_shader_draw(shader,rc.rendering_queue);
 }
 
-extern void render_postprocess(BiContext* context,
-                               BiNodeBase *shader_node,
-                               BiFramebuffer *dst,
-                               BiRenderingContext rc
-                              )
-{
-  BiShaderNode *l = (BiShaderNode*)shader_node;
-  // render to Temporary Framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, context->post_process_framebuffer.framebuffer_id);
-  glClearColor(0,0,0,0);
-  glClear(GL_COLOR_BUFFER_BIT);
-  draw_shader_node_to_buffer( context, l, &rc );
-  glBindFramebuffer(GL_FRAMEBUFFER,0);
-  // Blit temporary framebuffer to Destination FB
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, context->post_process_framebuffer.framebuffer_id);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->framebuffer_id);
-  glBlitFramebuffer(0, 0, dst->w, dst->h,
-                    0, 0, dst->w, dst->h,
-                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-  glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
-}
-
-extern void render_shader_node(BiContext* context,
-                         BiNodeBase *shader_node,
-                         BiFramebuffer *dst,
-                         BiRenderingContext rc
-                        )
+void render_shader_node(BiContext* context,
+                        BiNodeBase *shader_node,
+                        BiFramebuffer *dst,
+                        BiRenderingContext rc )
 {
   draw_shader_node_to_buffer( context, (BiShaderNode*)shader_node, &rc );
 }
@@ -176,7 +150,6 @@ extern void bi_render_framebuffer_node(BiContext* context,
                                BiRenderingContext rc
                               )
 {
-  render_function f=NULL;
   BiFramebufferNode *lg = (BiFramebufferNode*)framebuffer_node;
   // context
   rc.interaction_enabled = rc.interaction_enabled && lg->interaction_enabled;
@@ -198,8 +171,7 @@ extern void bi_render_framebuffer_node(BiContext* context,
       // nop
       break;
     case BI_LAYER:
-      f = ((BiShaderNode*)n)->_render_function_;
-      f( context, n, &lg->framebuffer, rc );
+      render_shader_node( context, n, &lg->framebuffer, rc );
       break;
     case BI_LAYER_GROUP:
       // render Child Framebuffer

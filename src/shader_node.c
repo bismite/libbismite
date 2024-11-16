@@ -3,21 +3,9 @@
 #include <bi/render.h>
 #include <bi/context.h>
 
-extern void render_postprocess(BiContext* context,
-                               BiNodeBase *shader_node,
-                               BiFramebuffer* dst,
-                               BiRenderingContext rc
-                             );
-extern void render_shader_node(BiContext* context,
-                         BiNodeBase *shader_node,
-                         BiFramebuffer *dst,
-                         BiRenderingContext rc
-                       );
-
 BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node)
 {
   bi_node_base_init( (BiNodeBase*)shader_node, BI_LAYER );
-  shader_node->_render_function_ = render_shader_node;
   shader_node->blend_factor = BI_BLEND_FACTOR_DEFAULT;
 
   shader_node->camera_x = 0;
@@ -30,13 +18,6 @@ BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node)
     shader_node->shader_extra_data[i] = 0;
   }
   //
-  return shader_node;
-}
-
-BiShaderNode* bi_shader_node_init_as_postprocess(BiShaderNode* shader_node)
-{
-  bi_shader_node_init(shader_node);
-  shader_node->_render_function_ = render_postprocess;
   return shader_node;
 }
 

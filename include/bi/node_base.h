@@ -11,8 +11,7 @@ typedef void (*on_add_child)(void*, void*); // parent,child
 
 typedef enum {
   BI_NODE,
-  BI_SHADER_NODE,
-  BI_FRAMEBUFFER_NODE
+  BI_SHADER_NODE
 } BiNodeClass;
 
 #define BI_NODE_HEADER \
@@ -20,7 +19,7 @@ typedef enum {
   BiNodeBase *parent; \
   Array children; \
   on_add_child _on_add_child; \
-  int z; \
+  int _z; \
   int index; \
   bool interaction_enabled; \
   double time_scale; \
@@ -33,6 +32,17 @@ struct _BiNodeBase{
 
 extern void bi_node_base_init(BiNodeBase* node,BiNodeClass class);
 extern void bi_node_base_deinit(BiNodeBase* node);
+
+static inline int bi_node_get_z(void* n) {
+    return ((BiNodeBase*)n)->_z;
+}
+static inline void bi_node_set_z(void* n, int z)
+{
+  ((BiNodeBase*)n)->_z = z;
+  if( ((BiNodeBase*)n)->parent ) {
+    ((BiNodeBase*)n)->parent->children.order_cached = false;
+  }
+}
 
 //
 // scene graph

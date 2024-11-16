@@ -29,7 +29,7 @@ struct _BiNode {
   float anchor_x;
   float anchor_y;
   bool visible;
-  bool final_visibility;
+  bool _final_visibility;
 
   // colors
   BiColor color;
@@ -80,7 +80,6 @@ static inline uint8_t bi_node_get_opacity(BiNode* node) { return node->color.a; 
 extern void bi_node_set_position(BiNode* n, int x, int y);
 static inline void bi_node_set_x(BiNode* n, int x) { bi_node_set_position(n,x,n->y); }
 static inline void bi_node_set_y(BiNode* n, int y) { bi_node_set_position(n,n->x,y); }
-extern void bi_node_set_z(BiNode* n, int z);
 extern void bi_node_transform_local(BiNode* node, int x, int y, int *lx, int*ly);
 extern bool bi_node_inside(BiNode* node, int x, int y);
 // size

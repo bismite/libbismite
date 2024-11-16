@@ -8,7 +8,6 @@
 #include <bi/bi_sdl.h>
 #include <bi/profile.h>
 #include <bi/framebuffer.h>
-#include <bi/framebuffer_node.h>
 #include <bi/shader.h>
 #include <bi/shader_node.h>
 #include <bi/node.h>
@@ -38,7 +37,6 @@ struct _BiContext {
   BiNode default_framebuffer_node;
 
   // queue
-  Array rendering_queue;
   Array interaction_queue;
   Array timer_queue;
 
@@ -73,5 +71,8 @@ extern bool is_high_dpi(BiContext* context);
 //
 extern const char* bi_default_vertex_shader();
 extern const char* bi_default_fragment_shader();
+
+//
+extern void bi_draw_framebuffer_node(BiContext* context, BiNode* n);
 
 #endif

@@ -1,4 +1,6 @@
 #include <bi/context.h>
+#include <bi/bi_gl.h>
+#include <bi/render.h>
 #include <bi/util.h>
 #include <bi/timer.h>
 #include <bi/shader_node.h>
@@ -43,7 +45,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 
   context->program_start_at = bi_get_now();
 
-  array_init(&context->rendering_queue);
+  // Queue
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
 
@@ -116,4 +118,35 @@ const char* bi_default_vertex_shader()
 const char* bi_default_fragment_shader()
 {
   return SHADER_DEFAULT_FRAG;
+}
+
+//
+// Framebuffer Draw
+//
+void bi_draw_framebuffer_node(BiContext* context, BiNode* n)
+{
+  // viewport setting
+  GLint tmp[4];
+  glGetIntegerv(GL_VIEWPORT,tmp);
+  glViewport(0,0,n->w,n->h);
+  // camera
+  int _w = context->w;
+  int _h = context->h;
+  context->w = n->w;
+  context->h = n->h;
+  // rendering
+  BiRenderingContext rendering_context;
+  // NULL interaction_queue and timer_queue
+  bi_rendering_context_init(&rendering_context,context,true,true,1.0, NULL, NULL );
+  Array rendering_queue;
+  array_init(&rendering_queue);
+  rendering_context._rendering_queue = &rendering_queue;
+  bi_render_node( rendering_context, n );
+  // restore
+  context->w = _w;
+  context->h = _h;
+  // restore viewport
+  glViewport(tmp[0],tmp[1],tmp[2],tmp[3]);
+  // Clean Queue
+  array_clear(&rendering_queue);
 }

@@ -21,8 +21,6 @@ struct _BiShaderNode {
 };
 
 extern BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node);
-static inline int bi_shader_node_get_z_order(BiShaderNode* shader_node){ return shader_node->z; }
-static inline void bi_shader_node_set_z_order(BiShaderNode* shader_node,int z){ shader_node->z = z; }
 
 // Timer
 extern BiTimer* bi_shader_node_add_timer(BiShaderNode* shader_node,BiTimer* timer);

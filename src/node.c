@@ -18,7 +18,7 @@ BiNode* bi_node_init(BiNode* n)
   n->anchor_x = 0;
   n->anchor_y = 0;
   n->visible = true;
-  n->final_visibility = true;
+  n->_final_visibility = true;
 
   // color
   n->color = RGBA32(0xffffffff);
@@ -38,6 +38,9 @@ BiNode* bi_node_init(BiNode* n)
   memset( &n->texture_crop_uv, 0, sizeof(GLfloat)*4 );
   n->texture_flip_horizontal = false;
   n->texture_flip_vertical = false;
+
+  // Framebuffer
+  n->framebuffer = NULL;
 
   // callbacks
   n->on_click = NULL;
@@ -67,14 +70,6 @@ void bi_node_set_position(BiNode* n, int x, int y)
   }
   n->x = x;
   n->y = y;
-}
-
-void bi_node_set_z(BiNode* n, int z)
-{
-  n->z = z;
-  if( n->parent ) {
-    ((BiNode*)n->parent)->children.order_cached = false;
-  }
 }
 
 void bi_node_set_size(BiNode* n, int w, int h)

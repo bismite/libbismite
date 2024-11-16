@@ -6,7 +6,7 @@ static int node_order_compare(const void *_a, const void *_b )
 {
   const BiNodeBase *a = *(BiNodeBase**)_a;
   const BiNodeBase *b = *(BiNodeBase**)_b;
-  return a->z == b->z ? a->index - b->index : a->z - b->z;
+  return a->_z == b->_z ? a->index - b->index : a->_z - b->_z;
 }
 
 static void node_sort(Array* a)
@@ -23,7 +23,7 @@ void bi_node_base_init(BiNodeBase* node,BiNodeClass class)
   node->parent = NULL;
   array_init(&node->children);
   node->children.sort = node_sort;
-  node->z = 0;
+  node->_z = 0;
   node->index = 0;
   node->interaction_enabled = true;
   node->time_scale = 1.0;

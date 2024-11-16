@@ -138,7 +138,7 @@ static void main_loop( void* arg )
     if( n == NULL ) continue;
     // Event Handler
     BiNode* node = (BiNode*)n;
-    if( node->final_visibility ) {
+    if( node->_final_visibility ) {
       for(int i=0;i<event_size;i++) {
         if(e[i].type == 0) continue;
         bool swallow = node_event_handle(node,context,&e[i]);
@@ -165,14 +165,15 @@ static void main_loop( void* arg )
   //
   // rendering
   //
+  bi_framebuffer_clear(&context->default_framebuffer,0,0,0,0);
   context->profile.matrix_updated = 0;
   context->profile.rendering_nodes_queue_size = 0;
   BiRenderingContext rendering_context;
-  bi_rendering_context_init(&rendering_context,true,true,1.0,
+  bi_rendering_context_init(&rendering_context, context,
+                            true,true,1.0,
                             &context->interaction_queue,
-                            &context->timer_queue,
-                            &context->rendering_queue);
-  bi_render_framebuffer_node( context, &context->default_framebuffer_node, rendering_context );
+                            &context->timer_queue );
+  bi_render_node(rendering_context, &context->default_framebuffer_node );
   SDL_GL_SwapWindow(context->_window);
 
   //

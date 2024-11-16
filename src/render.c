@@ -5,6 +5,7 @@
 #include <bi/camera.h>
 #include <bi/shader_node.h>
 #include <bi/bi_gl.h>
+#include <bi/framebuffer.h>
 #include "matrix/matrix.h"
 
 static bool node_has_event_handler(BiNode* n)
@@ -68,9 +69,11 @@ static inline void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_
   }
 }
 
-static void draw_shader_node_to_buffer(BiContext* context, BiShaderNode* shader_node, BiRenderingContext* rendering_context)
+static inline void render_shader_node_to_buffer(BiContext* context,
+                                                BiShaderNode* shader_node,
+                                                BiFramebuffer* fb,
+                                                BiRenderingContext rc)
 {
-  BiRenderingContext rc = *rendering_context;
   // timer
   rc.time_scale *= shader_node->time_scale;
   if( rc.timer_queue && shader_node->timers.size > 0 ) {
@@ -89,7 +92,7 @@ static void draw_shader_node_to_buffer(BiContext* context, BiShaderNode* shader_
   // uniforms
   double time = (context->program_start_at - context->frame_start_at)/1000.0;
   int drawable_w,drawable_h;
-  SDL_GL_GetDrawableSize(context->window, &drawable_w, &drawable_h);
+  SDL_GL_GetDrawableSize(context->_window, &drawable_w, &drawable_h);
   float scale = (float)drawable_h / context->h;
   bi_shader_set_uniforms(shader,time,context->w,context->h,scale,shader_node->shader_extra_data);
   // textures
@@ -105,96 +108,43 @@ static void draw_shader_node_to_buffer(BiContext* context, BiShaderNode* shader_
     shader_node->blend_factor.alpha_src,
     shader_node->blend_factor.alpha_dst
   );
+  // Target
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+  // Draw
   bi_shader_draw(shader,rc.rendering_queue);
-}
-
-void render_shader_node(BiContext* context,
-                        BiNodeBase *shader_node,
-                        BiFramebuffer *dst,
-                        BiRenderingContext rc )
-{
-  draw_shader_node_to_buffer( context, (BiShaderNode*)shader_node, &rc );
-}
-
-static void draw_framebuffer_node_to_buffer(BiContext* context, BiFramebufferNode *lg, GLuint dst)
-{
-  BiFramebuffer *src = &lg->framebuffer;
-  BiTexture t;
-  bi_texture_init_with_framebuffer(&t,src);
-  BiNode n;
-  bi_node_init(&n);
-  bi_node_set_size( &n, context->w,context->h);
-  bi_node_set_texture(&n, &t, 0,0,t.w,t.h);
-  n.texture_flip_vertical = true;
-  BiShaderNode l;
-  bi_shader_node_init(&l);
-  bi_shader_node_add_node(&l,&n);
-  l.textures[0] = &t;
-  BiRenderingContext rcontext;
-  bi_rendering_context_init(&rcontext,true,false,0,
-                            NULL,
-                            NULL,
-                            &context->rendering_queue);
-  // bind
-  glBindFramebuffer(GL_FRAMEBUFFER, dst);
-  // draw
-  draw_shader_node_to_buffer(context,&l,&rcontext);
-  // dealloc node array
-  bi_node_base_deinit((BiNodeBase*)&l);
-  // unbind
+  // Unbind
   glBindFramebuffer(GL_FRAMEBUFFER,0);
 }
+
 
 extern void bi_render_framebuffer_node(BiContext* context,
                                BiNodeBase *framebuffer_node,
                                BiRenderingContext rc
                               )
 {
-  BiFramebufferNode *lg = (BiFramebufferNode*)framebuffer_node;
+  BiFramebufferNode *fbnode = (BiFramebufferNode*)framebuffer_node;
   // context
-  rc.interaction_enabled = rc.interaction_enabled && lg->interaction_enabled;
-  rc.time_scale *= lg->time_scale;
+  rc.interaction_enabled = rc.interaction_enabled && fbnode->interaction_enabled;
+  rc.time_scale *= fbnode->time_scale;
   // timer
-  if( lg->timers.size > 0 ) {
-    array_add_object(&context->timer_queue, lg);
+  if( fbnode->timers.size > 0 ) {
+    array_add_object(&context->timer_queue, fbnode);
   }
-  // Target
-  glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
-  glClearColor(0,0,0,0);
+  // Clear
+  glBindFramebuffer(GL_FRAMEBUFFER, fbnode->framebuffer.framebuffer_id);
+  glClearColor(fbnode->color.r/255.0,fbnode->color.g/255.0,fbnode->color.b/255.0,fbnode->color.a/255.0);
   glClear(GL_COLOR_BUFFER_BIT);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   // Children
-  array_sort(&lg->children);
-  for( int i=0; i<lg->children.size; i++ ) {
-    BiNodeBase* n = array_object_at(&lg->children, i);
-    switch(n->class) {
-    case BI_NODE:
-      // nop
-      break;
-    case BI_LAYER:
-      render_shader_node( context, n, &lg->framebuffer, rc );
-      break;
-    case BI_LAYER_GROUP:
-      // render Child Framebuffer
-      bi_render_framebuffer_node(context,n,rc);
-      // Draw
-      draw_framebuffer_node_to_buffer(context, (BiFramebufferNode*)n, lg->framebuffer.framebuffer_id );
-      // Re-Target
-      glBindFramebuffer(GL_FRAMEBUFFER, lg->framebuffer.framebuffer_id);
-      break;
-    }
+  array_sort(&fbnode->children);
+  for( int i=0; i<fbnode->children.size; i++ ) {
+    BiShaderNode* shader_node = array_object_at(&fbnode->children, i);
+    render_shader_node_to_buffer( context, shader_node, &fbnode->framebuffer, rc );
   }
-  // Unbind
-  glBindFramebuffer(GL_FRAMEBUFFER,0);
 }
 
 void bi_render(BiContext* context)
 {
-  // clear
-  glClearColor(context->color.r/255.f,
-               context->color.g/255.f,
-               context->color.b/255.f,
-               context->color.a/255.f );
-  glClear(GL_COLOR_BUFFER_BIT);
   // reset stats
   context->profile.matrix_updated = 0;
   context->profile.rendering_nodes_queue_size = 0;
@@ -204,18 +154,18 @@ void bi_render(BiContext* context)
                             &context->interaction_queue,
                             &context->timer_queue,
                             &context->rendering_queue);
-  bi_render_framebuffer_node( context, (BiNodeBase*)&context->shader_nodes, rendering_context );
-  // Blit Framebuffer
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, context->shader_nodes.framebuffer.framebuffer_id);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  glBlitFramebuffer(0, 0, context->w, context->h,
-                    0, 0, context->w, context->h,
-                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-  glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+  bi_render_framebuffer_node( context, (BiNodeBase*)&context->default_framebuffer_node, rendering_context );
+  // // Blit Framebuffer
+  // glBindFramebuffer(GL_READ_FRAMEBUFFER, context->default_framebuffer_node.framebuffer.framebuffer_id);
+  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  // glBlitFramebuffer(0, 0, context->w, context->h,
+  //                   0, 0, context->w, context->h,
+  //                   GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  // glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
+  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
 
   //
-  SDL_GL_SwapWindow(context->window);
+  SDL_GL_SwapWindow(context->_window);
 }
 
 BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context,

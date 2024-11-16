@@ -18,10 +18,11 @@ struct _BiFramebufferNode {
   int h;
   BiBlendFactor blend_factor;
   BiFramebuffer framebuffer;
+  BiColor color;
 };
 
-extern BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode*);
-extern BiFramebufferNode* bi_framebuffer_node_init_with_size(BiFramebufferNode*,int w,int h);
+extern BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode*,int w,int h);
+extern BiFramebufferNode* bi_framebuffer_node_init_with_framebuffer(BiFramebufferNode*,int w,int h,BiFramebuffer);
 extern int bi_framebuffer_node_get_z_order(BiFramebufferNode*);
 extern void bi_framebuffer_node_set_z_order(BiFramebufferNode*,int);
 // Tree

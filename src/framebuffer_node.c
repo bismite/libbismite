@@ -3,21 +3,22 @@
 #include <bi/render.h>
 #include <bi/context.h>
 
-BiFramebufferNode* bi_framebuffer_node_init_with_size(BiFramebufferNode* framebuffer_node,int w, int h)
+BiFramebufferNode* bi_framebuffer_node_init_with_framebuffer(BiFramebufferNode* fbnode,int w, int h,BiFramebuffer fb)
 {
-  bi_node_base_init((BiNodeBase*)framebuffer_node,BI_LAYER_GROUP);
-  framebuffer_node->blend_factor = BI_BLEND_FACTOR_DEFAULT;
-  bi_framebuffer_init(&framebuffer_node->framebuffer,w,h);
-  framebuffer_node->w = w;
-  framebuffer_node->h = h;
-  return framebuffer_node;
+  bi_node_base_init((BiNodeBase*)fbnode,BI_LAYER_GROUP);
+  fbnode->blend_factor = BI_BLEND_FACTOR_DEFAULT;
+  fbnode->w = w;
+  fbnode->h = h;
+  fbnode->framebuffer = fb;
+  fbnode->color = RGBA(0,0,0,0);
+  return fbnode;
 }
 
-BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode* framebuffer_node)
+BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode* fbnode,int w, int h)
 {
-  GLint dims[4] = {0};
-  glGetIntegerv(GL_VIEWPORT, dims);
-  return bi_framebuffer_node_init_with_size(framebuffer_node,dims[2],dims[3]);
+  BiFramebuffer fb;
+  bi_framebuffer_init(&fb,w,h);
+  return bi_framebuffer_node_init_with_framebuffer(fbnode,w,h,fb);
 }
 
 int bi_framebuffer_node_get_z_order(BiFramebufferNode* framebuffer_node)

@@ -30,10 +30,10 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 
   Uint32 flag = SDL_WINDOW_OPENGL;
   if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
-  context->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
+  context->_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
 
-  SDL_GLContext *glcontext = SDL_GL_CreateContext(context->window);
-  if(glcontext==NULL){
+  context->_glcontext = SDL_GL_CreateContext(context->_window);
+  if(context->_glcontext==NULL){
     printf("SDL_GL_CreateContext failed: %s\n",SDL_GetError());
     exit(1);
   }
@@ -47,7 +47,16 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
 
-  bi_framebuffer_node_init(&context->shader_nodes);
+  BiFramebuffer fb;
+  fb.framebuffer_id = 0;
+  fb.texture_id = 0;
+  fb.w = w;
+  fb.h = h;
+  if( is_high_dpi(context) ){
+    fb.w *= 2;
+    fb.h *= 2;
+  }
+  bi_framebuffer_node_init_with_framebuffer(&context->default_framebuffer_node,w,h,fb);
 
   // timers
   context->last_update = 0;
@@ -62,9 +71,6 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 
   context->w = w;
   context->h = h;
-  context->highdpi = highdpi;
-
-  context->color = RGBA32(0);
 
   // default shader
   bi_shader_init(&context->default_shader, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
@@ -90,15 +96,19 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
 
 void bi_set_title(BiContext* context, const char* title)
 {
-  SDL_SetWindowTitle( context->window, title );
+  SDL_SetWindowTitle( context->_window, title );
 }
 
+bool is_high_dpi(BiContext* context)
+{
+  return (SDL_GetWindowFlags(context->_window) & SDL_WINDOW_ALLOW_HIGHDPI) == SDL_WINDOW_ALLOW_HIGHDPI;
+}
 
 //
 // Layer
 //
-void bi_add_shader_node(BiContext* context, BiShaderNode* shader_node) { bi_framebuffer_node_add_shader_node(&context->shader_nodes,shader_node); }
-void bi_remove_shader_node(BiContext* context, BiShaderNode* shader_node) { bi_framebuffer_node_remove_shader_node(&context->shader_nodes,shader_node); }
+void bi_add_shader_node(BiContext* context, BiShaderNode* shader_node) { bi_framebuffer_node_add_shader_node(&context->default_framebuffer_node,shader_node); }
+void bi_remove_shader_node(BiContext* context, BiShaderNode* shader_node) { bi_framebuffer_node_remove_shader_node(&context->default_framebuffer_node,shader_node); }
 
 //
 // Shader

@@ -23,10 +23,6 @@ struct _BiContext {
   // geometry
   int w;
   int h;
-  bool highdpi;
-
-  // background color
-  BiColor color;
 
   //
   int64_t program_start_at;
@@ -37,8 +33,8 @@ struct _BiContext {
   // show debug info
   bool debug;
 
-  // Shader Nodes
-  BiFramebufferNode shader_nodes;
+  // Default Framebuffer
+  BiFramebufferNode default_framebuffer_node;
 
   // queue
   Array rendering_queue;
@@ -54,7 +50,8 @@ struct _BiContext {
   BiShader default_shader;
 
   //
-  SDL_Window *window;
+  SDL_Window *_window;
+  SDL_GLContext *_glcontext;
 
   // for postprocess
   BiFramebuffer post_process_framebuffer;
@@ -70,6 +67,7 @@ typedef void (*InitializeFunction)(BiContext*);
 
 extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, bool highdpi, const char* title );
 extern void bi_set_title(BiContext* context,const char* title);
+extern bool is_high_dpi(BiContext* context);
 
 // Convenient Layer functions
 extern void bi_add_shader_node(BiContext* context, BiShaderNode* shader_node);

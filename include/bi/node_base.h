@@ -9,8 +9,8 @@ typedef struct _BiNodeBase BiNodeBase;
 
 typedef enum {
   BI_NODE,
-  BI_LAYER,
-  BI_LAYER_GROUP
+  BI_SHADER_NODE,
+  BI_FRAMEBUFFER_NODE
 } BiNodeClass;
 
 #define BI_NODE_HEADER \

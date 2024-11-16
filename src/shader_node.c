@@ -5,7 +5,7 @@
 
 BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node)
 {
-  bi_node_base_init( (BiNodeBase*)shader_node, BI_LAYER );
+  bi_node_base_init( (BiNodeBase*)shader_node, BI_SHADER_NODE );
   shader_node->blend_factor = BI_BLEND_FACTOR_DEFAULT;
 
   shader_node->camera_x = 0;

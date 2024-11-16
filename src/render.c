@@ -56,19 +56,6 @@ static inline void bi_render_queuing(BiRenderingContext context, BiNode* n)
   }
 }
 
-static inline void bi_render_activate_textures(BiTexture* textures[BI_LAYER_MAX_TEXTURES])
-{
-  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
-    glActiveTexture(GL_TEXTURE0+i);
-    if( textures[i] != NULL ) {
-      textures[i]->texture_unit = i;
-      glBindTexture(GL_TEXTURE_2D, textures[i]->texture_id);
-    }else{
-      glBindTexture(GL_TEXTURE_2D, 0);
-    }
-  }
-}
-
 static inline void render_shader_node_to_buffer(BiContext* context,
                                                 BiShaderNode* shader_node,
                                                 BiFramebuffer* fb,
@@ -79,7 +66,7 @@ static inline void render_shader_node_to_buffer(BiContext* context,
   if( rc.timer_queue && shader_node->timers.size > 0 ) {
     array_add_object(rc.timer_queue, shader_node);
   }
-  // queue
+  // Queueing children nodes
   array_clear(rc.rendering_queue);
   array_sort(&shader_node->children);
   for(int i=0;i<shader_node->children.size;i++){
@@ -95,8 +82,16 @@ static inline void render_shader_node_to_buffer(BiContext* context,
   SDL_GL_GetDrawableSize(context->_window, &drawable_w, &drawable_h);
   float scale = (float)drawable_h / context->h;
   bi_shader_set_uniforms(shader,time,context->w,context->h,scale,shader_node->shader_extra_data);
-  // textures
-  bi_render_activate_textures(shader_node->textures);
+  // Activate Textures
+  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
+    glActiveTexture(GL_TEXTURE0+i);
+    if( shader_node->textures[i] != NULL ) {
+      shader_node->textures[i]->texture_unit = i;
+      glBindTexture(GL_TEXTURE_2D, shader_node->textures[i]->texture_id);
+    }else{
+      glBindTexture(GL_TEXTURE_2D, 0);
+    }
+  }
   // set projection and view
   GLfloat camera[16];
   bi_camera_matrix(camera,shader_node->camera_x,shader_node->camera_y,context->w,context->h,false);
@@ -155,15 +150,6 @@ void bi_render(BiContext* context)
                             &context->timer_queue,
                             &context->rendering_queue);
   bi_render_framebuffer_node( context, (BiNodeBase*)&context->default_framebuffer_node, rendering_context );
-  // // Blit Framebuffer
-  // glBindFramebuffer(GL_READ_FRAMEBUFFER, context->default_framebuffer_node.framebuffer.framebuffer_id);
-  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  // glBlitFramebuffer(0, 0, context->w, context->h,
-  //                   0, 0, context->w, context->h,
-  //                   GL_COLOR_BUFFER_BIT, GL_NEAREST);
-  // glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
-  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
-
   //
   SDL_GL_SwapWindow(context->_window);
 }

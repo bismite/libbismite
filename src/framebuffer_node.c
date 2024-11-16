@@ -9,7 +9,6 @@ BiFramebufferNode* bi_framebuffer_node_init_with_framebuffer(BiFramebufferNode* 
   fbnode->w = w;
   fbnode->h = h;
   fbnode->framebuffer = fb;
-  fbnode->color = RGBA(0,0,0,0);
   return fbnode;
 }
 

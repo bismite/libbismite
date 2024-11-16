@@ -3,8 +3,6 @@
 int main(int argc, char* argv[])
 {
   BiContext* context = bi_init_context(malloc(sizeof(BiContext)), 480, 320, 0, true, __FILE__);
-  // background color
-  context->default_framebuffer_node.color = RGBA32(0x330000FF);
   // shader_node and root node
   BiShaderNode *shader_node = bi_shader_node_init(malloc(sizeof(BiShaderNode)));
   BiNode* rect = bi_shader_node_add_node(shader_node,bi_node_init(malloc(sizeof(BiNode))));

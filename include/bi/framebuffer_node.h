@@ -15,7 +15,6 @@ struct _BiFramebufferNode {
   int w;
   int h;
   BiFramebuffer framebuffer;
-  BiColor color;
 };
 
 extern BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode*,int w,int h);

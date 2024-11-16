@@ -127,7 +127,7 @@ void bi_render_framebuffer_node(BiContext* context,
   }
   // Clear
   glBindFramebuffer(GL_FRAMEBUFFER, fbnode->framebuffer.framebuffer_id);
-  glClearColor(fbnode->color.r/255.0,fbnode->color.g/255.0,fbnode->color.b/255.0,fbnode->color.a/255.0);
+  glClearColor(0,0,0,0);
   glClear(GL_COLOR_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   // Children

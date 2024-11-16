@@ -2,7 +2,9 @@
 #define __BISMITE_SHADER_H__
 
 #include <bi/bi_gl.h>
-#include <bi/shader_node.h>
+#include <bi/array.h>
+
+#define BI_SHADER_MAX_TEXTURES 16
 
 typedef struct _BiShader BiShader;
 struct _BiShader {

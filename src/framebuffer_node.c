@@ -6,7 +6,6 @@
 BiFramebufferNode* bi_framebuffer_node_init_with_framebuffer(BiFramebufferNode* fbnode,int w, int h,BiFramebuffer fb)
 {
   bi_node_base_init((BiNodeBase*)fbnode,BI_FRAMEBUFFER_NODE);
-  fbnode->blend_factor = BI_BLEND_FACTOR_DEFAULT;
   fbnode->w = w;
   fbnode->h = h;
   fbnode->framebuffer = fb;

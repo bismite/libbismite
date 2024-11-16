@@ -6,8 +6,6 @@
 #include <bi/node_base.h>
 #include <bi/framebuffer.h>
 
-#define BI_LAYER_MAX_TEXTURES 16
-
 typedef struct _BiNode BiNode;
 typedef struct _BiShaderNode BiShaderNode;
 typedef struct _BiFramebufferNode BiFramebufferNode;
@@ -16,7 +14,6 @@ struct _BiFramebufferNode {
   BI_NODE_HEADER;
   int w;
   int h;
-  BiBlendFactor blend_factor;
   BiFramebuffer framebuffer;
   BiColor color;
 };

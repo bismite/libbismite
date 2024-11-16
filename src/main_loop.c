@@ -167,7 +167,6 @@ static void main_loop( void* arg )
   //
   context->profile.matrix_updated = 0;
   context->profile.rendering_nodes_queue_size = 0;
-  // rendering
   BiRenderingContext rendering_context;
   bi_rendering_context_init(&rendering_context,true,true,1.0,
                             &context->interaction_queue,

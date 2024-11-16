@@ -4,12 +4,10 @@
 #include <stdbool.h>
 #include <bi/bi_gl.h>
 #include <bi/node_base.h>
-
-#define BI_LAYER_MAX_TEXTURES 16
+#include <bi/shader.h>
 
 typedef struct _BiTexture BiTexture;
 typedef struct _BiNode BiNode;
-typedef struct _BiShader BiShader;
 typedef struct _BiShaderNode BiShaderNode;
 
 struct _BiShaderNode {
@@ -17,7 +15,7 @@ struct _BiShaderNode {
   BiBlendFactor blend_factor;
   GLfloat camera_x;
   GLfloat camera_y;
-  BiTexture* textures[BI_LAYER_MAX_TEXTURES];
+  BiTexture* textures[BI_SHADER_MAX_TEXTURES];
   BiShader *shader;
   GLfloat shader_extra_data[16];
 };

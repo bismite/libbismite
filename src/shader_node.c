@@ -10,7 +10,7 @@ BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node)
 
   shader_node->camera_x = 0;
   shader_node->camera_y = 0;
-  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
+  for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
     shader_node->textures[i] = NULL;
   }
   shader_node->shader = NULL;

@@ -99,9 +99,9 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
 
   // set unit to sampler2D
   glUseProgram(shader->program_id);
-  int texture_location_indexes[BI_LAYER_MAX_TEXTURES];
-  for(int i=0; i<BI_LAYER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
-  glUniform1iv(shader->uniform.texture, BI_LAYER_MAX_TEXTURES, texture_location_indexes);
+  int texture_location_indexes[BI_SHADER_MAX_TEXTURES];
+  for(int i=0; i<BI_SHADER_MAX_TEXTURES; i++) { texture_location_indexes[i] = i; }
+  glUniform1iv(shader->uniform.texture, BI_SHADER_MAX_TEXTURES, texture_location_indexes);
   glUseProgram(0);
 
   // create vbo

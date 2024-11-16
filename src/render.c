@@ -85,7 +85,7 @@ static inline void render_shader_node_to_buffer(BiContext* context,
   float scale = (float)drawable_h / context->h;
   bi_shader_set_uniforms(shader,time,context->w,context->h,scale,shader_node->shader_extra_data);
   // Activate Textures
-  for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
+  for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);
     if( shader_node->textures[i] != NULL ) {
       shader_node->textures[i]->texture_unit = i;
@@ -114,9 +114,9 @@ static inline void render_shader_node_to_buffer(BiContext* context,
 }
 
 
-extern void bi_render_framebuffer_node(BiContext* context,
-                                       BiFramebufferNode *fbnode,
-                                       BiRenderingContext rc )
+void bi_render_framebuffer_node(BiContext* context,
+                                BiFramebufferNode *fbnode,
+                                BiRenderingContext rc )
 {
   // context
   rc.interaction_enabled = rc.interaction_enabled && fbnode->interaction_enabled;

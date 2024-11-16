@@ -6,10 +6,10 @@ int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
 
-  // Background layer
-  BiLayer *bg = bi_layer_init(ALLOC(BiLayer));
-  bg->textures[0] = bi_layer_add_node(bg,make_bg("assets/map.png"))->texture;
-  bi_add_layer(context,bg);
+  // Background shader_node
+  BiShaderNode *bg = bi_shader_node_init(ALLOC(BiShaderNode));
+  bg->textures[0] = bi_shader_node_add_node(bg,make_bg("assets/map.png"))->texture;
+  bi_add_shader_node(context,bg);
 
   //
   struct Blend{ GLuint src; GLuint dst; GLuint asrc; GLuint adst; };
@@ -28,9 +28,9 @@ int main(int argc, char* argv[])
   };
   const int COL=4, ROW=3, CW=96,RH=96;
   for(int i=0;i<SIZE;i++) {
-    BiLayer *a = bi_layer_init(ALLOC(BiLayer));
-    bi_add_layer(context,a);
-    BiNode *n = bi_layer_add_node(a,make_sprite_with_anchor("assets/tester.png",0,0) );
+    BiShaderNode *a = bi_shader_node_init(ALLOC(BiShaderNode));
+    bi_add_shader_node(context,a);
+    BiNode *n = bi_shader_node_add_node(a,make_sprite_with_anchor("assets/tester.png",0,0) );
     bi_node_set_scale(n, (float)CW/n->w, (float)RH/n->h );
     int x = (context->w-CW*COL)/(COL+1)*(1+i%COL)+CW*(i%COL);
     int y = (context->h-RH*ROW)/(ROW+1)*(1+i/COL)+RH*(i/COL);

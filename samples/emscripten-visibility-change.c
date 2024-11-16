@@ -25,10 +25,10 @@ int main(int argc, char* argv[])
   emscripten_set_visibilitychange_callback(context,true,visibilitychange_callback);
 #endif
 
-  BiLayer* layer = bi_layer_init(ALLOC(BiLayer));
-  background = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  layer->textures[0] = background->texture;
-  bi_add_layer(context,layer);
+  BiShaderNode* shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  background = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  shader_node->textures[0] = background->texture;
+  bi_add_shader_node(context,shader_node);
 
   bi_start_run_loop(context);
   return 0;

@@ -5,7 +5,7 @@
 #define MAP_SIZE 64
 #define SCALE 0.25
 
-static void layer_camera_position(BiLayer*l, float angle)
+static void shader_camera_position(BiShaderNode*l, float angle)
 {
   float r = TILE_SIZE*MAP_SIZE*SCALE * 0.5;
   l->camera_x = r - 480/2 + r*cos(angle);
@@ -14,10 +14,10 @@ static void layer_camera_position(BiLayer*l, float angle)
 
 static void lookaround(BiContext* ctx,BiTimer* timer,double dt)
 {
-  BiLayer* layer = timer->userdata;
+  BiShaderNode* shader_node = timer->userdata;
   static float angle = 0;
   angle += dt*0.0005;
-  layer_camera_position(layer,angle);
+  shader_camera_position(shader_node,angle);
 }
 
 static BiNode* create_tile(int x, int y,BiTexture *tex)
@@ -37,12 +37,12 @@ int main(int argc,char* argv[])
   context->color = RGBA(32,32,0,0xff);
   // texture
   BiTexture *tex = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  BiNode* root = bi_layer_add_node(layer, bi_node_init(ALLOC(BiNode)));
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  BiNode* root = bi_shader_node_add_node(shader_node, bi_node_init(ALLOC(BiNode)));
   bi_node_set_scale(root,SCALE,SCALE);
-  layer->textures[0] = tex;
+  shader_node->textures[0] = tex;
   // tiling
   for(int x=0; x<MAP_SIZE; x++) {
     for(int y=0; y<MAP_SIZE; y++){
@@ -50,8 +50,8 @@ int main(int argc,char* argv[])
     }
   }
   // look around
-  layer_camera_position(layer,0);
-  bi_layer_add_timer(layer,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,layer));
+  shader_camera_position(shader_node,0);
+  bi_shader_node_add_timer(shader_node,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,shader_node));
   // start
   bi_start_run_loop(context);
   return 0;

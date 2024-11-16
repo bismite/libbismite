@@ -4,12 +4,12 @@
 #include <bi/context.h>
 
 extern void render_postprocess(BiContext* context,
-                               BiNodeBase *layer,
+                               BiNodeBase *shader_node,
                                BiFramebuffer* dst,
                                BiRenderingContext rc
                              );
-extern void render_layer(BiContext* context,
-                         BiNodeBase *layer,
+extern void render_shader_node(BiContext* context,
+                         BiNodeBase *shader_node,
                          BiFramebuffer *dst,
                          BiRenderingContext rc
                        );
@@ -44,13 +44,13 @@ void bi_framebuffer_node_set_z_order(BiFramebufferNode* framebuffer_node,int z)
   framebuffer_node->z = z;
 }
 
-BiLayer* bi_framebuffer_node_add_layer(BiFramebufferNode* framebuffer_node, BiLayer* obj)
+BiShaderNode* bi_framebuffer_node_add_shader_node(BiFramebufferNode* framebuffer_node, BiShaderNode* obj)
 {
   obj->parent = (BiNodeBase*)framebuffer_node;
   return array_add_object(&framebuffer_node->children,obj);
 }
 
-BiLayer* bi_framebuffer_node_remove_layer(BiFramebufferNode* framebuffer_node, BiLayer* obj)
+BiShaderNode* bi_framebuffer_node_remove_shader_node(BiFramebufferNode* framebuffer_node, BiShaderNode* obj)
 {
   if( obj && obj == array_remove_object(&framebuffer_node->children,obj) ){
     obj->parent = NULL;
@@ -114,47 +114,47 @@ void bi_framebuffer_node_draw(BiFramebufferNode* canvas, BiContext* context)
 // Layer
 //
 
-BiLayer* bi_layer_init(BiLayer* layer)
+BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node)
 {
-  bi_node_base_init( (BiNodeBase*)layer, BI_LAYER );
-  layer->_render_function_ = render_layer;
-  layer->blend_factor = BI_BLEND_FACTOR_DEFAULT;
+  bi_node_base_init( (BiNodeBase*)shader_node, BI_LAYER );
+  shader_node->_render_function_ = render_shader_node;
+  shader_node->blend_factor = BI_BLEND_FACTOR_DEFAULT;
 
-  layer->camera_x = 0;
-  layer->camera_y = 0;
+  shader_node->camera_x = 0;
+  shader_node->camera_y = 0;
   for(int i=0;i<BI_LAYER_MAX_TEXTURES;i++) {
-    layer->textures[i] = NULL;
+    shader_node->textures[i] = NULL;
   }
-  layer->shader = NULL;
+  shader_node->shader = NULL;
   for(int i=0;i<16;i++) {
-    layer->shader_extra_data[i] = 0;
+    shader_node->shader_extra_data[i] = 0;
   }
   //
-  return layer;
+  return shader_node;
 }
 
-BiLayer* bi_layer_init_as_postprocess(BiLayer* layer)
+BiShaderNode* bi_shader_node_init_as_postprocess(BiShaderNode* shader_node)
 {
-  bi_layer_init(layer);
-  layer->_render_function_ = render_postprocess;
-  return layer;
+  bi_shader_node_init(shader_node);
+  shader_node->_render_function_ = render_postprocess;
+  return shader_node;
 }
 
-BiLayer* bi_layer_remove_from_parent(BiLayer* layer)
+BiShaderNode* bi_shader_node_remove_from_parent(BiShaderNode* shader_node)
 {
-  if(layer && layer->parent) return bi_framebuffer_node_remove_layer((BiFramebufferNode*)layer->parent,layer);
+  if(shader_node && shader_node->parent) return bi_framebuffer_node_remove_shader_node((BiFramebufferNode*)shader_node->parent,shader_node);
   return NULL;
 }
 
-BiNode* bi_layer_add_node(BiLayer *layer,BiNode* node)
+BiNode* bi_shader_node_add_node(BiShaderNode *shader_node,BiNode* node)
 {
-  node->parent = (BiNodeBase*)layer;
-  return array_add_object(&layer->children,node);
+  node->parent = (BiNodeBase*)shader_node;
+  return array_add_object(&shader_node->children,node);
 }
 
-BiNode* bi_layer_remove_node(BiLayer *layer,BiNode* node)
+BiNode* bi_shader_node_remove_node(BiShaderNode *shader_node,BiNode* node)
 {
-  if( node && node == array_remove_object(&layer->children,node) ){
+  if( node && node == array_remove_object(&shader_node->children,node) ){
     node->parent = NULL;
     return node;
   }
@@ -162,9 +162,9 @@ BiNode* bi_layer_remove_node(BiLayer *layer,BiNode* node)
 }
 
 // Timer
-BiTimer* bi_layer_add_timer(BiLayer* layer,BiTimer* timer){
-  return bi_timers_add( &layer->timers,timer);
+BiTimer* bi_shader_node_add_timer(BiShaderNode* shader_node,BiTimer* timer){
+  return bi_timers_add( &shader_node->timers,timer);
 }
-BiTimer* bi_layer_remove_timer(BiLayer* layer,BiTimer* timer){
-  return bi_timers_remove( &layer->timers,timer);
+BiTimer* bi_shader_node_remove_timer(BiShaderNode* shader_node,BiTimer* timer){
+  return bi_timers_remove( &shader_node->timers,timer);
 }

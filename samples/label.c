@@ -3,14 +3,14 @@
 int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  BiNode* root = bi_layer_add_node(layer,make_bg("assets/map.png"));
-  layer->textures[1] = root->texture;
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  BiNode* root = bi_shader_node_add_node(shader_node,make_bg("assets/map.png"));
+  shader_node->textures[1] = root->texture;
   // font
   BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
-  layer->textures[0] = font_texture;
+  shader_node->textures[0] = font_texture;
   const char* fonts[4] = {
     "assets/font12.dat", "assets/font12b.dat", "assets/font14.dat", "assets/font14b.dat"
   };

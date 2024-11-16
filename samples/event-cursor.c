@@ -35,10 +35,10 @@ static bool on_move_finger(BiContext* context,BiNode* n, float x, float y, int64
 int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* face = bi_layer_add_node(layer, make_sprite("assets/face01.png"));
-  bi_add_layer(context,layer);
-  layer->textures[0] = face->texture;
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* face = bi_shader_node_add_node(shader_node, make_sprite("assets/face01.png"));
+  bi_add_shader_node(context,shader_node);
+  shader_node->textures[0] = face->texture;
   bi_node_set_position(face,context->w/2,context->h/2);
   // set callbacks
   bi_node_set_on_click(face, on_click);

@@ -41,7 +41,7 @@ struct _BiShader {
     GLint time;
     GLint resolution;
     GLint scale;
-    GLint layer_extra_data;
+    GLint shader_extra_data;
   } uniform;
 };
 

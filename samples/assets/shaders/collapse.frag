@@ -10,7 +10,7 @@ in mat4 _node_extra_data;
 uniform float time;
 uniform vec2 resolution;
 uniform float scale;
-uniform mat4 layer_extra_data;
+uniform mat4 shader_extra_data;
 uniform sampler2D sampler[16];
 out vec4 color;
 

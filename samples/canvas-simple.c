@@ -6,10 +6,10 @@ BiFramebufferNode* draw_canvas(BiContext* context)
   BiNode *face = make_sprite("assets/face01.png");
   bi_node_set_position(face,100,100);
   // Layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_layer_add_node(layer, face);
-  layer->textures[0] = face->texture;
-  bi_framebuffer_node_add_layer(canvas, layer);
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_shader_node_add_node(shader_node, face);
+  shader_node->textures[0] = face->texture;
+  bi_framebuffer_node_add_shader_node(canvas, shader_node);
   // Draw
   bi_framebuffer_node_clear(canvas,0,0,0,0);
   bi_framebuffer_node_draw(canvas,context);
@@ -31,16 +31,16 @@ int main(int argc, char* argv[])
   bi_node_set_texture(canvas_sprite,canvas_tex,0,0,canvas_tex->w,canvas_tex->h);
 
   // Main Layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* background = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* background = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
   BiNode* face = make_sprite("assets/face01.png");
   bi_node_set_position(face,300,100);
-  bi_layer_add_node(layer, canvas_sprite);
-  bi_layer_add_node(layer, face);
-  layer->textures[0] = background->texture;
-  layer->textures[1] = face->texture;
-  layer->textures[2] = canvas_tex;
-  bi_add_layer(context,layer);
+  bi_shader_node_add_node(shader_node, canvas_sprite);
+  bi_shader_node_add_node(shader_node, face);
+  shader_node->textures[0] = background->texture;
+  shader_node->textures[1] = face->texture;
+  shader_node->textures[2] = canvas_tex;
+  bi_add_shader_node(context,shader_node);
 
   // start
   bi_start_run_loop(context);

@@ -62,7 +62,7 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->uniform.time = glGetUniformLocation(program_id, "time");
   shader->uniform.resolution = glGetUniformLocation(program_id, "resolution");
   shader->uniform.scale = glGetUniformLocation(program_id, "scale");
-  shader->uniform.layer_extra_data = glGetUniformLocation(program_id, "layer_extra_data");
+  shader->uniform.shader_extra_data = glGetUniformLocation(program_id, "shader_extra_data");
 }
 
 static inline void init_mat4_buffer(GLint location, GLuint buffer)
@@ -142,7 +142,7 @@ void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale
   glUniform1f( shader->uniform.time, time);
   glUniform2f( shader->uniform.resolution, w, h );
   glUniform1f( shader->uniform.scale, scale );
-  glUniformMatrix4fv(shader->uniform.layer_extra_data, 1, GL_FALSE, extra_data );
+  glUniformMatrix4fv(shader->uniform.shader_extra_data, 1, GL_FALSE, extra_data );
 }
 
 static inline void update_vbo(GLuint buffer,size_t len, const void *data)

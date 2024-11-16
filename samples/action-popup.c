@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
 
   // Layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode *root = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  bi_add_layer(context,layer);
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode *root = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  bi_add_shader_node(context,shader_node);
 
   // shade
   popup_shade = bi_node_init(ALLOC(BiNode));
@@ -91,10 +91,10 @@ int main(int argc, char* argv[])
   // hide
   popup_shade->visible = false;
 
-  // assign textures to layer
-  layer->textures[0] = root->texture;
-  layer->textures[1] = img->texture;
-  layer->textures[2] = font_texture;
+  // assign textures to shader_node
+  shader_node->textures[0] = root->texture;
+  shader_node->textures[1] = img->texture;
+  shader_node->textures[2] = font_texture;
 
   //
   bi_node_set_on_click(root, open);

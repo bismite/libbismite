@@ -18,11 +18,11 @@ int main(int argc,char* argv[])
   // Font
   BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
   BiFont *font = load_font("assets/font12.dat",font_texture);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));
-  bi_add_layer(context,layer);
-  layer->textures[0] = font->texture;
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* root = bi_shader_node_add_node(shader_node,bi_node_init(ALLOC(BiNode)));
+  bi_add_shader_node(context,shader_node);
+  shader_node->textures[0] = font->texture;
   // font & labels
   const char* texts[3] = { "PRESS ANY KEY", "Text:", "Text Length:" };
   for(int i=0;i<3;i++){

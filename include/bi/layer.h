@@ -11,10 +11,10 @@
 typedef struct _BiTexture BiTexture;
 typedef struct _BiNode BiNode;
 typedef struct _BiShader BiShader;
-typedef struct _BiLayer BiLayer;
+typedef struct _BiShaderNode BiShaderNode;
 typedef struct _BiFramebufferNode BiFramebufferNode;
 
-struct _BiLayer {
+struct _BiShaderNode {
   BI_NODE_HEADER;
   void* _render_function_;
   BiBlendFactor blend_factor;
@@ -34,15 +34,15 @@ struct _BiFramebufferNode {
 };
 
 //
-// layer group
+// shader_node group
 //
 extern BiFramebufferNode* bi_framebuffer_node_init(BiFramebufferNode* framebuffer_node);
 extern BiFramebufferNode* bi_framebuffer_node_init_with_size(BiFramebufferNode* framebuffer_node,int w, int h);
 extern int bi_framebuffer_node_get_z_order(BiFramebufferNode* framebuffer_node);
 extern void bi_framebuffer_node_set_z_order(BiFramebufferNode* framebuffer_node,int z);
 // Tree
-extern BiLayer* bi_framebuffer_node_add_layer(BiFramebufferNode* framebuffer_node, BiLayer* obj);
-extern BiLayer* bi_framebuffer_node_remove_layer(BiFramebufferNode* framebuffer_node, BiLayer* obj);
+extern BiShaderNode* bi_framebuffer_node_add_shader_node(BiFramebufferNode* framebuffer_node, BiShaderNode* obj);
+extern BiShaderNode* bi_framebuffer_node_remove_shader_node(BiFramebufferNode* framebuffer_node, BiShaderNode* obj);
 extern BiFramebufferNode* bi_framebuffer_node_add_framebuffer_node(BiFramebufferNode* framebuffer_node, BiFramebufferNode* obj);
 extern BiFramebufferNode* bi_framebuffer_node_remove_framebuffer_node(BiFramebufferNode* framebuffer_node, BiFramebufferNode* obj);
 // Timer
@@ -53,18 +53,18 @@ extern void bi_framebuffer_node_clear(BiFramebufferNode* framebuffer_node,uint8_
 extern void bi_framebuffer_node_draw(BiFramebufferNode* framebuffer_node,BiContext* context);
 
 //
-// layer
+// shader_node
 //
-extern BiLayer* bi_layer_init(BiLayer* layer);
-extern BiLayer* bi_layer_init_as_postprocess(BiLayer* layer);
-static inline int bi_layer_get_z_order(BiLayer* layer){ return layer->z; }
-static inline void bi_layer_set_z_order(BiLayer* layer,int z){ layer->z = z; }
+extern BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node);
+extern BiShaderNode* bi_shader_node_init_as_postprocess(BiShaderNode* shader_node);
+static inline int bi_shader_node_get_z_order(BiShaderNode* shader_node){ return shader_node->z; }
+static inline void bi_shader_node_set_z_order(BiShaderNode* shader_node,int z){ shader_node->z = z; }
 // Tree
-extern BiLayer* bi_layer_remove_from_parent(BiLayer* layer);
-extern BiNode* bi_layer_add_node(BiLayer *layer,BiNode* node);
-extern BiNode* bi_layer_remove_node(BiLayer *layer,BiNode* node);
+extern BiShaderNode* bi_shader_node_remove_from_parent(BiShaderNode* shader_node);
+extern BiNode* bi_shader_node_add_node(BiShaderNode *shader_node,BiNode* node);
+extern BiNode* bi_shader_node_remove_node(BiShaderNode *shader_node,BiNode* node);
 // Timer
-extern BiTimer* bi_layer_add_timer(BiLayer* layer,BiTimer* timer);
-extern BiTimer* bi_layer_remove_timer(BiLayer* layer,BiTimer* timer);
+extern BiTimer* bi_shader_node_add_timer(BiShaderNode* shader_node,BiTimer* timer);
+extern BiTimer* bi_shader_node_remove_timer(BiShaderNode* shader_node,BiTimer* timer);
 
 #endif

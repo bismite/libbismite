@@ -29,11 +29,11 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
 int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  layer->textures[0] = bg->texture;
-  bi_add_layer(context,layer);
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* bg = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  shader_node->textures[0] = bg->texture;
+  bi_add_shader_node(context,shader_node);
   // hit rect
   for(int x=0;x<5;x++){
     for(int y=0;y<3;y++){
@@ -41,7 +41,7 @@ int main(int argc,char* argv[])
       int yy = 100 + y*60;
       BiNode* node = create_new_node(xx,yy);
       bi_node_set_on_click(node, on_click);
-      bi_layer_add_node(layer,node);
+      bi_shader_node_add_node(shader_node,node);
     }
   }
   // start

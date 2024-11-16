@@ -3,13 +3,13 @@
 int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // layer
+  // shader_node
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  BiNode* background = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  layer->textures[0] = background->texture;
-  layer->textures[1] = tex;
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  BiNode* background = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  shader_node->textures[0] = background->texture;
+  shader_node->textures[1] = tex;
   // Nodes
   BiNode* n = NULL;
   // Normal

@@ -30,14 +30,14 @@ static void resume_rotate(BiContext* ctx,BiTimer* timer,double dt)
 int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  BiNode* bg = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  BiNode* face = bi_layer_add_node(layer, make_sprite("assets/face01.png"));
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  BiNode* bg = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  BiNode* face = bi_shader_node_add_node(shader_node, make_sprite("assets/face01.png"));
   bi_node_set_position(face,context->w/2,context->h/2);
-  layer->textures[0] = bg->texture;
-  layer->textures[1] = face->texture;
+  shader_node->textures[0] = bg->texture;
+  shader_node->textures[1] = face->texture;
   // rotate
   BiTimer *rotate_timer = bi_timer_init(ALLOC(BiTimer),rotate,10,-1,face);
   bi_node_add_timer(face,rotate_timer);

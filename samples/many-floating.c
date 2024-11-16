@@ -51,14 +51,14 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
   // texture
   BiTexture* ball_texture = MAKE_TEXTURE("assets/ball.png");
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = bi_layer_add_node(layer,make_bg("assets/map.png"));
-  bi_add_layer(context,layer);
-  layer->textures[0] = root->texture;
-  layer->textures[1] = ball_texture;
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* root = bi_shader_node_add_node(shader_node,make_bg("assets/map.png"));
+  bi_add_shader_node(context,shader_node);
+  shader_node->textures[0] = root->texture;
+  shader_node->textures[1] = ball_texture;
   // additive blending
-  layer->blend_factor = BI_BLEND_FACTOR_ADDTIVE;
+  shader_node->blend_factor = BI_BLEND_FACTOR_ADDTIVE;
   // particles
   for(uint64_t i=0; i< NUM_OF_NODES ; i++){
     bi_node_add_node(root, create_particle(context,ball_texture));

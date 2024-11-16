@@ -5,9 +5,9 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
 
   // Layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  BiNode* root = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  BiNode* root = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
 
   // Texture
   BiTexture *texture = MAKE_TEXTURE("assets/tester.png");
@@ -22,10 +22,10 @@ int main(int argc, char* argv[])
   bi_node_set_scale_x(sprite,4.0);
   bi_node_set_scale_y(sprite,4.0);
 
-  // layer
+  // shader_node
   bi_node_add_node(root,sprite);
-  layer->textures[0] = root->texture;
-  layer->textures[1] = texture;
+  shader_node->textures[0] = root->texture;
+  shader_node->textures[1] = texture;
 
   bi_start_run_loop(context);
   return 0;

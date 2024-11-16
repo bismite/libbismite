@@ -36,8 +36,8 @@ struct _BiContext {
   // show debug info
   bool debug;
 
-  // Layers
-  BiFramebufferNode layers;
+  // Shader Nodes
+  BiFramebufferNode shader_nodes;
 
   // queue
   Array rendering_queue;
@@ -71,9 +71,9 @@ extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, bool
 extern void bi_set_title(BiContext* context,const char* title);
 
 // Convenient Layer functions
-extern void bi_add_layer(BiContext* context, BiLayer* layer);
-extern void bi_update_layer_order(BiContext* context);
-extern void bi_remove_layer(BiContext* context, BiLayer* layer);
+extern void bi_add_shader_node(BiContext* context, BiShaderNode* shader_node);
+extern void bi_update_shader_node_order(BiContext* context);
+extern void bi_remove_shader_node(BiContext* context, BiShaderNode* shader_node);
 
 //
 extern const char* bi_default_vertex_shader();

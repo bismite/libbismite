@@ -21,13 +21,13 @@ static bool on_click(BiContext* context,BiNode* n, int x, int y, int button, boo
 static BiFramebufferNode* make_framebuffer_node(BiContext* context, BiFramebufferNode* lg, int offset_y)
 {
   bi_framebuffer_node_init(lg);
-  bi_framebuffer_node_add_framebuffer_node(&context->layers, lg);
-  // layer
+  bi_framebuffer_node_add_framebuffer_node(&context->shader_nodes, lg);
+  // shader_node
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = bi_layer_add_node(layer,bi_node_init(ALLOC(BiNode)));
-  bi_framebuffer_node_add_layer(lg,layer);
-  layer->textures[0] = tex;
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* root = bi_shader_node_add_node(shader_node,bi_node_init(ALLOC(BiNode)));
+  bi_framebuffer_node_add_shader_node(lg,shader_node);
+  shader_node->textures[0] = tex;
   // sprite
   BiNode* faces[2];
   for(int i=0;i<2;i++){
@@ -51,12 +51,12 @@ static BiFramebufferNode* make_framebuffer_node(BiContext* context, BiFramebuffe
 int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode* root = bi_layer_add_node(layer,make_bg("assets/check.png"));
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode* root = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
   bi_node_set_on_click(root, on_click);
-  bi_framebuffer_node_add_layer(&context->layers,layer);
-  layer->textures[0] = root->texture;
+  bi_framebuffer_node_add_shader_node(&context->shader_nodes,shader_node);
+  shader_node->textures[0] = root->texture;
   framebuffer_node_a = make_framebuffer_node(context, ALLOC(BiFramebufferNode), 320/3*2);
   framebuffer_node_b = make_framebuffer_node(context, ALLOC(BiFramebufferNode), 320/3*1);
   // start

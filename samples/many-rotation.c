@@ -22,11 +22,11 @@ static BiNode* create_node(BiContext* c)
 int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode *root = bi_layer_add_node(layer,make_bg("assets/map.png"));
-  layer->textures[0] = root->texture;
-  bi_add_layer(context,layer);
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode *root = bi_shader_node_add_node(shader_node,make_bg("assets/map.png"));
+  shader_node->textures[0] = root->texture;
+  bi_add_shader_node(context,shader_node);
   // nodes
   BiNode* center = bi_node_init(ALLOC(BiNode));
   bi_node_add_node(root, center);

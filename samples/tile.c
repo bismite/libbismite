@@ -17,16 +17,16 @@ int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
   BiTexture *texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  layer->textures[0] = texture;
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  shader_node->textures[0] = texture;
   // tiling
   const int COL = context->w/TILE_SIZE+1;
   const int ROW = context->h/TILE_SIZE+1;
   for(int i=0; i<COL*ROW; i++){
     int x = i % COL * TILE_SIZE;
     int y = i / COL * TILE_SIZE;
-    bi_layer_add_node(layer,create_tile(x,y,texture));
+    bi_shader_node_add_node(shader_node,create_tile(x,y,texture));
   }
   // start
   bi_start_run_loop(context);

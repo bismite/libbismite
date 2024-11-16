@@ -41,11 +41,11 @@ int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
 
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  bi_add_layer(context,layer);
-  BiNode* root = bi_layer_add_node(layer, make_bg("assets/check.png"));
-  layer->textures[1] = root->texture;
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  bi_add_shader_node(context,shader_node);
+  BiNode* root = bi_shader_node_add_node(shader_node, make_bg("assets/check.png"));
+  shader_node->textures[1] = root->texture;
 
   // bounds
   BiNode* bounds = bi_node_init(ALLOC(BiNode));
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   // font
   BiTexture *font_texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/font.png",false);
   BiFont *font = load_font("assets/font14.dat", font_texture);
-  layer->textures[0] = font_texture;
+  shader_node->textures[0] = font_texture;
 
   // txt
   char* text =

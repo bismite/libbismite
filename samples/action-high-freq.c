@@ -5,15 +5,15 @@ int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
 
-  // layer
-  BiLayer *layer = bi_layer_init(ALLOC(BiLayer));
-  BiNode *root = bi_layer_add_node(layer,make_bg("assets/check.png"));
-  bi_add_layer(context,layer);
+  // shader_node
+  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode *root = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  bi_add_shader_node(context,shader_node);
 
   // texture
   BiTexture* t = MAKE_TEXTURE("assets/face01.png");
-  layer->textures[0] = root->texture;
-  layer->textures[1] = t;
+  shader_node->textures[0] = root->texture;
+  shader_node->textures[1] = t;
 
   // 2degree/4msec x 540 = 1080degree/2160msec
   const int degree = 2;

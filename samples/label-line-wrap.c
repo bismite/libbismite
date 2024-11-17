@@ -43,9 +43,9 @@ int main(int argc, char* argv[])
 
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_add_shader_node(context,shader_node);
-  BiNode* root = bi_shader_node_add_node(shader_node, make_bg("assets/check.png"));
-  shader_node->textures[1] = root->texture;
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
+  BiNode* root = bi_node_add_node(shader_node, make_bg("assets/check.png"));
+  shader_node->textures[1] = bi_node_get_texture(root);
 
   // bounds
   BiNode* bounds = bi_node_init(ALLOC(BiNode));

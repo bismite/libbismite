@@ -26,9 +26,9 @@ int main(int argc, char* argv[])
 #endif
 
   BiShaderNode* shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  background = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
-  shader_node->textures[0] = background->texture;
-  bi_add_shader_node(context,shader_node);
+  background = bi_node_add_node(shader_node,make_bg("assets/check.png"));
+  shader_node->textures[0] = bi_node_get_texture(background);
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
 
   bi_start_run_loop(context);
   return 0;

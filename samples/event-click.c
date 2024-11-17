@@ -31,9 +31,9 @@ int main(int argc,char* argv[])
   BiContext* context = make_context(__FILE__);
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode* bg = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
-  shader_node->textures[0] = bg->texture;
-  bi_add_shader_node(context,shader_node);
+  BiNode* bg = bi_node_add_node(shader_node,make_bg("assets/check.png"));
+  shader_node->textures[0] = bi_node_get_texture(bg);
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
   // hit rect
   for(int x=0;x<5;x++){
     for(int y=0;y<3;y++){
@@ -41,7 +41,7 @@ int main(int argc,char* argv[])
       int yy = 100 + y*60;
       BiNode* node = create_new_node(xx,yy);
       bi_node_set_on_click(node, on_click);
-      bi_shader_node_add_node(shader_node,node);
+      bi_node_add_node(shader_node,node);
     }
   }
   // start

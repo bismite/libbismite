@@ -6,8 +6,8 @@ int main(int argc, char* argv[])
 
   // Layer
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_add_shader_node(context,shader_node);
-  BiNode* root = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
+  BiNode* root = bi_node_add_node(shader_node,make_bg("assets/check.png"));
 
   // Texture
   BiTexture *texture = MAKE_TEXTURE("assets/tester.png");
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
   // shader_node
   bi_node_add_node(root,sprite);
-  shader_node->textures[0] = root->texture;
+  shader_node->textures[0] = bi_node_get_texture(root);
   shader_node->textures[1] = texture;
 
   bi_start_run_loop(context);

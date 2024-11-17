@@ -34,13 +34,13 @@ static BiNode* create_tile(int x, int y,BiTexture *tex)
 int main(int argc,char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  context->color = RGBA(32,32,0,0xff);
+
   // texture
   BiTexture *tex = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_add_shader_node(context,shader_node);
-  BiNode* root = bi_shader_node_add_node(shader_node, bi_node_init(ALLOC(BiNode)));
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
+  BiNode* root = bi_node_add_node(shader_node, bi_node_init(ALLOC(BiNode)));
   bi_node_set_scale(root,SCALE,SCALE);
   shader_node->textures[0] = tex;
   // tiling

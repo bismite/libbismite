@@ -13,10 +13,10 @@ int main(int argc, char* argv[])
 
   // Layer
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_shader_node_add_node(shader_node,background);
-  shader_node->textures[0] = background->texture;
+  bi_node_add_node(shader_node,background);
+  shader_node->textures[0] = bi_node_get_texture(background);
   shader_node->textures[1] = tex;
-  bi_add_shader_node(context,shader_node);
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
 
   // No Cropping, Green Circle 32x32 in 32x32
   BiNode* n0 = bi_node_init(malloc(sizeof(BiNode)));
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     left/128.0, bottom/128.0, right/128.0, top/128.0,
     left2/128.0, bottom2/128.0, right2/128.0, top2/128.0
   );
-  bi_shader_node_add_node(shader_node,n0);
+  bi_node_add_node(shader_node,n0);
 
   // With Cropping, Green Circle 32x32 in 64x64
   BiNode* n1 = bi_node_init(malloc(sizeof(BiNode)));
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     left/128.0, bottom/128.0, right/128.0, top/128.0,
     left2/128.0, bottom2/128.0, right2/128.0, top2/128.0
   );
-  bi_shader_node_add_node(shader_node,n1);
+  bi_node_add_node(shader_node,n1);
 
   // Mapping (via Cropping)
   //   Red Circle 32x32 in 64x64
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
   bi_node_set_position(n2,300,80);
   bi_node_set_cropped_texture(n2, tex,
     32,96,32,32, 16,16, 64,64 );
-  bi_shader_node_add_node(shader_node,n2);
+  bi_node_add_node(shader_node,n2);
 
   //
   bi_start_run_loop(context);

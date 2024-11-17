@@ -7,12 +7,12 @@ int main(int argc, char* argv[])
 
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode *root = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
-  bi_add_shader_node(context,shader_node);
+  BiNode *root = bi_node_add_node(shader_node,make_bg("assets/check.png"));
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
 
   // texture
   BiTexture* t = MAKE_TEXTURE("assets/face01.png");
-  shader_node->textures[0] = root->texture;
+  shader_node->textures[0] = bi_node_get_texture(root);
   shader_node->textures[1] = t;
 
   // 2degree/4msec x 540 = 1080degree/2160msec

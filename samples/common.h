@@ -68,7 +68,7 @@ __attribute__((unused)) static void add_fps_layer(BiContext* context)
   BiShaderNode *shader_node = bi_shader_node_init(malloc(sizeof(BiShaderNode)));
   bi_node_set_z(shader_node,0xff);
   bi_node_add_node( shader_node, (BiNode*)label );
-  shader_node->textures[0] = label->font->texture;;
+  shader_node->textures[0] = label->font->texture;
   // add shader
   bi_node_add_node(&context->default_framebuffer_node, shader_node);
 }

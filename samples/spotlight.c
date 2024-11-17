@@ -22,8 +22,8 @@ int main(int argc,char* argv[])
   BiContext* context = make_context(__FILE__);
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode *bg = bi_shader_node_add_node(shader_node, make_bg("assets/check.png"));
-  bi_add_shader_node(context,shader_node);
+  BiNode *bg = bi_node_add_node(shader_node, make_bg("assets/check.png"));
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
   // face sprite
   BiNode *face = make_sprite("assets/face01.png");
   bi_node_set_scale(face,2.0,2.0);
@@ -35,14 +35,14 @@ int main(int argc,char* argv[])
   shade->color = RGBA(0,0,0,128);
   bi_node_add_node(bg,shade);
   // set textures
-  shader_node->textures[0] = bg->texture;
-  shader_node->textures[1] = face->texture;
+  shader_node->textures[0] = bi_node_get_texture(bg);
+  shader_node->textures[1] = bi_node_get_texture(face);
   // spotlight shader_node
   BiShaderNode *spotlight_shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
   BiTexture *texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/circle256.png",true);
-  bi_shader_node_add_node(spotlight_shader_node, create_spotlight(texture,W/3,H/2) );
-  bi_shader_node_add_node(spotlight_shader_node, create_spotlight(texture,W/3*2,H/2) );
-  bi_add_shader_node(context,spotlight_shader_node);
+  bi_node_add_node(spotlight_shader_node, create_spotlight(texture,W/3,H/2) );
+  bi_node_add_node(spotlight_shader_node, create_spotlight(texture,W/3*2,H/2) );
+  bi_node_add_node(&context->default_framebuffer_node,spotlight_shader_node);
   spotlight_shader_node->blend_factor.src = GL_DST_COLOR;
   spotlight_shader_node->blend_factor.dst = GL_ONE;
   spotlight_shader_node->textures[0] = texture;

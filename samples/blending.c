@@ -8,8 +8,8 @@ int main(int argc, char* argv[])
 
   // Background shader_node
   BiShaderNode *bg = bi_shader_node_init(ALLOC(BiShaderNode));
-  bg->textures[0] = bi_shader_node_add_node(bg,make_bg("assets/map.png"))->texture;
-  bi_add_shader_node(context,bg);
+  bg->textures[0] = bi_node_get_texture(bi_node_add_node(bg,make_bg("assets/map.png")));
+  bi_node_add_node(&context->default_framebuffer_node,bg);
 
   //
   struct Blend{ GLuint src; GLuint dst; GLuint asrc; GLuint adst; };
@@ -29,13 +29,13 @@ int main(int argc, char* argv[])
   const int COL=4, ROW=3, CW=96,RH=96;
   for(int i=0;i<SIZE;i++) {
     BiShaderNode *a = bi_shader_node_init(ALLOC(BiShaderNode));
-    bi_add_shader_node(context,a);
-    BiNode *n = bi_shader_node_add_node(a,make_sprite_with_anchor("assets/tester.png",0,0) );
+    bi_node_add_node(&context->default_framebuffer_node,a);
+    BiNode *n = bi_node_add_node(a,make_sprite_with_anchor("assets/tester.png",0,0) );
     bi_node_set_scale(n, (float)CW/n->w, (float)RH/n->h );
     int x = (context->w-CW*COL)/(COL+1)*(1+i%COL)+CW*(i%COL);
     int y = (context->h-RH*ROW)/(ROW+1)*(1+i/COL)+RH*(i/COL);
     bi_node_set_position(n,x,y);
-    a->textures[0] = n->texture;
+    a->textures[0] = bi_node_get_texture(n);
     a->blend_factor.src = b[i].src;
     a->blend_factor.dst = b[i].dst;
   }

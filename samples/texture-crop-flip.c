@@ -6,9 +6,9 @@ int main(int argc, char* argv[])
   // shader_node
   BiTexture* tex = MAKE_TEXTURE("assets/face01.png");
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_add_shader_node(context,shader_node);
-  BiNode* background = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
-  shader_node->textures[0] = background->texture;
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
+  BiNode* background = bi_node_add_node(shader_node,make_bg("assets/check.png"));
+  shader_node->textures[0] = bi_node_get_texture(background);
   shader_node->textures[1] = tex;
   // Nodes
   BiNode* n = NULL;

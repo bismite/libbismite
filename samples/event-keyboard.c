@@ -28,8 +28,8 @@ int main(int argc,char* argv[])
   BiFont *font = load_font("assets/font12.dat",font_texture);
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode* root = bi_shader_node_add_node(shader_node,bi_node_init(ALLOC(BiNode)));
-  bi_add_shader_node(context,shader_node);
+  BiNode* root = bi_node_add_node(shader_node,bi_node_init(ALLOC(BiNode)));
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
   shader_node->textures[0] = font->texture;
   // labels
   const char* texts[] = {

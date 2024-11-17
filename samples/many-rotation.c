@@ -24,9 +24,9 @@ int main(int argc, char* argv[])
   BiContext* context = make_context(__FILE__);
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode *root = bi_shader_node_add_node(shader_node,make_bg("assets/map.png"));
-  shader_node->textures[0] = root->texture;
-  bi_add_shader_node(context,shader_node);
+  BiNode *root = bi_node_add_node(shader_node,make_bg("assets/map.png"));
+  shader_node->textures[0] = bi_node_get_texture(root);
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
   // nodes
   BiNode* center = bi_node_init(ALLOC(BiNode));
   bi_node_add_node(root, center);

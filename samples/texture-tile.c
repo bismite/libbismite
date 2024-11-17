@@ -18,7 +18,7 @@ int main(int argc,char* argv[])
   BiContext* context = make_context(__FILE__);
   BiTexture *texture = bi_texture_init_with_filename(ALLOC(BiTexture),"assets/tester.png",false);
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_add_shader_node(context,shader_node);
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
   shader_node->textures[0] = texture;
   // tiling
   const int COL = context->w/TILE_SIZE+1;
@@ -26,7 +26,7 @@ int main(int argc,char* argv[])
   for(int i=0; i<COL*ROW; i++){
     int x = i % COL * TILE_SIZE;
     int y = i / COL * TILE_SIZE;
-    bi_shader_node_add_node(shader_node,create_tile(x,y,texture));
+    bi_node_add_node(shader_node,create_tile(x,y,texture));
   }
   // start
   bi_start_run_loop(context);

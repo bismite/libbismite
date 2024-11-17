@@ -53,9 +53,9 @@ int main(int argc, char* argv[])
   BiTexture* ball_texture = MAKE_TEXTURE("assets/ball.png");
   // shader_node
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode* root = bi_shader_node_add_node(shader_node,make_bg("assets/map.png"));
-  bi_add_shader_node(context,shader_node);
-  shader_node->textures[0] = root->texture;
+  BiNode* root = bi_node_add_node(shader_node,make_bg("assets/map.png"));
+  bi_node_add_node(&context->default_framebuffer_node,shader_node);
+  shader_node->textures[0] = bi_node_get_texture(root);
   shader_node->textures[1] = ball_texture;
   // additive blending
   shader_node->blend_factor = BI_BLEND_FACTOR_ADDTIVE;

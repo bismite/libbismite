@@ -14,7 +14,7 @@ OBJECTS = $(SOURCES:src/%.c=$(OBJ_DIR)/%.o)
 
 LIBSDL2=$(BUILD_DIR)/lib/libSDL2.a
 SDL_STATIC_LIBS=$(BUILD_DIR)/lib/libSDL2.a $(BUILD_DIR)/lib/libSDL2_image.a $(BUILD_DIR)/lib/libSDL2_mixer.a
-SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/20240804-4/emscripten-3.1.64-20240804-4-SDL2-2.30.5-SDL2_image-2.8.2-SDL2_mixer-2.8.0.tgz
+SDL_TGZ_URL=https://github.com/bismite/SDL-binaries/releases/download/20241117/emscripten-3.1.71-20241117-SDL2-2.30.9-SDL2_image-2.8.2-SDL2_mixer-2.8.0.tgz
 SDL_TGZ=build/$(shell basename $(SDL_TGZ_URL))
 
 # ----

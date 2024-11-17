@@ -56,8 +56,8 @@ void main()
   vec4 c = getTextureColor(1, uv);
   float power = c[0];
   if(power>0.0){
-    color = blur(_texture_index, power * 8.0);
+    color = blur(0, power * 8.0);
   }else{
-    color = getTextureColor(_texture_index, uv);
+    color = getTextureColor(0, uv);
   }
 }

@@ -51,8 +51,8 @@ int main(int argc, char* argv[])
   bi_node_set_position(face,150,240);
   bi_node_add_node(shader_node, canvas_sprite);
   bi_node_add_node(shader_node, face);
-  shader_node->textures[0] = background->texture;
-  shader_node->textures[1] = face->texture;
+  shader_node->textures[0] = bi_node_get_texture(background);
+  shader_node->textures[1] = bi_node_get_texture(face);
   shader_node->textures[2] = canvas_tex;
   bi_node_add_node(&context->default_framebuffer_node,shader_node);
 

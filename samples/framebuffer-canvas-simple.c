@@ -11,7 +11,7 @@ BiNode* draw_canvas(BiContext* context)
   // Shader
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
   bi_node_add_node(shader_node, face);
-  shader_node->textures[0] = face->texture;
+  shader_node->textures[0] = bi_node_get_texture(face);
   bi_node_add_node(canvas, shader_node);
   // Draw
   bi_framebuffer_clear(canvas->framebuffer,0,0,0xff,0x80);
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
   BiNode* background = bi_node_add_node(shader_node,make_bg("assets/check.png"));
   bi_node_add_node(shader_node, canvas_sprite);
-  shader_node->textures[0] = background->texture;
+  shader_node->textures[0] = bi_node_get_texture(background);
   shader_node->textures[1] = canvas_tex;
   bi_node_add_node(&context->default_framebuffer_node,shader_node);
 

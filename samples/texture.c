@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
   BiNode* background = make_bg("assets/check.png");
   bi_node_add_node(shader_node,background);
-  shader_node->textures[0] = background->texture;
+  shader_node->textures[0] = bi_node_get_texture(background);
   shader_node->textures[1] = tex;
   bi_node_add_node(&context->default_framebuffer_node,shader_node);
 

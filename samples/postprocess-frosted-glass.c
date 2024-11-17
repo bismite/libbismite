@@ -1,9 +1,7 @@
 #include "common.h"
 
-BiNode* glasses;
 BiNode* glass_a;
 BiNode* glass_b;
-BiFramebufferNode* canvas;
 
 typedef struct {
   int vx;
@@ -30,10 +28,7 @@ static void random_move(BiContext* ctx,BiTimer* t,double dt)
     // backport
     bi_node_set_position(n,x,y);
   }
-  // redraw
-  bi_framebuffer_node_draw(canvas,ctx);
 }
-
 
 BiNode* make_glass(const char* name)
 {
@@ -46,62 +41,59 @@ BiNode* make_glass(const char* name)
   return n;
 }
 
-BiFramebufferNode* make_canvas(BiContext* ctx)
+BiNode* make_mask_framebuffer(BiContext* ctx)
 {
-  canvas = bi_framebuffer_node_init_with_size(ALLOC(BiFramebufferNode),W,H);
-  // Nodes
-  glasses = bi_node_init(ALLOC(BiNode));
-  glass_a = make_glass("assets/glass-a.png");
-  glass_b = make_glass("assets/glass-b.png");
-  bi_node_add_node(glasses,glass_a);
-  bi_node_add_node(glasses,glass_b);
-  // Layer
-  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  bi_shader_node_add_node(shader_node,glasses);
-  shader_node->textures[0] = glass_a->texture;
-  shader_node->textures[1] = glass_b->texture;
-  bi_framebuffer_node_add_shader_node(canvas,shader_node);
-  // draw
-  bi_framebuffer_node_draw(canvas,ctx);
-  return canvas;
+  // Framebuffer
+  BiNode* node = bi_node_init(ALLOC(BiNode));
+  bi_node_set_size(node,W,H);
+  node->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),W,H);
+  BiTexture* tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture), node->framebuffer);
+  bi_node_set_texture(node,tex,0,0,tex->w,tex->h);
+  node->texture_flip_vertical = true;
+  // Shader
+  BiShaderNode *snode = bi_shader_node_init(ALLOC(BiShaderNode));
+  glass_a = bi_node_add_node(snode,make_glass("assets/glass-a.png"));
+  glass_b = bi_node_add_node(snode,make_glass("assets/glass-b.png"));
+  snode->textures[0] = bi_node_get_texture(glass_a);
+  snode->textures[1] = bi_node_get_texture(glass_b);
+  bi_node_add_node(node,snode);
+  // move glasses
+  onupdate(node,random_move);
+  return node;
 }
-
 
 int main(int argc, char* argv[])
 {
   BiContext* context = make_context(__FILE__);
-  // Shaders
-  BiShader *pp_shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-frosted-glass.frag");
-  // Main Layer
-  BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
-  BiNode *bg = bi_shader_node_add_node(shader_node,make_bg("assets/check.png"));
-  BiNode* face = make_sprite("assets/face01.png");
-  bi_node_set_position(face,context->w/2,context->h/2);
-  bi_node_add_node(bg,face);
-  shader_node->textures[0] = bg->texture;
-  shader_node->textures[1] = face->texture;
 
-  // Canvas
-  make_canvas(context);
-  BiTexture* canvas_tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),&canvas->framebuffer);
-  // bi_framebuffer_save_png_image(&canvas->framebuffer,"postprocess-frosted-glass.png");
+  // Main Framebuffer
+  BiNode* main = bi_node_init(ALLOC(BiNode));
+  bi_node_set_size(main,W,H);
+  main->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),W,H);
+  BiTexture* tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture), main->framebuffer);
+  bi_node_set_texture(main,tex,0,0,tex->w,tex->h);
+  main->texture_flip_vertical = true;
+  // Main Shader
+  BiShaderNode *snode = bi_shader_node_init(ALLOC(BiShaderNode));
+  BiNode *bg = bi_node_add_node(snode, make_bg("assets/check.png"));
+  BiNode* face = bi_node_add_node(snode, make_sprite("assets/face01.png"));
+  bi_node_set_position(face,W/2,H/2);
+  snode->textures[0] = bi_node_get_texture(bg);
+  snode->textures[1] = bi_node_get_texture(face);
+  bi_node_add_node(main,snode);
 
-  // PostProcess Layer
-  BiShaderNode *pp_shader_node = bi_shader_node_init_as_postprocess(ALLOC(BiShaderNode));
-  BiNode *root = bi_shader_node_add_node(pp_shader_node,bi_node_init(ALLOC(BiNode)));
-  BiFramebuffer *fb = &context->shader_nodes.framebuffer;
-  pp_shader_node->shader = pp_shader;
-  bi_node_set_size(root,context->w,context->h);
-  BiTexture *fb_tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),fb);
-  bi_node_set_texture(root, fb_tex, 0,0,fb_tex->w,fb_tex->h);
-  root->texture_flip_vertical = true;
-  pp_shader_node->textures[0] = fb_tex;
-  pp_shader_node->textures[1] = canvas_tex;
-  // move glasses
-  onupdate(root,random_move);
-  // add shader_nodes
-  bi_add_shader_node(context,shader_node);
-  bi_add_shader_node(context,pp_shader_node);
+  // Mask Framebuffer
+  BiNode* mask = make_mask_framebuffer(context);
+
+  // Post Process
+  snode = bi_shader_node_init(ALLOC(BiShaderNode));
+  snode->shader = create_shader_with_default_vertex_shader("assets/shaders/postprocess-frosted-glass.frag");
+  bi_node_add_node(snode,main);
+  bi_node_add_node(snode,mask);
+  snode->textures[0] = bi_node_get_texture(main);
+  snode->textures[1] = bi_node_get_texture(mask);
+  bi_node_add_node(&context->default_framebuffer_node,snode);
+
   //
   bi_start_run_loop(context);
   return 0;

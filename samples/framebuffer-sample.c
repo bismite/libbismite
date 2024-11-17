@@ -2,11 +2,6 @@
 
 BiNode* fbnode = NULL;
 
-static void save(BiContext* ctx,BiTimer* t,double dt)
-{
-  bi_framebuffer_save_png_image(fbnode->framebuffer,"0_shader_nodegroup.png");
-}
-
 // Default Framebuffer Node
 // - ShaderNode A
 //   - Sprite(Check)
@@ -26,8 +21,8 @@ int main(int argc, char* argv[])
   // Sprites for ShaderNode A
   BiNode *bg = make_bg("assets/check.png");
   BiNode* tester = make_sprite("assets/tester.png");
-  shader_a->textures[0] = bg->texture;
-  shader_a->textures[1] = tester->texture;
+  shader_a->textures[0] = bi_node_get_texture(bg);
+  shader_a->textures[1] = bi_node_get_texture(tester);
   bi_node_set_position(tester,480/4,320*3/4);
   bi_node_add_node(shader_a,bg);
   bi_node_add_node(bg,tester);
@@ -54,7 +49,7 @@ int main(int argc, char* argv[])
 
   // Sprite for ShaderNode B
   BiNode* face = bi_node_add_node(shader_b,make_sprite("assets/face01.png"));
-  shader_b->textures[0] = face->texture;
+  shader_b->textures[0] = bi_node_get_texture(face);
   bi_node_set_position(face,480/4*3,320*3/4);
   bi_node_add_node(shader_b,face);
 
@@ -66,7 +61,6 @@ int main(int argc, char* argv[])
   bi_node_add_node(shader_b,rect_b);
 
   //
-  onupdate(bg,save);
   bi_start_run_loop(context);
   return 0;
 }

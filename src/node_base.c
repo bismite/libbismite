@@ -27,6 +27,7 @@ void bi_node_base_init(BiNodeBase* node,BiNodeClass class)
   node->index = 0;
   node->interaction_enabled = true;
   node->time_scale = 1.0;
+  node->_on_add_child = NULL;
   bi_timers_init(&node->timers);
 }
 

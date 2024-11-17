@@ -38,7 +38,7 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
   if( rc.timer_queue && n->timers.size > 0 ) {
     array_add_object(rc.timer_queue, n);
   }
-  if( n->_final_visibility && n->w!=0 && n->h!=0 ) { // skip invisible node
+  if( rc._rendering_queue && n->_final_visibility && n->w!=0 && n->h!=0 ) { // skip invisible node
     array_add_object(rc._rendering_queue,n);
   }
   // Children
@@ -52,8 +52,7 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
         child->transform_matrix_cached = false;
       }
       bi_render_node(rc,child);
-    }
-    if(tmp->class == BI_SHADER_NODE) {
+    }else if(tmp->class == BI_SHADER_NODE) {
       BiShaderNode* child = (BiShaderNode*)tmp;
       bi_render_shader_node(rc,child);
     }

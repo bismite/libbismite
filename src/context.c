@@ -13,6 +13,22 @@ extern void enable_gl_extensions();
 
 BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
 {
+  context->debug = false;
+  context->running = false;
+
+  // Size
+  context->w = w;
+  context->h = h;
+
+  // Timers
+  context->program_start_at = bi_get_now();
+  context->frame_start_at = 0;
+  context->last_update = 0;
+  context->max_delta = 100;
+
+  //
+  // Init
+  //
   if( SDL_Init(SDL_INIT_VIDEO) != 0 ){
     LOG("SDL_Init fail.");
     return NULL;
@@ -43,8 +59,6 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   enable_gl_extensions();
   glEnable(GL_BLEND);
 
-  context->program_start_at = bi_get_now();
-
   // Queue
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
@@ -60,23 +74,11 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   }
   bi_node_init(&context->default_framebuffer_node);
   context->default_framebuffer_node.framebuffer = &context->default_framebuffer;
-
-  // timers
-  context->last_update = 0;
-  context->max_delta = 100;
+  // default shader
+  bi_shader_init(&context->default_shader, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
   //
   bi_profile_init(&context->profile,fps,bi_get_now());
-
-  context->debug = false;
-
-  context->running = true;
-
-  context->w = w;
-  context->h = h;
-
-  // default shader
-  bi_shader_init(&context->default_shader, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
   // default texture
 #ifdef __APPLE__
@@ -85,11 +87,6 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
   glBindTexture(GL_TEXTURE_2D, 0);
 #endif
-
-  // framebuffer
-  GLint dims[4] = {0};
-  glGetIntegerv(GL_VIEWPORT, dims);
-  bi_framebuffer_init(&context->post_process_framebuffer,dims[2],dims[3]);
 
   // mainloop_end_callback
   context->on_mainloop_end = NULL;

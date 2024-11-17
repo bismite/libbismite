@@ -33,7 +33,7 @@ BiNode* bi_node_init(BiNode* n)
   n->transform_matrix_cached = false;
 
   // Texture
-  n->texture = NULL;
+  n->_texture = NULL;
   memset( &n->texture_uv, 0, sizeof(GLfloat)*4 );
   memset( &n->texture_crop_uv, 0, sizeof(GLfloat)*4 );
   n->texture_flip_horizontal = false;
@@ -266,7 +266,7 @@ void bi_node_set_texture_mapping(BiNode* n, BiTexture* t,
   GLfloat l1, GLfloat b1, GLfloat r1, GLfloat t1,
   GLfloat l2, GLfloat b2, GLfloat r2, GLfloat t2 )
 {
-  n->texture = t;
+  n->_texture = t;
   n->texture_uv[0] = l1;
   n->texture_uv[1] = b1;
   n->texture_uv[2] = r1;
@@ -280,5 +280,5 @@ void bi_node_set_texture_mapping(BiNode* n, BiTexture* t,
 void bi_node_unset_texture(BiNode* n)
 {
   n->draw_matrix_cached = false;
-  n->texture = NULL;
+  n->_texture = NULL;
 }

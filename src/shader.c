@@ -183,7 +183,7 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     // Matrix
     bi_mat4_copy(&transforms[i*16], node->draw_matrix);
     // Texture
-    if(node->texture != NULL) {
+    if(bi_node_get_texture(node) != NULL) {
       for(int j=0;j<4;j++){
         texture_uv[i*4+j] = node->texture_uv[j];
         texture_crop_uv[i*4+j] = node->texture_crop_uv[j];
@@ -196,7 +196,7 @@ void bi_shader_draw(BiShader* shader,Array* queue)
         texture_uv[i*4+1] = node->texture_uv[3]; // bottom = top
         texture_uv[i*4+3] = node->texture_uv[1]; // top = bottom
       }
-      texture_index[i] = node->texture->texture_unit;
+      texture_index[i] = bi_node_get_texture(node)->texture_unit;
     }else{
       texture_index[i] = -1; // no-texture
     }

@@ -198,6 +198,7 @@ void bi_stop_run_loop()
 
 void bi_start_run_loop(BiContext* context)
 {
+  context->running = true;
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop_arg(main_loop, context, context->profile.target_fps, false);
 #else

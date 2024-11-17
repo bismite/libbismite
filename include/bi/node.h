@@ -45,7 +45,7 @@ struct _BiNode {
   bool draw_matrix_cached;
 
   // Texture
-  BiTexture *texture;
+  BiTexture *_texture;
   GLfloat texture_uv[4]; // left,bottom,right,top
   GLfloat texture_crop_uv[4]; // left,bottom,right,top
   bool texture_flip_horizontal;
@@ -104,6 +104,7 @@ static inline double bi_node_get_degree(BiNode* n) { return n->angle*(180.f/M_PI
 extern bool bi_node_update_matrix(BiNode* n);
 
 // Texture
+static inline BiTexture* bi_node_get_texture(BiNode* n){ return n->_texture; }
 extern void bi_node_set_texture(BiNode*, BiTexture*, uint16_t tx, uint16_t ty, uint16_t tw,  uint16_t th);
 extern void bi_node_unset_texture(BiNode*);
 //  Original Image and Crop   Cropped Texture in Sprite Sheet
@@ -132,7 +133,6 @@ extern void bi_node_set_cropped_texture(BiNode*, BiTexture*,
 extern void bi_node_set_texture_mapping(BiNode*, BiTexture*,
   GLfloat l1, GLfloat b1, GLfloat r1, GLfloat t1,
   GLfloat l2, GLfloat b2, GLfloat r2, GLfloat t2 );
-
 
 // Timer
 static inline BiTimer* bi_node_add_timer(BiNode* node,BiTimer* timer){ return bi_timers_add(&node->timers,timer); }

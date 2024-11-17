@@ -23,37 +23,30 @@ struct _BiContext {
   int w;
   int h;
 
-  //
-  int64_t program_start_at;
-
   // fps, etc...
   BiProfile profile;
 
   // show debug info
   bool debug;
 
-  // Default Framebuffer
+  // Shader and Framebuffer
   BiFramebuffer default_framebuffer;
   BiNode default_framebuffer_node;
+  BiShader default_shader;
 
   // queue
   Array interaction_queue;
   Array timer_queue;
 
   // timers
+  int64_t program_start_at;
   int64_t frame_start_at;
   int64_t last_update;
   int max_delta;
 
-  // default shader
-  BiShader default_shader;
-
   //
   SDL_Window *_window;
   SDL_GLContext *_glcontext;
-
-  // for postprocess
-  BiFramebuffer post_process_framebuffer;
 
   // callback
   on_mainloop_end_callback on_mainloop_end;

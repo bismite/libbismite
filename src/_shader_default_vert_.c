@@ -7,7 +7,6 @@ SHADER_VERSION
 VERTEX_SHADER_HEADER
 D(
 uniform mat4 camera;
-in vec2 resolution;
 in vec2 node_size;
 in mat4 transform;
 in vec2 vertex;

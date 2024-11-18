@@ -53,7 +53,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   context->_glcontext = SDL_GL_CreateContext(context->_window);
   if(context->_glcontext==NULL){
     printf("SDL_GL_CreateContext failed: %s\n",SDL_GetError());
-    exit(1);
+    return NULL;
   }
 
   enable_gl_extensions();

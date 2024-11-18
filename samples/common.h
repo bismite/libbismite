@@ -210,12 +210,21 @@ __attribute__((unused)) static void print_info(BiContext *context)
   GLint max_texture_image_units;
   glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_image_units);
   printf("GL_MAX_TEXTURE_IMAGE_UNITS: %d\n",max_texture_image_units);
+
+  // Determine Framebuffer Size
+  printf("HIGH DPI: %s\n", is_high_dpi(context) ? "YES" : "NO");
+  int pw,ph;
+  SDL_GetWindowSizeInPixels(context->_window,&pw,&ph);
+  printf("SDL_GetWindowSizeInPixels: %d,%d\n",pw,ph);
+  int dw,dh;
+  SDL_GL_GetDrawableSize(context->_window,&dw,&dh);
+  printf("SDL_GL_GetDrawableSize: %d,%d\n",dw,dh);
 }
 
 __attribute__((unused)) static BiContext* make_context(const char* name)
 {
   srand( bi_get_now() );
-  BiContext* context = bi_init_context(ALLOC(BiContext),W,H,0,false,name);
+  BiContext* context = bi_init_context(ALLOC(BiContext),W,H,0,true,name);
   print_info(context);
   add_fps_layer(context);
   return context;

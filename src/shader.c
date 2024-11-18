@@ -8,43 +8,66 @@
 #include <bi/node.h>
 #include "matrix/matrix.h"
 
-static void print_shader_log(const char* name, GLuint shader_id)
+static void print_shader_log(GLuint shader_id)
 {
-  int loglen=0;
-  glGetShaderiv(shader_id,GL_INFO_LOG_LENGTH,&loglen);
-  if(loglen>0){
-    char *log = malloc(loglen);
-    glGetShaderInfoLog(shader_id, loglen, NULL, log);
-    printf("%s: %s\n",name,log);
+  int len=0;
+  glGetShaderiv(shader_id,GL_INFO_LOG_LENGTH,&len);
+  if(len>0){
+    char *log = malloc(len*sizeof(char));
+    glGetShaderInfoLog(shader_id, len, NULL, log);
+    printf("glGetShaderInfoLog(): %s\n",log);
+    free(log);
+  }
+}
+static void print_program_log(GLuint program_id)
+{
+  int len=0;
+  glGetProgramiv(program_id,GL_INFO_LOG_LENGTH,&len);
+  if(len>0){
+    char *log = malloc(len*sizeof(char));
+    glGetProgramInfoLog(program_id, len, NULL, log);
+    printf("glGetProgramInfoLog(): %s\n",log);
     free(log);
   }
 }
 
+static inline GLuint create_shader(GLenum shader_type, const char* src) {
+  GLuint shader = glCreateShader(shader_type);
+  if(shader==0) {
+    printf("glCreateShader() failed.\n");
+  }
+  glShaderSource(shader, 1, &src, NULL);
+  glCompileShader(shader);
+  GLint compiled = 0;
+  glGetShaderiv(shader,GL_COMPILE_STATUS,&compiled);
+  if( compiled != GL_TRUE ) {
+    printf("glCompileShader failed.\n");
+    if(shader_type==GL_VERTEX_SHADER)   printf("GL_SHADER_TYPE = GL_VERTEX_SHADER\n");
+    if(shader_type==GL_FRAGMENT_SHADER) printf("GL_SHADER_TYPE = GL_FRAGMENT_SHADER\n");
+    print_shader_log(shader);
+  }
+  return shader;
+}
+
 static void load_shader(BiShader* shader,const char* vertex_shader_source, const char* fragment_shader_source)
 {
-  // compile vertex shader
-  GLuint vShaderId = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vShaderId, 1, &vertex_shader_source, NULL);
-  glCompileShader(vShaderId);
-  print_shader_log("Vertex Shader Log",vShaderId);
-
-  // compile fragment shader
-  GLuint fShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fShaderId, 1, &fragment_shader_source, NULL);
-  glCompileShader(fShaderId);
-  print_shader_log("Fragment Shader Log",fShaderId);
-
-  //
+  GLuint vert_shader = create_shader(GL_VERTEX_SHADER,vertex_shader_source);
+  GLuint frag_shader = create_shader(GL_FRAGMENT_SHADER,fragment_shader_source);
   GLuint program_id = glCreateProgram();
-  glAttachShader(program_id,vShaderId);
-  glDeleteShader(vShaderId);
-  glAttachShader(program_id,fShaderId);
-  glDeleteShader(fShaderId);
+  glAttachShader(program_id,vert_shader);
+  glDeleteShader(vert_shader);
+  glAttachShader(program_id,frag_shader);
+  glDeleteShader(frag_shader);
   glLinkProgram(program_id);
-
+  GLint link_status = 0;
+  glGetProgramiv(program_id, GL_LINK_STATUS, &link_status);
+  if(link_status!=GL_TRUE){
+    printf("glLinkProgram() failed.\n");
+    print_program_log(program_id);
+  }
   //
   shader->program_id = program_id;
-
+  glUseProgram(program_id);
   // Attribute locations
   shader->attribute.vertex = glGetAttribLocation(program_id, "vertex");
   shader->attribute.texture_uv = glGetAttribLocation(program_id, "texture_uv");
@@ -55,7 +78,6 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->attribute.node_size = glGetAttribLocation(program_id, "node_size");
   shader->attribute.transform = glGetAttribLocation(program_id, "transform");
   shader->attribute.node_extra_data = glGetAttribLocation(program_id, "node_extra_data");
-
   // Uniform
   shader->uniform.camera = glGetUniformLocation(program_id, "camera");
   shader->uniform.texture = glGetUniformLocation(program_id, "sampler[0]");
@@ -63,6 +85,7 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->uniform.resolution = glGetUniformLocation(program_id, "resolution");
   shader->uniform.scale = glGetUniformLocation(program_id, "scale");
   shader->uniform.shader_extra_data = glGetUniformLocation(program_id, "shader_extra_data");
+  glUseProgram(0);
 }
 
 static inline void init_mat4_buffer(GLint location, GLuint buffer)

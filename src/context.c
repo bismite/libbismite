@@ -66,12 +66,11 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   // Framebuffer
   context->default_framebuffer.framebuffer_id = 0;
   context->default_framebuffer.texture_id = 0;
-  context->default_framebuffer.w = w;
-  context->default_framebuffer.h = h;
-  if( is_high_dpi(context) ){
-    context->default_framebuffer.w *= 2;
-    context->default_framebuffer.h *= 2;
-  }
+  int real_w, real_h;
+  SDL_GetWindowSizeInPixels(context->_window,&real_w,&real_h);
+  context->default_framebuffer.w = real_w;
+  context->default_framebuffer.h = real_h;
+
   bi_node_init(&context->default_framebuffer_node);
   context->default_framebuffer_node.framebuffer = &context->default_framebuffer;
   // default shader

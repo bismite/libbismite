@@ -170,6 +170,7 @@ void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale
 
 static inline void update_vbo(GLuint buffer,size_t len, const void *data)
 {
+  // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, len, NULL, GL_DYNAMIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, len, data);
@@ -239,10 +240,7 @@ void bi_shader_draw(BiShader* shader,Array* queue)
     bi_mat4_copy(&extra_data[i*16], node->shader_extra_data);
   }
 
-  //
   // update vbo
-  // orphaning: https://www.khronos.org/opengl/wiki/Buffer_Object_Streaming#Buffer_re-specification
-  //
   update_vbo(shader->buffer.transform, sizeof(GLfloat)*16*len, transforms);
   update_vbo(shader->buffer.texture_index, sizeof(GLint)*1*len, texture_index);
   update_vbo(shader->buffer.texture_uv, sizeof(GLfloat)*4*len, texture_uv);
@@ -251,10 +249,7 @@ void bi_shader_draw(BiShader* shader,Array* queue)
   update_vbo(shader->buffer.modulate, sizeof(GLfloat)*4*len, modulate);
   update_vbo(shader->buffer.node_size, sizeof(GLfloat)*2*len, node_size);
   update_vbo(shader->buffer.node_extra_data, sizeof(GLfloat)*16*len, extra_data);
-
-  //
   // Draw instances
-  //
   glBindVertexArray(shader->vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, len);
   glBindVertexArray(0);

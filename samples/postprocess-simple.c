@@ -26,8 +26,6 @@ int main(int argc, char* argv[])
   snode->shader = shader;
   bi_node_add_node(snode,main);
   snode->textures[0] = bi_node_get_texture(main);
-
-  // shader_nodes
   bi_node_add_node(&context->default_framebuffer_node,snode);
 
   // start

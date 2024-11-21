@@ -10,20 +10,6 @@
 
 static inline void bi_render_shader_node(BiRenderingContext, BiShaderNode*);
 
-static bool node_has_event_handler(BiNode* n)
-{
-  if(n->on_move_cursor != NULL ||
-     n->on_click != NULL ||
-     n->on_move_finger != NULL ||
-     n->on_keyinput != NULL ||
-     n->on_touch != NULL ||
-     n->on_textinput != NULL
-   ) {
-    return true;
-  }
-  return false;
-}
-
 void bi_render_node(BiRenderingContext rc, BiNode* n)
 {
   // inherit
@@ -32,7 +18,7 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
   n->_final_visibility = n->visible && rc.visible;;
   rc.visible = n->_final_visibility;
   // Queueing
-  if( rc.interaction_queue && rc.interaction_enabled && node_has_event_handler(n) ) {
+  if( rc.interaction_queue && rc.interaction_enabled && bi_node_is_event_handler_available(n) ) {
     array_add_object(rc.interaction_queue, n);
   }
   if( rc.timer_queue && n->timers.size > 0 ) {
@@ -67,7 +53,8 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   if( parent == NULL || parent->framebuffer == NULL) {
     return;
   }
-  // timer
+  BiFramebuffer *fb = parent->framebuffer;
+  // Queueing Timer
   rc.time_scale *= snode->time_scale;
   if( rc.timer_queue && snode->timers.size > 0 ) {
     array_add_object(rc.timer_queue, snode);
@@ -92,16 +79,20 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   }
 
   // Set Target Framebuffer
-  BiNode *fbnode = (BiNode*)snode->parent;
-  glBindFramebuffer(GL_FRAMEBUFFER, fbnode->framebuffer->framebuffer_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+  // Set Viewport
+  int viewport_w = fb->w;
+  int viewport_h = fb->h;
+  if(fb->framebuffer_id==0){ // Scaling High DPI
+    SDL_GetWindowSizeInPixels(c->_window,&viewport_w,&viewport_h);
+  }
+  glViewport(0,0,viewport_w,viewport_h);
   // shader select
   BiShader* shader = snode->shader ? snode->shader : &rc.bi_context->default_shader;
   glUseProgram(shader->program_id);
   // uniforms
   double time = (c->program_start_at - c->frame_start_at)/1000.0;
-  int drawable_w,drawable_h;
-  SDL_GL_GetDrawableSize(c->_window, &drawable_w, &drawable_h);
-  float scale = (float)drawable_h / c->h;
+  float scale = (float)viewport_h / c->h;
   bi_shader_set_uniforms(shader,time,c->w,c->h,scale,snode->shader_extra_data);
   // Activate Textures
   for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
@@ -115,7 +106,7 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   }
   // set projection and view
   GLfloat camera[16];
-  bi_camera_matrix(camera,snode->camera_x,snode->camera_y,c->w,c->h,false);
+  bi_camera_matrix(camera,snode->camera_x,snode->camera_y,fb->w,fb->h,false);
   glUniformMatrix4fv(shader->uniform.camera, 1, GL_FALSE, camera);
   // blend function
   glBlendFuncSeparate(

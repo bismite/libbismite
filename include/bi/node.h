@@ -1,5 +1,5 @@
-#ifndef __BISMITE_NODE_H__
-#define __BISMITE_NODE_H__
+#ifndef __BINODE_H__
+#define __BINODE_H__
 
 #include <stdbool.h>
 #include <bi/node_base.h>
@@ -145,5 +145,18 @@ static inline void bi_node_set_on_move_finger(BiNode* node, on_move_finger_callb
 static inline void bi_node_set_on_touch(BiNode* node, on_touch_callback callback){node->on_touch=callback;}
 static inline void bi_node_set_on_keyinput(BiNode* node, on_keyinput_callback callback){node->on_keyinput=callback;}
 static inline void bi_node_set_on_textinput(BiNode* node, on_textinput_callback callback){node->on_textinput=callback;}
+static inline bool bi_node_is_event_handler_available(BiNode* n)
+{
+  if(n->on_move_cursor != NULL ||
+     n->on_click != NULL ||
+     n->on_move_finger != NULL ||
+     n->on_keyinput != NULL ||
+     n->on_touch != NULL ||
+     n->on_textinput != NULL
+   ) {
+    return true;
+  }
+  return false;
+}
 
-#endif
+#endif // __BINODE_H__

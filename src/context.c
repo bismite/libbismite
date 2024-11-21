@@ -63,16 +63,14 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
 
-  // Framebuffer
+  // Default Framebuffer
   context->default_framebuffer.framebuffer_id = 0;
   context->default_framebuffer.texture_id = 0;
-  int real_w, real_h;
-  SDL_GetWindowSizeInPixels(context->_window,&real_w,&real_h);
-  context->default_framebuffer.w = real_w;
-  context->default_framebuffer.h = real_h;
-
+  context->default_framebuffer.w = w;
+  context->default_framebuffer.h = h;
   bi_node_init(&context->default_framebuffer_node);
   context->default_framebuffer_node.framebuffer = &context->default_framebuffer;
+
   // default shader
   bi_shader_init(&context->default_shader, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
@@ -121,16 +119,6 @@ const char* bi_default_fragment_shader()
 //
 void bi_draw_framebuffer_node(BiContext* context, BiNode* n)
 {
-  // viewport setting
-  GLint tmp[4];
-  glGetIntegerv(GL_VIEWPORT,tmp);
-  glViewport(0,0,n->w,n->h);
-  // camera
-  int _w = context->w;
-  int _h = context->h;
-  context->w = n->w;
-  context->h = n->h;
-  // rendering
   BiRenderingContext rendering_context;
   // NULL interaction_queue and timer_queue
   bi_rendering_context_init(&rendering_context,context,true,true,1.0, NULL, NULL );
@@ -138,11 +126,6 @@ void bi_draw_framebuffer_node(BiContext* context, BiNode* n)
   array_init(&rendering_queue);
   rendering_context._rendering_queue = &rendering_queue;
   bi_render_node( rendering_context, n );
-  // restore
-  context->w = _w;
-  context->h = _h;
-  // restore viewport
-  glViewport(tmp[0],tmp[1],tmp[2],tmp[3]);
   // Clean Queue
   array_clear(&rendering_queue);
 }

@@ -101,7 +101,7 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);
     if( snode->textures[i] != NULL ) {
-      snode->textures[i]->texture_unit = i;
+      snode->textures[i]->_texture_unit = i;
       glBindTexture(GL_TEXTURE_2D, snode->textures[i]->texture_id);
     }else{
       glBindTexture(GL_TEXTURE_2D, 0);

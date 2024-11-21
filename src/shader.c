@@ -220,7 +220,7 @@ void bi_shader_draw(BiShader* shader,Array* queue)
         texture_uv[i*4+1] = node->texture_uv[3]; // bottom = top
         texture_uv[i*4+3] = node->texture_uv[1]; // top = bottom
       }
-      texture_index[i] = bi_node_get_texture(node)->texture_unit;
+      texture_index[i] = bi_node_get_texture(node)->_texture_unit;
     }else{
       texture_index[i] = -1; // no-texture
     }

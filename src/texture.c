@@ -78,12 +78,12 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
     texture->texture_id = bi_texture_convert_to_premultiplied_alpha(texture_id,tex_format,img->w,img->h);
     texture->w = img->w;
     texture->h = img->h;
-    texture->texture_unit = 0;
+    texture->_texture_unit = 0;
   }else{
     texture->texture_id = texture_id;
     texture->w = img->w;
     texture->h = img->h;
-    texture->texture_unit = 0;
+    texture->_texture_unit = 0;
   }
 
   SDL_FreeSurface(img);
@@ -120,7 +120,7 @@ BiTexture* bi_texture_init_with_texture_id(BiTexture* texture, int w, int h, GLu
   texture->texture_id = texture_id;
   texture->w = w;
   texture->h = h;
-  texture->texture_unit = 0;
+  texture->_texture_unit = 0;
   return texture;
 }
 
@@ -143,5 +143,5 @@ void bi_texture_delete(BiTexture* texture)
   texture->texture_id = 0;
   texture->w = 0;
   texture->h = 0;
-  texture->texture_unit = 0;
+  texture->_texture_unit = 0;
 }

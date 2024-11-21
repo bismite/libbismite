@@ -221,11 +221,26 @@ __attribute__((unused)) static void print_info(BiContext *context)
   printf("SDL_GL_GetDrawableSize: %d,%d\n",dw,dh);
 }
 
+static void on_window_size_changed(BiContext* context)
+{
+  int pw,ph;
+  SDL_GetWindowSizeInPixels(context->_window,&pw,&ph);
+  int w,h;
+  SDL_GetWindowSize(context->_window,&w,&h);
+  printf("on_window_size_changed: %d,%d %d,%d\n",w,h, pw,ph);
+  context->w = w;
+  context->h = h;
+  context->default_framebuffer.w = w;
+  context->default_framebuffer.h = h;
+}
+
 __attribute__((unused)) static BiContext* make_context(const char* name)
 {
   srand( bi_get_now() );
-  BiContext* context = bi_init_context(ALLOC(BiContext),W,H,0,true,name);
+  uint32_t flags = BI_WINDOW_ALLOW_HIGHDPI | BI_WINDOW_RESIZABLE;
+  BiContext* context = bi_init_context(ALLOC(BiContext),W,H,0,flags,name);
   print_info(context);
+  context->window_event_callback[SDL_WINDOWEVENT_SIZE_CHANGED] = on_window_size_changed;
   add_fps_layer(context);
   return context;
 }

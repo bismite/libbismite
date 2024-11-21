@@ -17,6 +17,11 @@ typedef struct _BiContext BiContext;
 typedef void (*mainloop_end_callback)(BiContext*);
 typedef void (*window_event_callback)(BiContext*);
 
+typedef enum BiWindowFlags {
+  BI_WINDOW_ALLOW_HIGHDPI = 1,
+  BI_WINDOW_RESIZABLE
+} BiWindowFlags;
+
 struct _BiContext {
   bool running;
 
@@ -59,7 +64,7 @@ struct _BiContext {
 
 typedef void (*InitializeFunction)(BiContext*);
 
-extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, bool highdpi, const char* title );
+extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, uint32_t flags, const char* title );
 extern void bi_set_title(BiContext* context,const char* title);
 extern bool is_high_dpi(BiContext* context);
 

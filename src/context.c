@@ -11,7 +11,7 @@ extern const char *SHADER_DEFAULT_VERT;
 extern const char *SHADER_DEFAULT_FRAG;
 extern void enable_gl_extensions();
 
-BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi, const char* title)
+BiContext* bi_init_context(BiContext* context,int w,int h,int fps, uint32_t flags, const char* title)
 {
   context->debug = false;
   context->running = false;
@@ -46,10 +46,10 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 #endif
 
-  Uint32 flag = SDL_WINDOW_OPENGL;
-  if(highdpi == true) { flag = flag | SDL_WINDOW_ALLOW_HIGHDPI; }
-  context->_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flag);
-
+  uint32_t sdl_flags = SDL_WINDOW_OPENGL;
+  if(flags & BI_WINDOW_ALLOW_HIGHDPI)  sdl_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+  if(flags & BI_WINDOW_RESIZABLE)  sdl_flags |= SDL_WINDOW_RESIZABLE;
+  context->_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, sdl_flags);
   context->_glcontext = SDL_GL_CreateContext(context->_window);
   if(context->_glcontext==NULL){
     printf("SDL_GL_CreateContext failed: %s\n",SDL_GetError());

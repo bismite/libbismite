@@ -172,6 +172,8 @@ static void print_version(const char* name,const SDL_version *v)
   printf("%s : %u.%u.%u\n", name, v->major, v->minor, v->patch);
 }
 
+#define print_gl_parameter(name) { GLint v; glGetIntegerv(name, &v); printf( #name "=%d\n",v ); }
+
 __attribute__((unused)) static void print_info(BiContext *context)
 {
   printf("bismite version: %d.%d.%d\n", BISMITE_MAJOR_VERSION, BISMITE_MINOR_VERSION, BISMITE_PATCHLEVEL);
@@ -203,22 +205,20 @@ __attribute__((unused)) static void print_info(BiContext *context)
   printf("OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
   printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-  GLint max_texture_size;
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
-  printf("GL_MAX_TEXTURE_SIZE: %d\n",max_texture_size);
+  print_gl_parameter(GL_MAX_TEXTURE_SIZE);
+  print_gl_parameter(GL_MAX_TEXTURE_IMAGE_UNITS);
+  print_gl_parameter(GL_MAX_COLOR_ATTACHMENTS);
+  print_gl_parameter(GL_MAX_DRAW_BUFFERS);
 
-  GLint max_texture_image_units;
-  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_image_units);
-  printf("GL_MAX_TEXTURE_IMAGE_UNITS: %d\n",max_texture_image_units);
-
-  // Determine Framebuffer Size
+  // Determine Default Framebuffer Size
   printf("HIGH DPI: %s\n", is_high_dpi(context) ? "YES" : "NO");
-  int pw,ph;
-  SDL_GetWindowSizeInPixels(context->_window,&pw,&ph);
-  printf("SDL_GetWindowSizeInPixels: %d,%d\n",pw,ph);
-  int dw,dh;
-  SDL_GL_GetDrawableSize(context->_window,&dw,&dh);
-  printf("SDL_GL_GetDrawableSize: %d,%d\n",dw,dh);
+  int w,h;
+  SDL_GetWindowSize(context->_window,&w,&h);
+  printf("SDL_GetWindowSize: %d,%d\n",w,h);
+  SDL_GetWindowSizeInPixels(context->_window,&w,&h);
+  printf("SDL_GetWindowSizeInPixels: %d,%d\n",w,h);
+  // SDL_GL_GetDrawableSize(context->_window,&w,&h);
+  // printf("SDL_GL_GetDrawableSize: %d,%d\n",w,h);
 }
 
 static void on_window_size_changed(BiContext* context)

@@ -80,6 +80,9 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
 
   // Set Target Framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+  GLenum list[8];
+  for(int i=0;i<fb->texture_num;i++){ list[i] = GL_COLOR_ATTACHMENT0+i; }
+  glDrawBuffers(fb->texture_num,list);
   // Set Viewport
   int viewport_w = fb->w;
   int viewport_h = fb->h;

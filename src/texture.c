@@ -112,9 +112,14 @@ BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filenam
 
 BiTexture* bi_texture_init_with_framebuffer(BiTexture* texture, BiFramebuffer* framebuffer)
 {
-  texture->texture_id = framebuffer->texture_id;
-  texture->w = framebuffer->w;
-  texture->h = framebuffer->h;
+  return bi_texture_init_with_texture_id(texture,framebuffer->w,framebuffer->h,framebuffer->texture_ids[0]);
+}
+
+BiTexture* bi_texture_init_with_texture_id(BiTexture* texture, int w, int h, GLuint texture_id)
+{
+  texture->texture_id = texture_id;
+  texture->w = w;
+  texture->h = h;
   texture->texture_unit = 0;
   return texture;
 }

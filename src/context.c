@@ -65,7 +65,8 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, uint32_t flag
 
   // Default Framebuffer
   context->default_framebuffer.framebuffer_id = 0;
-  context->default_framebuffer.texture_id = 0;
+  context->default_framebuffer.texture_ids[0] = 0;
+  context->default_framebuffer.texture_num = 1;
   context->default_framebuffer.w = w;
   context->default_framebuffer.h = h;
   bi_node_init(&context->default_framebuffer_node);

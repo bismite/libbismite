@@ -85,8 +85,9 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, bool highdpi,
   glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 
-  // mainloop_end_callback
+  // callback
   context->on_mainloop_end = NULL;
+  for(int i=0;i<32;i++) context->window_event_callback[i] = NULL;
 
   return context;
 }

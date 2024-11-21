@@ -14,7 +14,8 @@
 
 typedef struct _BiContext BiContext;
 
-typedef void (*on_mainloop_end_callback)(BiContext*);
+typedef void (*mainloop_end_callback)(BiContext*);
+typedef void (*window_event_callback)(BiContext*);
 
 struct _BiContext {
   bool running;
@@ -49,7 +50,8 @@ struct _BiContext {
   SDL_GLContext *_glcontext;
 
   // callback
-  on_mainloop_end_callback on_mainloop_end;
+  mainloop_end_callback on_mainloop_end;
+  window_event_callback window_event_callback[32];
 
   //
   void* userdata;

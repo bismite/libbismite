@@ -125,6 +125,13 @@ static void main_loop( void* arg )
   SDL_Event e[PUMP_EVENT_MAX];
   SDL_PumpEvents();
   int event_size = SDL_PeepEvents(e,PUMP_EVENT_MAX,SDL_GETEVENT,SDL_FIRSTEVENT,SDL_LASTEVENT);
+  // Window Event
+  for(int i=0;i<event_size;i++) {
+    if(e[i].type == SDL_WINDOWEVENT ){
+      window_event_callback cb = context->window_event_callback[e[i].window.event];
+      if(cb) cb(context);
+    }
+  }
   // timer
   for(int i=context->timer_queue.size-1;i>=0;i--){
     BiNodeBase *n = context->timer_queue.objects[i];

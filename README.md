@@ -2,6 +2,10 @@
 
 # Change Log
 ## 12.0.0
+- removed BiLayerGroup and BiCanvas
+- BiLayer is renamed to BiShaderNode
+- BiNode has BiFramebuffer
+- samples updated.
 ## 11.0.0 - 2024/11/03
 - Update: `node.c` and `shader.c` have been updated. Cropped textures are handled in shaders.
   - new function: `bi_node_set_texture_mapping` in `node.c`.

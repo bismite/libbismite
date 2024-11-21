@@ -2,8 +2,8 @@
 
 int main(int argc, char* argv[])
 {
-  BiContext* context = bi_init_context(ALLOC(BiContext), 480, 320, 0, true, __FILE__);
-  print_info(context);
+  BiContext* context = make_context(__FILE__);
+
   // Background
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
   BiNode *root = bi_node_add_node(shader_node,make_bg("assets/check.png"));

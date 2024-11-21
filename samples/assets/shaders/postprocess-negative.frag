@@ -49,8 +49,8 @@ void main()
   vec2 xy = gl_FragCoord.xy / scale;
   vec4 c = getTextureColor(_texture_index, uv, crop);
   vec2 orbit = vec2(
-    (ORBIT_R * sin(time) + resolution.x * 0.5),
-    (ORBIT_R * cos(time) + resolution.y * 0.5)
+    (ORBIT_R * sin(time) + 480.0 * 0.5),
+    (ORBIT_R * cos(time) + 320.0 * 0.5)
   );
   if( distance(xy,orbit) < BALL_SIZE ) {
     color = vec4( 1.0-c.r, 1.0-c.g, 1.0-c.b, 1.0 );

@@ -44,7 +44,7 @@ vec4 getTextureColor(int index,vec2 xy,vec4 crop) {
 vec4 blur(int i, vec2 direction,float power)
 {
   vec4 c = vec4(0.0);
-  vec2 s = direction/resolution;
+  vec2 s = direction / vec2(480.0,320.0);
   float d = power / 110.0;
   for(float q=1.0; q<=10.0; q+=1.0) {
     c += getTextureColor(i, uv + s*q, crop ) * d*(11.0-q);

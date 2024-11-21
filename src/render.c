@@ -92,8 +92,8 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   glUseProgram(shader->program_id);
   // uniforms
   double time = (c->program_start_at - c->frame_start_at)/1000.0;
-  float scale = (float)viewport_h / c->h;
-  bi_shader_set_uniforms(shader,time,c->w,c->h,scale,snode->shader_extra_data);
+  float scale = (float)viewport_h / fb->h;
+  bi_shader_set_uniforms(shader,time,fb->w,fb->h,scale,snode->shader_extra_data);
   // Activate Textures
   for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);

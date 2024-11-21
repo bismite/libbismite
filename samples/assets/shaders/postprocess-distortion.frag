@@ -48,13 +48,12 @@ vec4 getTextureColor(int index,vec2 xy,vec4 crop) {
 void main()
 {
   vec2 xy = gl_FragCoord.xy / scale;
-
   vec2 orbit = vec2(
-    ORBIT_R * cos(time) + resolution.x * 0.5,
-    ORBIT_R * sin(time) + resolution.y * 0.5
+    ORBIT_R * cos(time) + 480.0 * 0.5,
+    ORBIT_R * sin(time) + 320.0 * 0.5
   );
   if( distance(xy,orbit) < BALL_SIZE ) {
-    float offset = cos(uv.x * 10.0 + time*5.0) * AMPLITUDE / resolution.y;
+    float offset = cos(uv.x * 10.0 + time*5.0) * AMPLITUDE / 320.0;
     color = getTextureColor(0, vec2(uv.x,uv.y+offset), crop );
   } else {
     color = getTextureColor(0, uv, crop);

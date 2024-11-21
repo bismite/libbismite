@@ -34,7 +34,7 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 vec4 get_color(int i, vec2 d)
 {
   vec2 xy = gl_FragCoord.xy / scale + d;
-  vec2 uv = vec2(xy.x / resolution.x, xy.y / resolution.y );
+  vec2 uv = vec2(xy.x / 480.0, xy.y / 320.0 );
   return getTextureColor(i, uv);
 }
 

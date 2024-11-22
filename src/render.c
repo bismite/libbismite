@@ -47,7 +47,6 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
 
 static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* snode)
 {
-  BiContext *c = rc.bi_context;
   // invalid parent
   BiNode* parent = bi_node_p(snode->parent);
   if( parent == NULL || parent->framebuffer == NULL) {
@@ -87,14 +86,15 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   int viewport_w = fb->w;
   int viewport_h = fb->h;
   if(fb->framebuffer_id==0){ // Scaling High DPI
-    SDL_GetWindowSizeInPixels(c->_window,&viewport_w,&viewport_h);
+    viewport_w = rc.real_window_w;
+    viewport_h = rc.real_window_h;
   }
   glViewport(0,0,viewport_w,viewport_h);
   // shader select
-  BiShader* shader = snode->shader ? snode->shader : &rc.bi_context->default_shader;
+  BiShader* shader = snode->shader ? snode->shader : rc.default_shader;
   glUseProgram(shader->program_id);
   // uniforms
-  double time = (c->program_start_at - c->frame_start_at)/1000.0;
+  double time = rc.time/1000.0;
   float scale = (float)viewport_h / fb->h;
   bi_shader_set_uniforms(shader,time,fb->w,fb->h,scale,snode->shader_extra_data);
   // Activate Textures
@@ -126,20 +126,26 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   array_clear(&rendering_queue);
 }
 
-BiRenderingContext* bi_rendering_context_init(BiRenderingContext* context,
-                                              BiContext* bi_context,
+BiRenderingContext* bi_rendering_context_init(BiRenderingContext* rendering_context,
                                               bool visible,
                                               bool interaction_enabled,
                                               double time_scale,
+                                              int64_t time,
+                                              int real_window_w,
+                                              int real_window_h,
+                                              BiShader* default_shader,
                                               Array* interaction_queue,
                                               Array* timer_queue )
 {
-  context->visible = visible;
-  context->interaction_enabled = interaction_enabled;
-  context->time_scale = time_scale;
-  context->interaction_queue = interaction_queue;
-  context->timer_queue = timer_queue;
-  context->_rendering_queue = NULL;
-  context->bi_context = bi_context;
-  return context;
+  rendering_context->visible = visible;
+  rendering_context->interaction_enabled = interaction_enabled;
+  rendering_context->time_scale = time_scale;
+  rendering_context->time = time;
+  rendering_context->real_window_w = real_window_w;
+  rendering_context->real_window_h = real_window_h;
+  rendering_context->default_shader = default_shader;
+  rendering_context->interaction_queue = interaction_queue;
+  rendering_context->timer_queue = timer_queue;
+  rendering_context->_rendering_queue = NULL;
+  return rendering_context;
 }

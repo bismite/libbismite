@@ -175,9 +175,14 @@ static void main_loop( void* arg )
   bi_framebuffer_clear(&context->default_framebuffer,0,0,0,0);
   context->profile.matrix_updated = 0;
   context->profile.rendering_nodes_queue_size = 0;
+  int64_t time = (context->program_start_at - context->frame_start_at);
+  int real_w,real_h;
+  SDL_GetWindowSizeInPixels(context->_window,&real_w,&real_h);
   BiRenderingContext rendering_context;
-  bi_rendering_context_init(&rendering_context, context,
-                            true,true,1.0,
+  bi_rendering_context_init(&rendering_context,
+                            true,true,1.0,time,
+                            real_w,real_h,
+                            &context->default_shader,
                             &context->interaction_queue,
                             &context->timer_queue );
   bi_render_node(rendering_context, &context->default_framebuffer_node );

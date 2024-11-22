@@ -122,8 +122,11 @@ const char* bi_default_fragment_shader()
 void bi_draw_framebuffer_node(BiContext* context, BiNode* n)
 {
   BiRenderingContext rendering_context;
+  int64_t time = (context->program_start_at - context->frame_start_at);
+  int real_w,real_h;
+  SDL_GetWindowSizeInPixels(context->_window,&real_w,&real_h);
   // NULL interaction_queue and timer_queue
-  bi_rendering_context_init(&rendering_context,context,true,true,1.0, NULL, NULL );
+  bi_rendering_context_init(&rendering_context,true,true,1.0,time,real_w,real_h,&context->default_shader,NULL,NULL);
   Array rendering_queue;
   array_init(&rendering_queue);
   rendering_context._rendering_queue = &rendering_queue;

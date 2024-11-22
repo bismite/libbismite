@@ -5,6 +5,8 @@
 - removed BiLayerGroup and BiCanvas
 - BiLayer is renamed to BiShaderNode
 - BiNode has BiFramebuffer
+- Multiple Render Targets are now supported.
+  - BiFramebuffer has multiple textures (MAX 8).
 - samples updated.
 ## 11.0.0 - 2024/11/03
 - Update: `node.c` and `shader.c` have been updated. Cropped textures are handled in shaders.

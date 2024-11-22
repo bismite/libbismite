@@ -38,6 +38,7 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+PFNGLDRAWBUFFERSPROC glDrawBuffers;
 // GL_VERSION_3_0
 PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
@@ -92,6 +93,7 @@ void enable_gl_extensions()
   GLP(glGetAttribLocation);
   GLP(glEnableVertexAttribArray);
   GLP(glVertexAttribPointer);
+  GLP(glDrawBuffers);
   // GL_VERSION_3_0
   GLP(glBlitFramebuffer);
   GLP(glGenVertexArrays);

@@ -1,7 +1,7 @@
 # libbismite
 
 # Change Log
-## 12.0.0
+## 12.0.1 - 2024/11/22
 - removed BiLayerGroup and BiCanvas
 - BiLayer is renamed to BiShaderNode
 - BiNode has BiFramebuffer

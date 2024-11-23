@@ -152,9 +152,14 @@ void bi_texture_save_png_image(BiTexture* texture,const char *filename)
   const int w = texture->w;
   const int h = texture->h;
   uint8_t* pixels = malloc(w*h*4);
-  glBindTexture(GL_TEXTURE_2D,texture->texture_id);
-  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-  glBindTexture(GL_TEXTURE_2D,0);
+  GLuint fb;
+  // !!!: glGetTexImage unavailable in WebGL
+  glGenFramebuffers(1, &fb);
+  glBindFramebuffer(GL_FRAMEBUFFER, fb);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->texture_id, 0);
+  glReadPixels(0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
+  glDeleteFramebuffers(1,&fb);
   bi_image_rgba32_flip_vertical(w,h,pixels);
   bi_image_rgba32_save(w,h,pixels,filename);
   free(pixels);

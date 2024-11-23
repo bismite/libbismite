@@ -40,6 +40,9 @@ int main(int argc, char* argv[])
                                               canvas->framebuffer->texture_ids[i] );
     bi_node_set_texture(sprites[i],texs[i],0,0,texs[i]->w,texs[i]->h);
   }
+  // save
+  bi_texture_save_png_image(texs[0],"mrt0.png");
+  bi_texture_save_png_image(texs[1],"mrt1.png");
 
   // Main Layer
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));

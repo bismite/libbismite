@@ -22,5 +22,6 @@ extern BiTexture* bi_texture_init_with_framebuffer(BiTexture*, BiFramebuffer*);
 extern BiTexture* bi_texture_init_with_texture_id(BiTexture*, int w, int h, GLuint texture_id);
 extern void bi_texture_set_anti_alias(BiTexture* texture,bool anti_alias);
 extern void bi_texture_delete(BiTexture* texture);
+extern void bi_texture_save_png_image(BiTexture* texture,const char *filename);
 
 #endif

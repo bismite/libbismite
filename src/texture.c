@@ -3,6 +3,7 @@
 #include <bi/bi_sdl.h>
 #include <bi/logger.h>
 #include <bi/framebuffer.h>
+#include <bi/image.h>
 
 extern GLuint bi_texture_convert_to_premultiplied_alpha(GLuint texture_id,GLint tex_format,int w,int h);
 
@@ -144,4 +145,17 @@ void bi_texture_delete(BiTexture* texture)
   texture->w = 0;
   texture->h = 0;
   texture->_texture_unit = 0;
+}
+
+void bi_texture_save_png_image(BiTexture* texture,const char *filename)
+{
+  const int w = texture->w;
+  const int h = texture->h;
+  uint8_t* pixels = malloc(w*h*4);
+  glBindTexture(GL_TEXTURE_2D,texture->texture_id);
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  glBindTexture(GL_TEXTURE_2D,0);
+  bi_image_rgba32_flip_vertical(w,h,pixels);
+  bi_image_rgba32_save(w,h,pixels,filename);
+  free(pixels);
 }

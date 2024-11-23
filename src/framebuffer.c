@@ -1,6 +1,6 @@
 #include <bi/framebuffer.h>
 #include <bi/node.h>
-#include <bi/bi_sdl.h>
+#include <bi/image.h>
 
 BiFramebuffer* bi_framebuffer_init(BiFramebuffer *fb,int w,int h)
 {
@@ -34,14 +34,12 @@ void bi_framebuffer_save_png_image(BiFramebuffer *fb,const char *filename)
 {
   const int w = fb->w;
   const int h = fb->h;
-  const int pitch = 4*w;
-  uint8_t* pixels = malloc(pitch*h);
+  uint8_t* pixels = malloc(w*h*4);
   glBindFramebuffer(GL_FRAMEBUFFER,fb->framebuffer_id);
   glReadPixels(0,0,fb->w,fb->h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
   glBindFramebuffer(GL_FRAMEBUFFER,0);
-  SDL_Surface* s = SDL_CreateRGBSurfaceWithFormatFrom(pixels,w,h,32,pitch,SDL_PIXELFORMAT_RGBA32);
-  IMG_SavePNG(s,filename);
-  SDL_FreeSurface(s);
+  bi_image_rgba32_flip_vertical(w,h,pixels);
+  bi_image_rgba32_save(w,h,pixels,filename);
   free(pixels);
 }
 

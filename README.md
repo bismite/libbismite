@@ -1,7 +1,7 @@
 # libbismite
 
 # Change Log
-## 12.1.0 - 2024/11/24
+## 12.1.1 - 2024/11/24
 - add : bi_texture_save_png_image(), bi_image_rgba32_flip_vertical(), bi_image_rgba32_save()
 - change: bi_texture_save_png_image() and bi_framebuffer_save_png_image() flip vertical.
 ## 12.0.1 - 2024/11/22

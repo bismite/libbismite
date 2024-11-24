@@ -91,7 +91,7 @@ static BiTexture* load_texture_from_image(BiTexture* texture, SDL_RWops* rwops, 
   return texture;
 }
 
-BiTexture* bi_texture_init_with_file(BiTexture* texture, void* buffer, size_t size, bool straight_alpha)
+BiTexture* bi_texture_init_with_file(BiTexture* texture, void* buffer, int size, bool straight_alpha)
 {
   SDL_RWops *rw = SDL_RWFromMem(buffer,size);
   if(rw==NULL) {
@@ -109,11 +109,6 @@ BiTexture* bi_texture_init_with_filename(BiTexture* texture, const char* filenam
     return NULL;
   }
   return load_texture_from_image( texture, rw, straight_alpha );
-}
-
-BiTexture* bi_texture_init_with_framebuffer(BiTexture* texture, BiFramebuffer* framebuffer)
-{
-  return bi_texture_init_with_texture_id(texture,framebuffer->w,framebuffer->h,framebuffer->texture_ids[0]);
 }
 
 BiTexture* bi_texture_init_with_texture_id(BiTexture* texture, int w, int h, GLuint texture_id)

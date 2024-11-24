@@ -1,4 +1,6 @@
 #include <bi/node.h>
+#include <bi/framebuffer.h>
+#include <bi/texture.h>
 #include "matrix/matrix.h"
 #include <stdlib.h>
 #include <string.h>

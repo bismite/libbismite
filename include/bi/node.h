@@ -5,13 +5,14 @@
 #include <bi/node_base.h>
 #include <bi/timer.h>
 #include <bi/bi_gl.h>
-#include <bi/texture.h>
 #include <bi/util.h>
 #include <bi/array.h>
 #include <bi/color.h>
 
 typedef struct _BiContext BiContext;
 typedef struct _BiNode BiNode;
+typedef struct _BiTexture BiTexture;
+typedef struct _BiFramebuffer BiFramebuffer;
 
 typedef bool (*on_click_callback)(BiContext*, BiNode*, int, int, int, bool); // x,y,button,pressed
 typedef bool (*on_move_cursor_callback)(BiContext*, BiNode*, int, int); // x, y

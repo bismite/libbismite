@@ -1,6 +1,10 @@
 # libbismite
 
 # Change Log
+## 12.2.0 - 2024/11/25
+- BiFramebuffer has BiTextures (max 8).
+- remove bi_texture_init_with_framebuffer().
+- remove bi_framebuffer_save_png_image().
 ## 12.1.1 - 2024/11/24
 - add : bi_texture_save_png_image(), bi_image_rgba32_flip_vertical(), bi_image_rgba32_save()
 - change: bi_texture_save_png_image() and bi_framebuffer_save_png_image() flip vertical.

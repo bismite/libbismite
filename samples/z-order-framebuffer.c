@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   BiNode* fbnode = bi_node_init(ALLOC(BiNode));
   fbnode->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),W,H);
   fbnode->texture_flip_vertical = true;
-  BiTexture* fbtex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),fbnode->framebuffer);
+  BiTexture* fbtex = &fbnode->framebuffer->textures[0];
   bi_node_set_texture(fbnode,fbtex,0,0,fbtex->w,fbtex->h);
   bi_node_set_size(fbnode,W,H);
   // 1. Mushroom

@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
   BiNode* canvas = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(canvas,W,H);
   canvas->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),W,H);
-  BiTexture* tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture), canvas->framebuffer);
+  BiTexture* tex = &canvas->framebuffer->textures[0];
   bi_node_set_texture(canvas,tex,0,0,tex->w,tex->h);
   canvas->texture_flip_vertical = true;
   // Main Shader
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     BiNode* fbnode = bi_node_init(ALLOC(BiNode));
     fbnode->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),W,H);
     fbnode->texture_flip_vertical = true;
-    BiTexture* tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture), fbnode->framebuffer);
+    BiTexture* tex = &fbnode->framebuffer->textures[0];
     bi_node_set_texture(fbnode,tex,0,0,tex->w,tex->h);
     bi_node_set_size(fbnode,W,H);
     bi_node_add_node(fbnode,snode);

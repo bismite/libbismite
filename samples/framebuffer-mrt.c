@@ -29,20 +29,17 @@ int main(int argc, char* argv[])
 
   // 2 Texture from 1 Canvas
   BiNode* sprites[2];
-  BiTexture* texs[2];
   for(int i=0;i<2;i++){
     sprites[i] = bi_node_init(ALLOC(BiNode));
     bi_node_set_size(sprites[i], canvas->w,canvas->h);
     bi_node_set_position(sprites[i], 10+i*220,10);
     sprites[i]->texture_flip_vertical = true; // UPSIDE DOWN
-    texs[i] = bi_texture_init_with_texture_id(ALLOC(BiTexture),
-                                              canvas->framebuffer->w, canvas->framebuffer->h,
-                                              canvas->framebuffer->texture_ids[i] );
-    bi_node_set_texture(sprites[i],texs[i],0,0,texs[i]->w,texs[i]->h);
+    BiTexture *t = &canvas->framebuffer->textures[i];
+    bi_node_set_texture(sprites[i],t,0,0,t->w,t->h);
   }
   // save
-  bi_texture_save_png_image(texs[0],"mrt0.png");
-  bi_texture_save_png_image(texs[1],"mrt1.png");
+  bi_texture_save_png_image(&canvas->framebuffer->textures[0],"mrt0.png");
+  bi_texture_save_png_image(&canvas->framebuffer->textures[1],"mrt1.png");
 
   // Main Layer
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
@@ -50,8 +47,8 @@ int main(int argc, char* argv[])
   bi_node_add_node(shader_node, sprites[0]);
   bi_node_add_node(shader_node, sprites[1]);
   shader_node->textures[0] = bi_node_get_texture(background);
-  shader_node->textures[1] = texs[0];
-  shader_node->textures[2] = texs[1];
+  shader_node->textures[1] = &canvas->framebuffer->textures[0];
+  shader_node->textures[2] = &canvas->framebuffer->textures[1];
   bi_node_add_node(&context->default_framebuffer_node,shader_node);
 
   // start

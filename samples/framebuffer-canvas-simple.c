@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   bi_node_set_size(canvas_sprite, canvas->w,canvas->h);
   bi_node_set_position(canvas_sprite, 10,10);
   canvas_sprite->texture_flip_vertical = true; // UPSIDE DOWN
-  BiTexture *canvas_tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),canvas->framebuffer);
+  BiTexture *canvas_tex = &canvas->framebuffer->textures[0];
   bi_node_set_texture(canvas_sprite,canvas_tex,0,0,canvas_tex->w,canvas_tex->h);
 
   // Main Layer

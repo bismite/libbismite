@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   fbnode = bi_node_init(ALLOC(BiNode));
   fbnode->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),context->w,context->h);
   fbnode->texture_flip_vertical = true;
-  BiTexture* fbtex = bi_texture_init_with_framebuffer(ALLOC(BiTexture),fbnode->framebuffer);
+  BiTexture* fbtex = &fbnode->framebuffer->textures[0];
   shader_a->textures[2] = fbtex;
   bi_node_set_texture(fbnode,fbtex,0,0,fbtex->w,fbtex->h);
   bi_node_set_size(fbnode,context->w,context->h);

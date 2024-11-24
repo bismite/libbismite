@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
   BiNode* main = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(main,W,H);
   main->framebuffer = bi_framebuffer_init(ALLOC(BiFramebuffer),W,H);
-  BiTexture* tex = bi_texture_init_with_framebuffer(ALLOC(BiTexture), main->framebuffer);
+  BiTexture* tex = &main->framebuffer->textures[0];
   bi_node_set_texture(main,tex,0,0,tex->w,tex->h);
   main->texture_flip_vertical = true;
   // Main Shader

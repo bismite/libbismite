@@ -16,6 +16,7 @@ in vec2 _node_size;
 in mat4 _node_extra_data;
 uniform float time;
 uniform vec2 resolution;
+uniform vec2 viewport_size;
 uniform mat4 shader_extra_data;
 uniform sampler2D sampler[16];
 out vec4 color;

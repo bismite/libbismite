@@ -8,7 +8,7 @@ in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform float scale;
+uniform vec2 viewport_size;
 uniform mat4 shader_extra_data;
 out vec4 color;
 
@@ -46,7 +46,7 @@ vec4 getTextureColor(int index,vec2 xy,vec4 crop) {
 
 void main()
 {
-  vec2 xy = gl_FragCoord.xy / scale;;
+  vec2 xy = gl_FragCoord.xy;
   if( mod(xy.x,GRID) <= SIZE && mod(xy.y,GRID) <= SIZE ) {
     vec4 c = getTextureColor(_texture_index, uv, crop);
     color = vec4(_tint.rgb + c.rgb*(1.0-_tint.a), c.a * _modulate.a );

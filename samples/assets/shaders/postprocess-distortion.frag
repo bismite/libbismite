@@ -8,7 +8,7 @@ in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform float scale;
+uniform vec2 viewport_size;
 uniform mat4 shader_extra_data;
 out vec4 color;
 
@@ -47,6 +47,8 @@ vec4 getTextureColor(int index,vec2 xy,vec4 crop) {
 
 void main()
 {
+  // support High-DPI
+  float scale = viewport_size.x / resolution.x;
   vec2 xy = gl_FragCoord.xy / scale;
   vec2 orbit = vec2(
     ORBIT_R * cos(time) + 480.0 * 0.5,

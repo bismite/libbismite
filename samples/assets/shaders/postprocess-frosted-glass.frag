@@ -7,7 +7,7 @@ in mat4 _node_extra_data;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform float scale;
+uniform vec2 viewport_size;
 uniform mat4 shader_extra_data;
 out vec4 color;
 
@@ -33,6 +33,8 @@ vec4 getTextureColor(int samplerID,vec2 xy) {
 
 vec4 get_color(int i, vec2 d)
 {
+  // Support High-DPI
+  float scale = viewport_size.x / resolution.x;
   vec2 xy = gl_FragCoord.xy / scale + d;
   vec2 uv = vec2(xy.x / 480.0, xy.y / 320.0 );
   return getTextureColor(i, uv);
@@ -52,9 +54,8 @@ vec4 blur(int i, float r)
 
 void main()
 {
-  vec2 xy = gl_FragCoord.xy / scale;
-  vec4 c = getTextureColor(1, uv);
-  float power = c[0];
+  vec4 mask_color = getTextureColor(1, uv);
+  float power = mask_color[0];
   if(power>0.0){
     color = blur(0, power * 8.0);
   }else{

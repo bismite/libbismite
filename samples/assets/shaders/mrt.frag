@@ -8,7 +8,6 @@ in vec4 _modulate;
 uniform sampler2D sampler[16];
 uniform float time;
 uniform vec2 resolution;
-uniform float scale;
 uniform mat4 shader_extra_data;
 
 layout (location = 0) out vec4 color0;

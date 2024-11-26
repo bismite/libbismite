@@ -281,6 +281,5 @@ void bi_node_set_texture_mapping(BiNode* n, BiTexture* t,
 
 void bi_node_unset_texture(BiNode* n)
 {
-  n->draw_matrix_cached = false;
   n->_texture = NULL;
 }

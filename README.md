@@ -5,6 +5,9 @@
 - BiFramebuffer has BiTextures (max 8).
 - remove bi_texture_init_with_framebuffer().
 - remove bi_framebuffer_save_png_image().
+- bi_texture_save_png_image() can choose flip_vertical.
+- shader receives viewport_size uniform, remove scale uniform.
+- main_loop.c : default framebuffer viewport update when SDL_WINDOWEVENT_RESIZED.
 ## 12.1.1 - 2024/11/24
 - add : bi_texture_save_png_image(), bi_image_rgba32_flip_vertical(), bi_image_rgba32_save()
 - change: bi_texture_save_png_image() and bi_framebuffer_save_png_image() flip vertical.

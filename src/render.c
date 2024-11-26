@@ -13,12 +13,12 @@ static inline void bi_render_shader_node(BiRenderingContext, BiShaderNode*);
 void bi_render_node(BiRenderingContext rc, BiNode* n)
 {
   // inherit
-  rc.interaction_enabled = rc.interaction_enabled && n->interaction_enabled;
-  n->timers.scale = rc.time_scale * n->time_scale;
-  n->_final_visibility = n->visible && rc.visible;;
-  rc.visible = n->_final_visibility;
+  rc._interaction_enabled = rc._interaction_enabled && n->interaction_enabled;
+  n->timers.scale = rc._time_scale * n->time_scale;
+  n->_final_visibility = n->visible && rc._visible;;
+  rc._visible = n->_final_visibility;
   // Queueing
-  if( rc.interaction_queue && rc.interaction_enabled && bi_node_is_event_handler_available(n) ) {
+  if( rc.interaction_queue && rc._interaction_enabled && bi_node_is_event_handler_available(n) ) {
     array_add_object(rc.interaction_queue, n);
   }
   if( rc.timer_queue && n->timers.size > 0 ) {
@@ -54,7 +54,7 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   }
   BiFramebuffer *fb = parent->framebuffer;
   // Queueing Timer
-  rc.time_scale *= snode->time_scale;
+  rc._time_scale *= snode->time_scale;
   if( rc.timer_queue && snode->timers.size > 0 ) {
     array_add_object(rc.timer_queue, snode);
   }
@@ -85,20 +85,13 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
     glDrawBuffers(fb->texture_num,list);
   }
   // Set Viewport
-  int viewport_w = fb->w;
-  int viewport_h = fb->h;
-  if(fb->framebuffer_id==0){ // Scaling High DPI
-    viewport_w = rc.real_window_w;
-    viewport_h = rc.real_window_h;
-  }
-  glViewport(0,0,viewport_w,viewport_h);
+  glViewport(0,0,fb->viewport_w,fb->viewport_h);
   // shader select
   BiShader* shader = snode->shader ? snode->shader : rc.default_shader;
   glUseProgram(shader->program_id);
   // uniforms
   double time = rc.time/1000.0;
-  float scale = (float)viewport_h / fb->h;
-  bi_shader_set_uniforms(shader,time,fb->w,fb->h,scale,snode->shader_extra_data);
+  bi_shader_set_uniforms(shader,time,fb,snode);
   // Activate Textures
   for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
     glActiveTexture(GL_TEXTURE0+i);
@@ -129,22 +122,15 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
 }
 
 BiRenderingContext* bi_rendering_context_init(BiRenderingContext* rendering_context,
-                                              bool visible,
-                                              bool interaction_enabled,
-                                              double time_scale,
                                               int64_t time,
-                                              int real_window_w,
-                                              int real_window_h,
                                               BiShader* default_shader,
                                               Array* interaction_queue,
                                               Array* timer_queue )
 {
-  rendering_context->visible = visible;
-  rendering_context->interaction_enabled = interaction_enabled;
-  rendering_context->time_scale = time_scale;
+  rendering_context->_visible = true;
+  rendering_context->_interaction_enabled = true;
+  rendering_context->_time_scale = 1.0;
   rendering_context->time = time;
-  rendering_context->real_window_w = real_window_w;
-  rendering_context->real_window_h = real_window_h;
   rendering_context->default_shader = default_shader;
   rendering_context->interaction_queue = interaction_queue;
   rendering_context->timer_queue = timer_queue;

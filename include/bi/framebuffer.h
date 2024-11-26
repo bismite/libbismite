@@ -14,6 +14,8 @@ struct _BiFramebuffer {
   int texture_num;
   int w;
   int h;
+  int viewport_w;
+  int viewport_h;
 };
 
 extern BiFramebuffer* bi_framebuffer_init_with_texture_num(BiFramebuffer *fb,int w,int h,int texture_num);
@@ -21,6 +23,5 @@ static inline BiFramebuffer* bi_framebuffer_init(BiFramebuffer *fb,int w,int h) 
   return bi_framebuffer_init_with_texture_num(fb,w,h,1);
 }
 extern void bi_framebuffer_clear(BiFramebuffer *fb,uint8_t r,uint8_t g,uint8_t b,uint8_t a);
-extern void bi_framebuffer_save_png_image(BiFramebuffer *fb,const char *filename);
 
 #endif

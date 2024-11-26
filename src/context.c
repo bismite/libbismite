@@ -68,6 +68,9 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, uint32_t flag
   context->default_framebuffer.texture_num = 0;
   context->default_framebuffer.w = w;
   context->default_framebuffer.h = h;
+  SDL_GetWindowSizeInPixels(context->_window,
+    &context->default_framebuffer.viewport_w,
+    &context->default_framebuffer.viewport_h );
   bi_node_init(&context->default_framebuffer_node);
   context->default_framebuffer_node.framebuffer = &context->default_framebuffer;
 
@@ -122,10 +125,8 @@ void bi_draw_framebuffer_node(BiContext* context, BiNode* n)
 {
   BiRenderingContext rendering_context;
   int64_t time = (context->program_start_at - context->frame_start_at);
-  int real_w,real_h;
-  SDL_GetWindowSizeInPixels(context->_window,&real_w,&real_h);
   // NULL interaction_queue and timer_queue
-  bi_rendering_context_init(&rendering_context,true,true,1.0,time,real_w,real_h,&context->default_shader,NULL,NULL);
+  bi_rendering_context_init(&rendering_context,time,&context->default_shader,NULL,NULL);
   Array rendering_queue;
   array_init(&rendering_queue);
   rendering_context._rendering_queue = &rendering_queue;

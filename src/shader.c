@@ -6,6 +6,8 @@
 #include <bi/bi_sdl.h>
 #include <bi/texture.h>
 #include <bi/node.h>
+#include <bi/shader_node.h>
+#include <bi/framebuffer.h>
 #include "matrix/matrix.h"
 
 static void print_shader_log(GLuint shader_id)
@@ -78,11 +80,12 @@ static void load_shader(BiShader* shader,const char* vertex_shader_source, const
   shader->attribute.node_size = glGetAttribLocation(program_id, "node_size");
   shader->attribute.transform = glGetAttribLocation(program_id, "transform");
   shader->attribute.node_extra_data = glGetAttribLocation(program_id, "node_extra_data");
-  // Uniform
+  // Uniform Locations
   shader->uniform.camera = glGetUniformLocation(program_id, "camera");
   shader->uniform.texture = glGetUniformLocation(program_id, "sampler[0]");
   shader->uniform.time = glGetUniformLocation(program_id, "time");
   shader->uniform.resolution = glGetUniformLocation(program_id, "resolution");
+  shader->uniform.viewport_size = glGetUniformLocation(program_id, "viewport_size");
   shader->uniform.scale = glGetUniformLocation(program_id, "scale");
   shader->uniform.shader_extra_data = glGetUniformLocation(program_id, "shader_extra_data");
   glUseProgram(0);
@@ -160,12 +163,12 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
   glBindVertexArray(0); // unbind vao
 }
 
-void bi_shader_set_uniforms(BiShader* shader,double time,int w,int h,float scale,float extra_data[16])
+void bi_shader_set_uniforms(BiShader* shader,double time,BiFramebuffer* fb,BiShaderNode* snode)
 {
   glUniform1f( shader->uniform.time, time);
-  glUniform2f( shader->uniform.resolution, w, h );
-  glUniform1f( shader->uniform.scale, scale );
-  glUniformMatrix4fv(shader->uniform.shader_extra_data, 1, GL_FALSE, extra_data );
+  glUniform2f( shader->uniform.resolution, fb->w,fb->h );
+  glUniform2f( shader->uniform.viewport_size, fb->viewport_w,fb->viewport_h );
+  glUniformMatrix4fv(shader->uniform.shader_extra_data, 1, GL_FALSE, snode->shader_extra_data );
 }
 
 static inline void update_vbo(GLuint buffer,size_t len, const void *data)

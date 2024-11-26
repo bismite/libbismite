@@ -142,7 +142,7 @@ void bi_texture_delete(BiTexture* texture)
   texture->_texture_unit = 0;
 }
 
-void bi_texture_save_png_image(BiTexture* texture,const char *filename)
+void bi_texture_save_png_image(BiTexture* texture,const char *filename,bool flip_vertical)
 {
   const int w = texture->w;
   const int h = texture->h;
@@ -155,7 +155,7 @@ void bi_texture_save_png_image(BiTexture* texture,const char *filename)
   glReadPixels(0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
   glBindFramebuffer(GL_FRAMEBUFFER,0);
   glDeleteFramebuffers(1,&fb);
-  bi_image_rgba32_flip_vertical(w,h,pixels);
+  if(flip_vertical) bi_image_rgba32_flip_vertical(w,h,pixels);
   bi_image_rgba32_save(w,h,pixels,filename);
   free(pixels);
 }

@@ -6,6 +6,8 @@ BiFramebuffer* bi_framebuffer_init_with_texture_num(BiFramebuffer *fb,int w,int 
 {
   fb->w = w;
   fb->h = h;
+  fb->viewport_w = w;
+  fb->viewport_h = h;
   fb->texture_num = texture_num;
   glGenFramebuffers(1, &fb->framebuffer_id);
   glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
@@ -26,19 +28,6 @@ BiFramebuffer* bi_framebuffer_init_with_texture_num(BiFramebuffer *fb,int w,int 
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind
   return fb;
-}
-
-void bi_framebuffer_save_png_image(BiFramebuffer *fb,const char *filename)
-{
-  const int w = fb->w;
-  const int h = fb->h;
-  uint8_t* pixels = malloc(w*h*4);
-  glBindFramebuffer(GL_FRAMEBUFFER,fb->framebuffer_id);
-  glReadPixels(0,0,fb->w,fb->h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
-  glBindFramebuffer(GL_FRAMEBUFFER,0);
-  bi_image_rgba32_flip_vertical(w,h,pixels);
-  bi_image_rgba32_save(w,h,pixels,filename);
-  free(pixels);
 }
 
 void bi_framebuffer_clear(BiFramebuffer *fb,uint8_t r,uint8_t g,uint8_t b,uint8_t a)

@@ -128,6 +128,12 @@ static void main_loop( void* arg )
   // Window Event
   for(int i=0;i<event_size;i++) {
     if(e[i].type == SDL_WINDOWEVENT ){
+      // Update Default Framebuffer Viewport
+      if(e[i].window.event == SDL_WINDOWEVENT_RESIZED){
+        SDL_GetWindowSizeInPixels(context->_window,
+          &context->default_framebuffer.viewport_w,
+          &context->default_framebuffer.viewport_h );
+      }
       window_event_callback cb = context->window_event_callback[e[i].window.event];
       if(cb) cb(context);
     }
@@ -179,9 +185,7 @@ static void main_loop( void* arg )
   int real_w,real_h;
   SDL_GetWindowSizeInPixels(context->_window,&real_w,&real_h);
   BiRenderingContext rendering_context;
-  bi_rendering_context_init(&rendering_context,
-                            true,true,1.0,time,
-                            real_w,real_h,
+  bi_rendering_context_init(&rendering_context, time,
                             &context->default_shader,
                             &context->interaction_queue,
                             &context->timer_queue );

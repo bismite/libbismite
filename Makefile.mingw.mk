@@ -28,28 +28,18 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-mingw-samples.tgz
 # ----
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
-libs: $(OBJ_DIR) $(LIB_DIR) $(LIBSDL2) $(TARGET)
-samples: libs $(SAMPLE_DIR) $(SAMPLE_EXES) copy_assets copy_libs
+samples: $(TARGET) $(SAMPLE_DIR) $(SAMPLE_EXES) copy_assets copy_libs
 
-clean:
-	rm -rf $(BUILD_DIR)
-
-$(OBJ_DIR):
-	mkdir -p $@/ext
-
-$(LIB_DIR):
+$(BUILD_DIR):
 	mkdir -p $@
-
-$(SDL_TGZ):
-	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
-
+$(OBJ_DIR)/ext:
+	mkdir -p $@/ext
+$(SDL_TGZ): $(BUILD_DIR)
+	@echo $(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
 $(LIBSDL2): $(SDL_TGZ)
-	mkdir -p $(BUILD_DIR)
 	tar xf $(SDL_TGZ) -C $(BUILD_DIR)
-
-$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2)
+$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2) $(OBJ_DIR)/ext
 	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS)
-
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
 
@@ -57,18 +47,16 @@ $(TARGET): $(OBJECTS)
 
 $(SAMPLE_DIR):
 	mkdir -p $@
-
-$(SAMPLE_DIR)/%.exe: samples/%.c
+$(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET) $(SAMPLE_DIR)
 	$(CC) $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LIBS) $(SAMPLE_LDFLAGS)
-
 copy_assets:
 	cp -R samples/assets $(SAMPLE_DIR)
-copy_libs:
+copy_libs: $(TARGET)
 	cp -R $(BUILD_DIR)/bin/*.dll $(SAMPLE_DIR)
 
 # ----
 
-$(ARCHIVE):
+$(ARCHIVE): $(TARGET)
 	cp -R include $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/licenses
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
@@ -79,3 +67,13 @@ $(ARCHIVE_SAMPLES):
 	mkdir -p $(BUILD_DIR)/licenses
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE_SAMPLES) samples licenses
+
+clean:
+	rm -rf $(BUILD_DIR)/objs/*
+	rm -rf $(BUILD_DIR)/lib/*
+	rm -rf $(BUILD_DIR)/bin/*
+	rm -rf $(BUILD_DIR)/include/*
+	rm -rf $(BUILD_DIR)/samples/*
+	rm -rf $(BUILD_DIR)/licenses/*
+	rm -rf $(BUILD_DIR)/*.tgz
+	rm -f $(SDL_TGZ)

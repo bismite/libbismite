@@ -35,28 +35,18 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-emscripten-samples.tgz
 # ----
 
 all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
-lib: $(LIB_DIR) $(OBJ_DIR) $(TARGET)
-samples: lib $(SAMPLE_DIR) $(SAMPLE_EXES)
+samples: $(TARGET) $(SAMPLE_DIR) $(SAMPLE_EXES)
 
-clean:
-	rm -rf $(BUILD_DIR)
-
-$(LIB_DIR):
+$(BUILD_DIR):
 	mkdir -p $@
-
-$(OBJ_DIR):
+$(OBJ_DIR)/ext:
 	mkdir -p $@/ext
-
-$(SDL_TGZ):
-	$(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
-
+$(SDL_TGZ): $(BUILD_DIR)
+	@echo $(shell ./scripts/download.sh $(SDL_TGZ_URL) $(SDL_TGZ))
 $(LIBSDL2): $(SDL_TGZ)
-	mkdir -p $(BUILD_DIR)
 	tar xf $(SDL_TGZ) -C $(BUILD_DIR)
-
-$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2)
+$(OBJ_DIR)/%.o: src/%.c $(LIBSDL2) $(OBJ_DIR)/ext
 	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS)
-
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
 
@@ -64,8 +54,7 @@ $(TARGET): $(OBJECTS)
 
 $(SAMPLE_DIR):
 	mkdir -p $@
-
-$(SAMPLE_DIR)/%.html: samples/%.c $(TARGET)
+$(SAMPLE_DIR)/%.html: samples/%.c $(TARGET) $(SAMPLE_DIR)
 	$(CC) $< -o $@ $(SDL_STATIC_LIBS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS) -sMAX_WEBGL_VERSION=2
 
 # ----
@@ -80,3 +69,13 @@ $(ARCHIVE): $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 
 $(ARCHIVE_SAMPLES): $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE_SAMPLES) samples licenses
+
+clean:
+	rm -rf $(BUILD_DIR)/objs/*
+	rm -rf $(BUILD_DIR)/lib/*
+	rm -rf $(BUILD_DIR)/bin/*
+	rm -rf $(BUILD_DIR)/include/*
+	rm -rf $(BUILD_DIR)/samples/*
+	rm -rf $(BUILD_DIR)/licenses/*
+	rm -rf $(BUILD_DIR)/*.tgz
+	rm -f $(SDL_TGZ)

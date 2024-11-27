@@ -1,4 +1,5 @@
 #include "common.h"
+#include <math.h>
 
 static void collapse(BiContext* ctx,BiTimer* timer,double dt)
 {

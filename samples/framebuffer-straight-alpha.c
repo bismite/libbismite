@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   BiNode* canvas = draw_canvas(context);
   // Save Image
   // UPSIDE DOWN, Premultiplied-Alpha Texture are Darked.
-  bi_texture_save_png_image(&canvas->framebuffer->textures[0],"framebuffer-straight-alpha.png",true);
+  bi_texture_save_png(&canvas->framebuffer->textures[0],"framebuffer-straight-alpha.png",true);
 
   // Sprite from Canvas
   BiNode *canvas_sprite = bi_node_init(ALLOC(BiNode));

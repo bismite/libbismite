@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 
   // Canvas
   BiNode* canvas = draw_canvas(context);
-  bi_texture_save_png_image(&canvas->framebuffer->textures[0],"framebuffer-large.png",true);
+  bi_texture_save_png(&canvas->framebuffer->textures[0],"framebuffer-large.png",true);
   // Sprite from Canvas
   BiNode *canvas_sprite = bi_node_init(ALLOC(BiNode));
   bi_node_set_size(canvas_sprite, canvas->w,canvas->h);

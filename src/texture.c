@@ -7,10 +7,6 @@
 
 extern GLuint bi_texture_convert_to_premultiplied_alpha(GLuint texture_id,GLint tex_format,int w,int h);
 
-//
-// Texture
-//
-
 static GLuint create_texture_from_pixels(int w,int h,void*pixels,GLint tex_format,GLenum img_format)
 {
   GLuint texture_id;
@@ -142,7 +138,7 @@ void bi_texture_delete(BiTexture* texture)
   texture->_texture_unit = 0;
 }
 
-void bi_texture_save_png_image(BiTexture* texture,const char *filename,bool flip_vertical)
+void bi_texture_save_png(BiTexture* texture,const char *filename,bool flip_vertical)
 {
   const int w = texture->w;
   const int h = texture->h;
@@ -155,7 +151,13 @@ void bi_texture_save_png_image(BiTexture* texture,const char *filename,bool flip
   glReadPixels(0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
   glBindFramebuffer(GL_FRAMEBUFFER,0);
   glDeleteFramebuffers(1,&fb);
-  if(flip_vertical) bi_image_rgba32_flip_vertical(w,h,pixels);
-  bi_image_rgba32_save(w,h,pixels,filename);
+  if(flip_vertical) {
+    uint8_t* flipped = malloc(w*h*4);
+    bi_image_rgba32_flip_vertical(w,h,pixels,flipped);
+    bi_image_rgba32_save_png(w,h,flipped,filename);
+    free(flipped);
+  }else{
+    bi_image_rgba32_save_png(w,h,pixels,filename);
+  }
   free(pixels);
 }

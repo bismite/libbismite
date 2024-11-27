@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <bi/image.h>
@@ -20,8 +21,6 @@ void bi_image_rgba32_save_png(int w,int h,uint8_t* pixels, const char* filename)
     printf("SDL_CreateRGBSurfaceWithFormatFrom() failed.\n");
     const char* err = SDL_GetError();
     printf("Error: %s\n",err);
-  }else{
-    printf("SDL_Surface %d,%d\n",s->w,s->h);
   }
   IMG_SavePNG(s,filename);
   SDL_FreeSurface(s);

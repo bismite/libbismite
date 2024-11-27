@@ -1,6 +1,9 @@
 # libbismite
 
 # Change Log
+## 12.3.0 - 2024/11/28
+- texture.h : rename bi_texture_save_png_image() -> bi_texture_save_png()
+- src/image.c : fix image flip.
 ## 12.2.0 - 2024/11/25
 - BiFramebuffer has BiTextures (max 8).
 - remove bi_texture_init_with_framebuffer().

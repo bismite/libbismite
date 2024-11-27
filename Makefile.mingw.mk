@@ -27,7 +27,7 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-mingw-samples.tgz
 
 # ----
 
-all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
+all: $(ARCHIVE) $(ARCHIVE_SAMPLES)
 samples: $(TARGET) $(SAMPLE_DIR) $(SAMPLE_EXES) copy_assets copy_libs
 
 $(BUILD_DIR):
@@ -62,7 +62,7 @@ $(ARCHIVE): $(TARGET)
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE) bin lib include licenses
 
-$(ARCHIVE_SAMPLES):
+$(ARCHIVE_SAMPLES): samples
 	cp -R include $(BUILD_DIR)
 	mkdir -p $(BUILD_DIR)/licenses
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt

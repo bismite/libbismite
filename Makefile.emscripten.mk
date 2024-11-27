@@ -34,8 +34,8 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-emscripten-samples.tgz
 
 # ----
 
-all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
-samples: $(TARGET) $(SAMPLE_DIR) $(SAMPLE_EXES)
+all: $(ARCHIVE) $(ARCHIVE_SAMPLES)
+samples: $(TARGET) $(SAMPLE_EXES)
 
 $(BUILD_DIR):
 	mkdir -p $@
@@ -63,11 +63,11 @@ $(BUILD_DIR)/licenses/libbismite-LICENSE.txt:
 	mkdir -p $(BUILD_DIR)/licenses
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 
-$(ARCHIVE): $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
+$(ARCHIVE): $(BUILD_DIR)/licenses/libbismite-LICENSE.txt $(TARGET)
 	cp -R include $(BUILD_DIR)
 	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE) lib include licenses
 
-$(ARCHIVE_SAMPLES): $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
+$(ARCHIVE_SAMPLES): $(BUILD_DIR)/licenses/libbismite-LICENSE.txt samples
 	tar -cz -C $(BUILD_DIR) -f $(ARCHIVE_SAMPLES) samples licenses
 
 clean:

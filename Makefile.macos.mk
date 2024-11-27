@@ -26,7 +26,7 @@ ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-macos-samples.tgz
 
 # ----
 
-all: samples $(ARCHIVE) $(ARCHIVE_SAMPLES)
+all: $(ARCHIVE) $(ARCHIVE_SAMPLES)
 samples: $(TARGET) $(SAMPLE_DIR) copy_assets copy_libs $(SAMPLE_EXES)
 
 $(BUILD_DIR):
@@ -62,7 +62,7 @@ $(ARCHIVE): $(TARGET)
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 	tar -cz -C $(BUILD_DIR) -f $@ lib licenses include
 
-$(ARCHIVE_SAMPLES): $(SAMPLE_EXES)
+$(ARCHIVE_SAMPLES): samples
 	cp LICENSE.txt $(BUILD_DIR)/licenses/libbismite-LICENSE.txt
 	tar -cz -C $(BUILD_DIR) -f $@ samples licenses
 

@@ -115,6 +115,7 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   );
   // Draw
   bi_shader_draw(shader,&rendering_queue);
+  glFlush();
   // Unbind
   glBindFramebuffer(GL_FRAMEBUFFER,0);
   // Clean Queue

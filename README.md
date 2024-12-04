@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 12.3.1 - 2024/12/05
+- call glFlush() after framebuffer drawed.
 ## 12.3.0 - 2024/11/28
 - texture.h : rename bi_texture_save_png_image() -> bi_texture_save_png()
 - src/image.c : fix image flip.

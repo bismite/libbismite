@@ -51,7 +51,7 @@ int main(int argc,char* argv[])
   }
   // look around
   shader_camera_position(shader_node,0);
-  bi_shader_node_add_timer(shader_node,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,shader_node));
+  bi_node_add_timer(shader_node,bi_timer_init(ALLOC(BiTimer),lookaround,0,-1,shader_node));
   // start
   bi_start_run_loop(context);
   return 0;

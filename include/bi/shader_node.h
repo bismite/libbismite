@@ -1,5 +1,5 @@
-#ifndef __BISMITE_SHADER_NODE_H__
-#define __BISMITE_SHADER_NODE_H__
+#ifndef __BI_SHADER_NODE_H__
+#define __BI_SHADER_NODE_H__
 
 #include <stdbool.h>
 #include <bi/bi_gl.h>
@@ -7,7 +7,6 @@
 #include <bi/shader.h>
 
 typedef struct _BiTexture BiTexture;
-typedef struct _BiNode BiNode;
 typedef struct _BiShaderNode BiShaderNode;
 
 struct _BiShaderNode {
@@ -22,8 +21,4 @@ struct _BiShaderNode {
 
 extern BiShaderNode* bi_shader_node_init(BiShaderNode* shader_node);
 
-// Timer
-extern BiTimer* bi_shader_node_add_timer(BiShaderNode* shader_node,BiTimer* timer);
-extern BiTimer* bi_shader_node_remove_timer(BiShaderNode* shader_node,BiTimer* timer);
-
-#endif // __BISMITE_SHADER_NODE_H__
+#endif // __BI_SHADER_NODE_H__

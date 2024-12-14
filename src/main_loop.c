@@ -74,7 +74,7 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
 static void __run_timers__(BiContext* context,BiNodeBase* node,double delta_time)
 {
   BiTimers* timers = &node->timers;
-  delta_time *= timers->scale;
+  delta_time *= timers->_final_time_scale;
 
   for(int i=0;i<timers->size;i++){
     BiTimer* t = timers->timers[i];

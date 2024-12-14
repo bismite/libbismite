@@ -85,4 +85,12 @@ static inline void* bi_node_remove_from_parent(void* child) {
   return NULL;
 }
 
+// Timer
+static inline BiTimer* bi_node_add_timer(void* node,BiTimer* timer){
+  return bi_timers_add(&((BiNodeBase*)node)->timers,timer);
+}
+static inline BiTimer* bi_node_remove_timer(void* node,BiTimer* timer){
+  return bi_timers_remove(&((BiNodeBase*)node)->timers,timer);
+}
+
 #endif // __BI_NODE_BASE_H__

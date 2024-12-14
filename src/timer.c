@@ -43,7 +43,7 @@ void bi_timers_clear(BiTimers* timers)
   free(timers->timers);
   timers->timers=NULL;
   timers->size = 0;
-  timers->scale = 1.0;
+  timers->_final_time_scale = 1.0;
 }
 
 BiTimer* bi_timers_add(BiTimers* timers, BiTimer* timer)

@@ -135,10 +135,6 @@ extern void bi_node_set_texture_mapping(BiNode*, BiTexture*,
   GLfloat l1, GLfloat b1, GLfloat r1, GLfloat t1,
   GLfloat l2, GLfloat b2, GLfloat r2, GLfloat t2 );
 
-// Timer
-static inline BiTimer* bi_node_add_timer(BiNode* node,BiTimer* timer){ return bi_timers_add(&node->timers,timer); }
-static inline BiTimer* bi_node_remove_timer(BiNode* node,BiTimer* timer){ return bi_timers_remove(&node->timers,timer); }
-
 // event handler
 static inline void bi_node_set_on_click(BiNode* node, on_click_callback callback){node->on_click=callback;}
 static inline void bi_node_set_on_move_cursor(BiNode* node, on_move_cursor_callback callback){node->on_move_cursor=callback;}

@@ -1,5 +1,5 @@
-#ifndef __BISMITE_TIMER_H__
-#define __BISMITE_TIMER_H__
+#ifndef __BI_TIMER_H__
+#define __BI_TIMER_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -26,7 +26,7 @@ struct _BiTimer {
 typedef struct _BiTimers{
   int size;
   BiTimer **timers;
-  double scale;
+  double _final_time_scale;
 } BiTimers;
 
 extern BiTimer* bi_timer_init(BiTimer* timer,

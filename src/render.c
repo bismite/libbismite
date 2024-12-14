@@ -14,7 +14,7 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
 {
   // inherit
   rc._interaction_enabled = rc._interaction_enabled && n->interaction_enabled;
-  n->timers.scale = rc._time_scale * n->time_scale;
+  n->timers._final_time_scale = rc._time_scale * n->time_scale;
   n->_final_visibility = n->visible && rc._visible;;
   rc._visible = n->_final_visibility;
   // Queueing

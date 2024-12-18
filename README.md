@@ -1,6 +1,10 @@
 # libbismite
 
 # Change Log
+## 13.0.0 - 2024/12/18
+- remove bi_shader_node_add_timer() and bi_shader_node_remove_timer().
+- test : event-fault.c, event-mass-remove.c
+- node_base.c, main_loop.c, render.c : fix queue processing. (remove node from queue when removed from scene graph)
 ## 12.3.1 - 2024/12/05
 - call glFlush() after framebuffer drawed.
 ## 12.3.0 - 2024/11/28

@@ -16,6 +16,7 @@ struct _Array {
 void array_init(Array *a);
 void array_clear(Array* a);
 void* array_add_object(Array* a, void* object);
+int array_object_index(Array* a, void* object);
 static inline void* array_object_at(Array* a, int index){ return a->objects[index]; }
 void* array_remove_object_at(Array* a, int index);
 void* array_remove_object(Array* a, void* object);

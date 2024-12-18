@@ -21,13 +21,20 @@ SAMPLE_EXES = $(SAMPLE_SOURCES:samples/%.c=$(SAMPLE_DIR)/%.exe)
 SAMPLE_LDFLAGS =-L$(LIB_DIR) -lbismite -lSDL2 -lSDL2_image -lSDL2_mixer -lm -lGL '-Wl,-rpath=$$ORIGIN/lib'
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
+TEST_DIR=$(BUILD_DIR)/test
+TEST_SOURCES = $(wildcard test/*.c)
+TEST_EXES = $(TEST_SOURCES:test/%.c=$(TEST_DIR)/%.exe)
+TEST_LDFLAGS = $(SAMPLE_LDFLAGS)
+TEST_ASSETS = $(SAMPLE_ASSETS)
+
 ARCHIVE=$(BUILD_DIR)/libbismite-linux.tgz
 ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-linux-samples.tgz
 
 # ----
 
 all: $(ARCHIVE) $(ARCHIVE_SAMPLES)
-samples: $(TARGET) $(SAMPLE_DIR) $(SAMPLE_EXES) copy_assets copy_libs
+samples: copy_assets copy_libs $(SAMPLE_EXES)
+test: copy_test_assets copy_test_libs $(TEST_EXES)
 
 $(BUILD_DIR):
 	mkdir -p $@
@@ -42,17 +49,29 @@ $(OBJ_DIR)/%.o: src/%.c $(LIBSDL2) $(OBJ_DIR)/ext
 $(TARGET): $(OBJECTS)
 	$(AR) rcs $@ $^
 
-# ----
+# ---- Samples
 
-$(SAMPLE_DIR):
-	mkdir -p $@
-$(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET) $(SAMPLE_DIR)
+$(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET)
+	mkdir -p $(SAMPLE_DIR)
 	$(CC) $< -o $@ $(CFLAGS) $(SAMPLE_CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 copy_assets:
+	mkdir -p $(SAMPLE_DIR)
 	cp -R samples/assets $(SAMPLE_DIR)
 copy_libs: $(TARGET)
 	mkdir -p $(SAMPLE_DIR)/lib
 	cp build/linux/lib/*.so $(SAMPLE_DIR)/lib/
+
+# ---- Test
+
+$(TEST_DIR)/%.exe: test/%.c $(TARGET)
+	mkdir -p $(TEST_DIR)
+	$(CC) $< -o $@ $(CFLAGS) $(TEST_CFLAGS) $(INCLUDE_PATHS) $(TEST_LDFLAGS)
+copy_test_assets:
+	mkdir -p $(TEST_DIR)
+	cp -R samples/assets $(TEST_DIR)
+copy_test_libs: $(TARGET)
+	mkdir -p $(TEST_DIR)/lib
+	cp build/linux/lib/*.so $(TEST_DIR)/lib/
 
 # ----
 

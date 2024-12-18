@@ -19,10 +19,16 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
   rc._visible = n->_final_visibility;
   // Queueing
   if( rc.interaction_queue && rc._interaction_enabled && bi_node_is_event_handler_available(n) ) {
+    n->_interaction_queue = rc.interaction_queue;
     array_add_object(rc.interaction_queue, n);
+  }else{
+    n->_interaction_queue = NULL;
   }
   if( rc.timer_queue && n->timers.size > 0 ) {
+    n->_timer_queue = rc.timer_queue;
     array_add_object(rc.timer_queue, n);
+  }else{
+    n->_timer_queue = NULL;
   }
   if( rc._rendering_queue && n->_final_visibility && n->w!=0 && n->h!=0 ) { // skip invisible node
     array_add_object(rc._rendering_queue,n);
@@ -53,10 +59,15 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
     return;
   }
   BiFramebuffer *fb = parent->framebuffer;
+  // Interaction
+  snode->_interaction_queue = NULL;
   // Queueing Timer
   rc._time_scale *= snode->time_scale;
   if( rc.timer_queue && snode->timers.size > 0 ) {
+    snode->_timer_queue = rc.timer_queue;
     array_add_object(rc.timer_queue, snode);
+  }else{
+    snode->_timer_queue = NULL;
   }
   // New Queue
   Array rendering_queue;

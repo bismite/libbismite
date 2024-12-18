@@ -21,13 +21,20 @@ SAMPLE_EXES = $(SAMPLE_SOURCES:samples/%.c=$(SAMPLE_DIR)/%.exe)
 SAMPLE_LDFLAGS =-L$(LIB_DIR) -lSDL2 -lSDL2_image -lSDL2_mixer -framework OpenGL -lbismite
 SAMPLE_ASSETS = $(wildcard samples/assets/**/*)
 
+TEST_DIR=$(BUILD_DIR)/test
+TEST_SOURCES = $(wildcard test/*.c)
+TEST_EXES = $(TEST_SOURCES:test/%.c=$(TEST_DIR)/%.exe)
+TEST_LDFLAGS= $(SAMPLE_LDFLAGS)
+TEST_ASSETS = $(SAMPLE_ASSETS)
+
 ARCHIVE=$(BUILD_DIR)/libbismite-macos.tgz
 ARCHIVE_SAMPLES=$(BUILD_DIR)/libbismite-macos-samples.tgz
 
 # ----
 
-all: $(ARCHIVE) $(ARCHIVE_SAMPLES)
-samples: $(TARGET) $(SAMPLE_DIR) copy_assets copy_libs $(SAMPLE_EXES)
+all: $(ARCHIVE) $(ARCHIVE_SAMPLES) test
+samples: copy_assets copy_libs $(SAMPLE_EXES)
+test: copy_test_assets copy_test_libs $(TEST_EXES)
 
 $(BUILD_DIR):
 	mkdir -p $@
@@ -42,18 +49,31 @@ $(OBJ_DIR)/%.o: src/%.c $(LIBSDL2) $(OBJ_DIR)/ext
 $(TARGET): $(OBJECTS)
 	libtool -static -o $@ $^
 
-# ----
+# ---- Samples
 
-$(SAMPLE_DIR):
-	mkdir -p $@
-$(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET) $(SAMPLE_DIR)
+$(SAMPLE_DIR)/%.exe: samples/%.c $(TARGET)
+	mkdir -p $(SAMPLE_DIR)
 	$(CC) $< -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(SAMPLE_LDFLAGS)
 	install_name_tool -add_rpath @executable_path/lib $@
 copy_assets:
+	mkdir -p $(SAMPLE_DIR)
 	cp -R samples/assets $(SAMPLE_DIR)
 copy_libs: $(TARGET)
 	mkdir -p $(SAMPLE_DIR)/lib
 	cp -R $(BUILD_DIR)/lib/*.dylib $(SAMPLE_DIR)/lib
+
+# ---- Test
+
+$(TEST_DIR)/%.exe: test/%.c $(TARGET)
+	mkdir -p $(TEST_DIR)
+	$(CC) $< -o $@ -I include $(CFLAGS) $(INCLUDE_PATHS) $(TEST_LDFLAGS)
+	install_name_tool -add_rpath @executable_path/lib $@
+copy_test_assets:
+	mkdir -p $(TEST_DIR)
+	cp -R samples/assets $(TEST_DIR)
+copy_test_libs: $(TARGET)
+	mkdir -p $(TEST_DIR)/lib
+	cp -R $(BUILD_DIR)/lib/*.dylib $(TEST_DIR)/lib
 
 # ----
 
@@ -72,6 +92,7 @@ clean:
 	rm -rf $(BUILD_DIR)/bin/*
 	rm -rf $(BUILD_DIR)/include/*
 	rm -rf $(BUILD_DIR)/samples/*
+	rm -rf $(BUILD_DIR)/test/*
 	rm -rf $(BUILD_DIR)/licenses/*
 	rm -rf $(BUILD_DIR)/*.tgz
 	rm -f $(SDL_TGZ)

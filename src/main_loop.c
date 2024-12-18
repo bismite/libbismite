@@ -70,28 +70,8 @@ static bool node_event_handle(BiNode* n,BiContext* context,SDL_Event *e)
   return swallow;
 }
 
-
-static void __run_timers__(BiContext* context,BiNodeBase* node,double delta_time)
+static inline void timers_compact(BiTimers* timers)
 {
-  BiTimers* timers = &node->timers;
-  delta_time *= timers->_final_time_scale;
-
-  for(int i=0;i<timers->size;i++){
-    BiTimer* t = timers->timers[i];
-    // skip
-    if(t==NULL) continue;
-    if(t->state == BI_TIMER_STATE_PAUSED) continue;
-    if(t->count == 0) continue;
-    // check schedule
-    t->wait -= delta_time;
-    if(t->wait < 0) {
-      t->count -= 1;
-      t->wait = t->interval;
-      t->callback(context,t,delta_time);
-    }
-  }
-
-  // remove and resize
   int new_size = 0;
   for(int i=0;i<timers->size;i++){
     BiTimer *t = timers->timers[i];
@@ -103,6 +83,35 @@ static void __run_timers__(BiContext* context,BiNodeBase* node,double delta_time
   if( timers->size != new_size ){
     timers->size = new_size;
     timers->timers = realloc( timers->timers, sizeof(BiTimer*) * timers->size );
+  }
+}
+
+static inline void __run_timers__(BiContext* context,double delta_time)
+{
+  for(int i=context->timer_queue.size-1;i>=0;i--){
+    BiNodeBase *node = context->timer_queue.objects[i];
+    if( node == NULL ) continue;
+    BiTimers* timers = &node->timers;
+    double dt = delta_time * timers->_final_time_scale;
+    for(int j=0;j<timers->size;j++){
+      BiTimer* t = timers->timers[j];
+      // skip
+      if(t==NULL) continue; // timer removed
+      if(t->state == BI_TIMER_STATE_PAUSED) continue;
+      if(t->count == 0) continue;
+      // check schedule
+      t->wait -= dt;
+      if(t->wait < 0) {
+        t->count -= 1;
+        t->wait = t->interval;
+        t->callback(context,t,dt);
+      }
+      // node removed
+      if( context->timer_queue.objects[i] == NULL )
+        break;
+    }
+    // remove and resize
+    timers_compact(timers);
   }
 }
 
@@ -138,25 +147,19 @@ static void main_loop( void* arg )
       if(cb) cb(context);
     }
   }
-  // timer
-  for(int i=context->timer_queue.size-1;i>=0;i--){
-    BiNodeBase *n = context->timer_queue.objects[i];
-    if( n == NULL ) continue;
-    // Timer
-    __run_timers__(context,n,delta_time);
-  }
+  // Timer
+  __run_timers__(context,delta_time);
   // callback
-  for(int i=context->interaction_queue.size-1;i>=0;i--){
-    BiNodeBase *n = context->interaction_queue.objects[i];
-    if( n == NULL ) continue;
-    // Event Handler
-    BiNode* node = (BiNode*)n;
-    if( node->_final_visibility ) {
-      for(int i=0;i<event_size;i++) {
-        if(e[i].type == 0) continue;
+  for(int i=0;i<event_size;i++) {
+    for(int j=context->interaction_queue.size-1;j>=0;j--){
+      BiNodeBase *n = context->interaction_queue.objects[j];
+      if( n == NULL ) continue;
+      // Event Handler
+      BiNode* node = (BiNode*)n;
+      if( node->_final_visibility ) {
         bool swallow = node_event_handle(node,context,&e[i]);
         if(swallow) {
-          e[i].type = 0; // XXX: swallow
+          break;
         }
       }
     }

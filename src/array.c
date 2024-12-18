@@ -35,6 +35,18 @@ void* array_add_object(Array* a, void* object)
   return object;
 }
 
+int array_object_index(Array* a, void* object)
+{
+  int index = -1;
+  for(int i=0; i<a->size; i++){
+    if(a->objects[i] == object){
+      index = i;
+      break;
+    }
+  }
+  return index;
+}
+
 void* array_remove_object_at(Array* a, int index)
 {
   if(index<0) return NULL;
@@ -60,13 +72,7 @@ void* array_remove_object_at(Array* a, int index)
 void* array_remove_object(Array* a, void* object)
 {
   a->order_cached = false;
-  int index = -1;
-  for(int i=0; i<a->size; i++){
-    if(a->objects[i] == object){
-      index = i;
-      break;
-    }
-  }
+  int index = array_object_index(a,object);
   if(index<0){
     return NULL;
   }

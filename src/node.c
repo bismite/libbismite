@@ -283,3 +283,18 @@ void bi_node_unset_texture(BiNode* n)
 {
   n->_texture = NULL;
 }
+
+//
+bool bi_node_is_event_handler_available(BiNode* n)
+{
+  if(n->on_move_cursor != NULL ||
+     n->on_click != NULL ||
+     n->on_move_finger != NULL ||
+     n->on_keyinput != NULL ||
+     n->on_touch != NULL ||
+     n->on_textinput != NULL
+   ) {
+    return true;
+  }
+  return false;
+}

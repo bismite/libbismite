@@ -63,7 +63,7 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, uint32_t flag
   array_init(&context->interaction_queue);
   array_init(&context->timer_queue);
 
-  // Default Framebuffer
+  // Default Framebuffer Node
   context->default_framebuffer.framebuffer_id = 0;
   context->default_framebuffer.texture_num = 0;
   context->default_framebuffer.w = w;

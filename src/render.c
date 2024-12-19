@@ -51,6 +51,15 @@ void bi_render_node(BiRenderingContext rc, BiNode* n)
   }
 }
 
+static inline bool shader_node_has_texture(BiShaderNode* snode,BiTexture* tex)
+{
+  if(tex==NULL) return false;
+  for(int i=0;i<BI_SHADER_MAX_TEXTURES;i++) {
+    if( snode->textures[i] == tex ) return true;
+  }
+  return false;
+}
+
 static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* snode)
 {
   // invalid parent
@@ -91,8 +100,17 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   // Set Target Framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
   if(fb->texture_num>0){
+    // textures for output (exclude that read from shader)
     GLenum list[BI_FRAMEBUFFER_TEXTURE_MAX];
-    for(int i=0;i<fb->texture_num;i++){ list[i] = GL_COLOR_ATTACHMENT0+i; }
+    for(int i=0;i<fb->texture_num;i++){
+      if( shader_node_has_texture(snode,&fb->textures[i]) ){
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, 0, 0);
+        list[i] = GL_NONE;
+      }else{
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, fb->textures[i].texture_id, 0);
+        list[i] = GL_COLOR_ATTACHMENT0+i;
+      }
+    }
     glDrawBuffers(fb->texture_num,list);
   }
   // Set Viewport

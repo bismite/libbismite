@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 14.0.0 - 2024/12/20
+- Framebuffer textures exclude from drawing if they used in shader.
 ## 13.0.0 - 2024/12/18
 - remove bi_shader_node_add_timer() and bi_shader_node_remove_timer().
 - test : event-fault.c, event-mass-remove.c

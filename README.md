@@ -1,6 +1,8 @@
 # libbismite
 
 # Change Log
+## 15.0.0 - 2024/12/22
+- BiShader has output attribute for fragment shader output.
 ## 14.0.0 - 2024/12/20
 - Framebuffer textures exclude from drawing if they used in shader.
 ## 13.0.0 - 2024/12/18

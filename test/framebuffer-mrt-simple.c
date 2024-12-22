@@ -1,8 +1,7 @@
-#include "common.h"
+#include "../samples/common.h"
 
 int main(int argc, char* argv[])
 {
-  // BiContext* context = make_context(__FILE__);
   srand( bi_get_now() );
   uint32_t flags = BI_WINDOW_ALLOW_HIGHDPI | BI_WINDOW_RESIZABLE;
   BiContext* context = bi_init_context(ALLOC(BiContext),W,H,10,flags,__FILE__);

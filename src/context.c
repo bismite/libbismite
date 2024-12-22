@@ -5,6 +5,7 @@
 #include <bi/timer.h>
 #include <bi/shader_node.h>
 #include <bi/logger.h>
+#include <bi/image.h>
 #include <stdlib.h>
 
 extern const char *SHADER_DEFAULT_VERT;
@@ -125,4 +126,21 @@ void bi_draw_framebuffer_node(BiContext* context, BiNode* n)
   bi_render_node( rendering_context, n );
   // Clean Queue
   array_clear(&rendering_queue);
+}
+
+void bi_take_screenshot(BiContext* context, const char* filename)
+{
+  int w = context->default_framebuffer.viewport_w;
+  int h = context->default_framebuffer.viewport_h;
+  int pitch = w*4;
+  uint8_t* raw = malloc(4*w*h);
+  uint8_t* flipped = malloc(4*w*h);
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
+  glReadPixels(0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,raw);
+  bi_image_rgba32_flip_vertical(w,h,raw,flipped);
+  SDL_Surface* s = SDL_CreateRGBSurfaceWithFormatFrom(flipped,w,h,32,pitch,SDL_PIXELFORMAT_RGBA32);
+  IMG_SavePNG(s,filename);
+  SDL_FreeSurface(s);
+  free(raw);
+  free(flipped);
 }

@@ -67,12 +67,9 @@ typedef void (*InitializeFunction)(BiContext*);
 extern BiContext* bi_init_context(BiContext* context,int w, int h, int fps, uint32_t flags, const char* title );
 extern void bi_set_title(BiContext* context,const char* title);
 extern bool is_high_dpi(BiContext* context);
-
-//
 extern const char* bi_default_vertex_shader();
 extern const char* bi_default_fragment_shader();
-
-//
 extern void bi_draw_framebuffer_node(BiContext* context, BiNode* n);
+extern void bi_take_screenshot(BiContext* context, const char* filename);
 
 #endif

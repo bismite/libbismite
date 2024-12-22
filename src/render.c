@@ -86,10 +86,16 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
   // Queueing children nodes
   array_sort(&snode->children);
   for(int i=0;i<snode->children.size;i++){
-    BiNode* child  = bi_node_p(array_object_at(&snode->children,i));
-    // Clear Framebuffer
-    if(child->framebuffer) bi_framebuffer_clear(child->framebuffer,0,0,0,0);
-    bi_render_node(rc,child);
+    BiNodeBase* tmp = bi_node_child_at(snode,i);
+    if(tmp->class == BI_NODE) {
+      BiNode* child  = bi_node_p(tmp);
+      // Clear Framebuffer
+      if(child->framebuffer) bi_framebuffer_clear(child->framebuffer,0,0,0,0);
+      bi_render_node(rc,child);
+    }else{
+      // oops...
+      printf("bi_render_shader_node(): invalid child node\n");
+    }
   }
   rc._rendering_queue = original_queue;
   if(rendering_queue.size==0) {
@@ -99,11 +105,16 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
 
   // Set Target Framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, fb->framebuffer_id);
+  // Set Viewport
+  glViewport(0,0,fb->viewport_w,fb->viewport_h);
+  // shader select
+  BiShader* shader = snode->shader ? snode->shader : rc.default_shader;
+  // framebuffer and shader output
   if(fb->texture_num>0){
-    // textures for output (exclude that read from shader)
+    // framebuffer textures for output
     GLenum list[BI_FRAMEBUFFER_TEXTURE_MAX];
     for(int i=0;i<fb->texture_num;i++){
-      if( shader_node_has_texture(snode,&fb->textures[i]) ){
+      if( shader->output[i]==false ){
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, 0, 0);
         list[i] = GL_NONE;
       }else{
@@ -113,10 +124,6 @@ static inline void bi_render_shader_node(BiRenderingContext rc, BiShaderNode* sn
     }
     glDrawBuffers(fb->texture_num,list);
   }
-  // Set Viewport
-  glViewport(0,0,fb->viewport_w,fb->viewport_h);
-  // shader select
-  BiShader* shader = snode->shader ? snode->shader : rc.default_shader;
   glUseProgram(shader->program_id);
   // uniforms
   double time = rc.time/1000.0;

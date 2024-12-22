@@ -80,14 +80,6 @@ BiContext* bi_init_context(BiContext* context,int w,int h,int fps, uint32_t flag
   //
   bi_profile_init(&context->profile,fps,bi_get_now());
 
-  // default texture
-#ifdef __APPLE__
-  uint8_t pixels[4] = {0,0,0,0};
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-  glBindTexture(GL_TEXTURE_2D, 0);
-#endif
-
   // callback
   context->on_mainloop_end = NULL;
   for(int i=0;i<32;i++) context->window_event_callback[i] = NULL;

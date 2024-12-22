@@ -11,6 +11,8 @@ BiNode* draw_canvas(BiContext* context)
   // Shader : Multiple Render Targets
   BiShaderNode *shader_node = bi_shader_node_init(ALLOC(BiShaderNode));
   shader_node->shader =  create_shader_with_default_vertex_shader("assets/shaders/mrt.frag");
+  shader_node->shader->output[0] = true;
+  shader_node->shader->output[1] = true;
   bi_node_add_node(shader_node, face);
   shader_node->textures[0] = bi_node_get_texture(face);
   bi_node_add_node(canvas, shader_node);

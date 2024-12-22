@@ -123,6 +123,12 @@ void bi_shader_init(BiShader* shader,const char* vertex_shader_source, const cha
 {
   load_shader(shader,vertex_shader_source,fragment_shader_source);
 
+  //
+  for(int i=0;i<BI_FRAMEBUFFER_TEXTURE_MAX;i++){
+    shader->output[i] = false;
+  }
+  shader->output[0] = true;
+
   // set unit to sampler2D
   glUseProgram(shader->program_id);
   int texture_location_indexes[BI_SHADER_MAX_TEXTURES];

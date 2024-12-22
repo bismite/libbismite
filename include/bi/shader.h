@@ -3,6 +3,7 @@
 
 #include <bi/bi_gl.h>
 #include <bi/array.h>
+#include <bi/framebuffer.h>
 
 #define BI_SHADER_MAX_TEXTURES 16
 
@@ -13,6 +14,7 @@ typedef struct _BiShader BiShader;
 struct _BiShader {
   GLuint program_id;
   GLuint vao;
+  bool output[BI_FRAMEBUFFER_TEXTURE_MAX];
 
   struct {
     GLuint vertex;
